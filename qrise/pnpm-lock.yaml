@@ -38,9 +38,6 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.99.2
         version: 5.99.2(@tanstack/react-query@5.99.2(react@19.2.4))(react@19.2.4)
-      '@types/bcryptjs':
-        specifier: ^2.4.6
-        version: 2.4.6
       '@uploadthing/react':
         specifier: ^7.3.3
         version: 7.3.3(next@16.2.4(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)(uploadthing@7.7.4(express@5.2.1)(next@16.2.4(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tailwindcss@4.2.2))
@@ -128,6 +125,9 @@ importers:
       uploadthing:
         specifier: ^7.7.4
         version: 7.7.4(express@5.2.1)(next@16.2.4(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tailwindcss@4.2.2)
+      uuid:
+        specifier: ^10.0.0
+        version: 10.0.0
       xlsx:
         specifier: ^0.18.5
         version: 0.18.5
@@ -144,6 +144,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.2.2
+      '@types/bcryptjs':
+        specifier: ^2.4.6
+        version: 2.4.6
       '@types/highlight.js':
         specifier: ^10.1.0
         version: 10.1.0
