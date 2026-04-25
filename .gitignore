@@ -1,0 +1,113 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.lerna-debug.log*
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+dist-ssr/
+.cache/
+.parcel-cache/
+.vuepress/dist/
+.gridsome/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
+.coverage
+.nyc_output
+*.log
+*.seed
+*.pid
+*.gz
+
+# Package files
+*.tgz
+*.zip
+*.rar
+*.7z
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+ ehthumbs.db
+ Icon?
+ Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+.lcov*
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+jspm_packages
+
+# TypeScript v1 declaration files
+typings/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache
+.rts2_cache_cj
+.routes.viktor-cloud
+
+# Click-to-replay (https://github.com/alextsechikov/click-to-replay)
+node_replay_history
+
+# Yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp*
