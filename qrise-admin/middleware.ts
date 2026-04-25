@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import * as jose from "jose";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -17,7 +18,7 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
+          cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
           response = NextResponse.next({
@@ -32,8 +33,31 @@ export async function middleware(request: NextRequest) {
   );
 
   const {
-    data: { user },
+    data: { user: supabaseUser },
   } = await supabase.auth.getUser();
+
+  let user = supabaseUser;
+
+  if (!user) {
+    const adminToken = request.cookies.get('admin_session')?.value;
+    if (adminToken) {
+      try {
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+        const { payload } = await jose.jwtVerify(adminToken, secret);
+        if (payload.is_admin && payload.email === process.env.ADMIN_EMAIL) {
+          user = {
+            id: payload.id,
+            email: payload.email,
+            app_metadata: { is_admin: true },
+            user_metadata: { is_admin: true },
+            last_sign_in_at: new Date().toISOString()
+          } as any;
+        }
+      } catch (e) {
+        // Invalid token
+      }
+    }
+  }
 
   // 1. Allow public routes
   const publicRoutes = ["/login", "/api/auth/callback"];
@@ -51,15 +75,28 @@ export async function middleware(request: NextRequest) {
   // we check the user's JWT/metadata or a quick DB check.
   // The prompt says: verify is_admin = true + email in ADMIN_EMAIL_ALLOWLIST
   
-  const isAdmin = user.app_metadata?.is_admin || user.user_metadata?.is_admin;
+  const isAdminMetadata = user.app_metadata?.is_admin || user.user_metadata?.is_admin;
   const allowList = process.env.ADMIN_EMAIL_ALLOWLIST?.split(",") || [];
-  const isEmailAllowed = allowList.includes(user.email || "");
+  const isEmailAllowed = allowList.includes(user.email || "") || user.email === process.env.ADMIN_EMAIL;
 
-  // For a more robust check, we should query the users table since we have service role access.
-  // However, middleware should be fast. 
-  // If we want to strictly follow the prompt "verify is_admin = true", we might need a DB check 
-  // if it's not in the JWT.
-  
+  // If not in metadata, check the database users table
+  let isDbAdmin = false;
+  if (!isAdminMetadata) {
+    const { createClient: createAdminSupabase } = await import('@supabase/supabase-js');
+    const adminClient = createAdminSupabase(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    const { data: userProfile } = await adminClient
+      .from('users')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single();
+    isDbAdmin = !!userProfile?.is_admin;
+  }
+
+  const isAdmin = isAdminMetadata || isDbAdmin;
+
   if (!isAdmin || !isEmailAllowed) {
     return NextResponse.redirect(new URL("/login?error=unauthorized", request.url));
   }

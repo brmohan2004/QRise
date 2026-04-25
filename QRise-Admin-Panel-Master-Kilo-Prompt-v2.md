@@ -951,27 +951,86 @@ Note for main app team: Create `app/competitions/[slug]/page.tsx` in main SaaS:
 
 ---
 
-## PHASE 13 — Abuse Reports (unchanged from v1)
+---
 
-### Task 13.1–13.3: Reports queue, management, API routes
+## PHASE 13 — Abuse Reports
+
+### Task 13.1: `app/(admin)/reports/page.tsx` (max 100 lines)
+Reports queue with status filter (pending/reviewed/actioned/dismissed). Sort by newest first.
+
+### Task 13.2: Report management split into components:
+- `components/qr-codes/qr-suspend-dialog.tsx` — reuse from Phase 5
+- Reports table (max 150 lines): columns — QR name, owner, reported reason, reported at, status, reviewer, action taken, actions menu
+- Actions per report: View QR, Suspend QR, Dismiss Report, Mark Actioned
+
+### Task 13.3: `app/api/admin/reports/route.ts` + `[id]/route.ts` (max 150 lines)
+```
+GET /api/admin/reports?status=pending — filtered list
+PATCH /api/admin/reports/{id} — update status + action_taken
+```
+
+---
+---
+
+## PHASE 14 — Bulk Jobs Monitor
+
+### Task 14.1: `app/(admin)/bulk-jobs/page.tsx` (max 100 lines)
+Table of all bulk jobs across all users. Shows: user email, status, total rows, processed rows, progress bar, created at, duration.
+
+### Task 14.2: Stuck job recovery
+- Jobs in `processing` status for > 1 hour are highlighted in red
+- "Retry" button → PATCH `/api/admin/bulk-jobs/{id}/retry` → resets job to `queued`
+- "Cancel" button → sets status to `failed` with error_log entry
+
+---
+---
+
+## PHASE 15 — Features Quiz Management
+
+### Task 15.1: `app/(admin)/features-quiz/page.tsx` (max 100 lines)
+Manage the "Guess the upcoming feature" quiz from the public Features page.
+
+Split:
+- Table of quiz questions (max 150 lines): feature name, hint text, answer (hidden/shown), correct guesses count, status (active/revealed)
+- "Add feature" button → modal with: feature name, hint text, answer (stored as SHA-256 hash — admin sets it in plain text here, it's hashed before storing), blurred preview image upload, gift code
+- "Reveal feature" action → marks as active/visible on public site
 
 ---
 
-## PHASE 14 — Bulk Jobs Monitor (unchanged from v1)
-
-### Task 14.1–14.3: Bulk jobs table, retry, stuck job recovery
-
 ---
 
-## PHASE 15 — Features Quiz Management (unchanged from v1)
+## PHASE 16 — System Health
 
-### Task 15.1–15.3: Quiz table, form modal, stats integration
+### Task 16.1: `app/(admin)/system/page.tsx` (max 100 lines)
+System health overview page. Auto-refreshes every 30 seconds.
 
----
+### Task 16.2: Split into health components (each max 100 lines):
 
-## PHASE 16 — System Health (unchanged from v1)
+`components/system/db-stats.tsx`:
+- DB size (MB), table row counts for major tables, active connections count
+- Fetch from Supabase `pg_stat` queries via service role
 
-### Task 16.1–16.3: Health dashboard, service ping, DB stats
+`components/system/health-card.tsx`:
+- Per-service health indicator: Supabase DB (ping), Upstash Redis (ping), Resend (last email status), Cloudflare Worker (ping redirect endpoint)
+- Green/yellow/red status dots
+
+`components/system/job-queue-monitor.tsx`:
+- Count of bulk jobs by status (queued/processing/done/failed)
+- Count of webhook deliveries by status
+- Count of failed webhook retries
+- "Flush stuck jobs" button
+
+### Task 16.3: `app/api/admin/system/route.ts` (max 200 lines)
+```
+GET /api/admin/system/health
+  - Ping Supabase: SELECT 1
+  - Ping Upstash: redis.ping()
+  - Get DB size: SELECT pg_size_pretty(pg_database_size(current_database()))
+  - Get table row counts for: users, qr_codes, scan_events, bulk_jobs, form_submissions
+  - Get bulk job counts by status
+  - Get webhook delivery counts by status
+  - Return structured health report
+```
 
 ---
 
@@ -1027,7 +1086,7 @@ Reusable TanStack Table v8 wrapper with server-side pagination, sorting, row sel
 
 ## DEPLOYMENT CHECKLIST
 
-1. **Supabase:** Run all SQL migrations
+1. **Supabase:** Run all SQL migrations (runed aldready)
 2. **Seed:** Run `pnpm tsx scripts/seed-feature-flags.ts`
 3. **Seed:** Run `pnpm tsx scripts/seed-plans.ts`
 4. **Seed:** Run `pnpm tsx scripts/seed-admin.ts your@email.com`

@@ -40,7 +40,8 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://qrise.app"),
 };
 
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "sonner";
+import { BugReportButton } from "@/components/bug-report-button";
 
 export default function RootLayout({
   children,
@@ -56,6 +57,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         {children}
         <Toaster position="top-center" richColors />
+        <BugReportButton />
       </body>
     </html>
   );
