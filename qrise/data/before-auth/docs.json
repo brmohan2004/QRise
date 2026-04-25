@@ -1,0 +1,71 @@
+{
+  "navSections": [
+    {
+      "title": "Getting started",
+      "items": [
+        { "label": "Introduction", "href": "/docs/introduction" },
+        { "label": "Authentication", "href": "/docs/authentication" },
+        { "label": "Quickstart", "href": "/docs/quickstart" },
+        { "label": "Rate limits", "href": "/docs/rate-limits" },
+        { "label": "Errors", "href": "/docs/errors" }
+      ]
+    },
+    {
+      "title": "QR codes",
+      "items": [
+        { "label": "Overview", "href": "/docs/qr-codes" },
+        { "label": "Create QR", "href": "/docs/qr-codes/create", "method": "POST" },
+        { "label": "List QRs", "href": "/docs/qr-codes/list", "method": "GET" },
+        { "label": "Get QR", "href": "/docs/qr-codes/get", "method": "GET" },
+        { "label": "Update QR", "href": "/docs/qr-codes/update", "method": "PUT" },
+        { "label": "Delete QR", "href": "/docs/qr-codes/delete", "method": "DELETE" },
+        { "label": "Export QR image", "href": "/docs/qr-codes/export", "method": "GET" },
+        { "label": "Redirect history", "href": "/docs/qr-codes/history", "method": "GET" }
+      ]
+    },
+    {
+      "title": "Smart routing",
+      "items": [
+        { "label": "Overview", "href": "/docs/smart-routing" },
+        { "label": "Get rules", "href": "/docs/smart-routing/get-rules", "method": "GET" },
+        { "label": "Update rules", "href": "/docs/smart-routing/update-rules", "method": "PUT" }
+      ]
+    },
+    {
+      "title": "Analytics",
+      "items": [
+        { "label": "QR analytics", "href": "/docs/analytics", "method": "GET" }
+      ]
+    },
+    {
+      "title": "Bulk generation",
+      "items": [
+        { "label": "Overview", "href": "/docs/bulk" },
+        { "label": "Create job", "href": "/docs/bulk/create", "method": "POST" },
+        { "label": "Job status", "href": "/docs/bulk/status", "method": "GET" }
+      ]
+    },
+    {
+      "title": "Forms",
+      "items": [
+        { "label": "Overview", "href": "/docs/forms" },
+        { "label": "Create form", "href": "/docs/forms/create", "method": "POST" },
+        { "label": "Manage forms", "href": "/docs/forms/manage", "method": "GET" }
+      ]
+    },
+    {
+      "title": "Webhooks",
+      "items": [
+        { "label": "Overview", "href": "/docs/webhooks" },
+        { "label": "Create webhook", "href": "/docs/webhooks/create", "method": "POST" },
+        { "label": "Event reference", "href": "/docs/webhooks/events" }
+      ]
+    },
+    {
+      "title": "Reference",
+      "items": [
+        { "label": "Changelog", "href": "/docs/changelog" }
+      ]
+    }
+  ]
+}

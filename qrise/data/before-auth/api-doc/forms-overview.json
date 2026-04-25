@@ -1,0 +1,28 @@
+{
+  "title": "Forms",
+  "description": "Collect data from scanners using dynamic forms and webhooks.",
+  "breadcrumb": [{ "label": "Forms" }],
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "content": "QRise allows you to attach a lead capture form to any dynamic QR code. When a user scans the QR, they are presented with a form before being redirected to the target URL."
+    },
+    {
+      "id": "field-types",
+      "title": "Supported field types",
+      "items": [
+        "Email (validated)",
+        "Short text",
+        "Long text (paragraphs)",
+        "Select / Dropdown",
+        "Checkbox / Consent"
+      ]
+    },
+    {
+      "id": "integrations",
+      "title": "Data handling",
+      "content": "Form submissions can be retrieved via the API, exported to CSV, or sent in real-time to your CRM via webhooks."
+    }
+  ]
+}

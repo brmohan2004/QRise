@@ -1,0 +1,24 @@
+{
+  "title": "Analytics",
+  "description": "Track every scan with detailed insights while staying privacy-compliant.",
+  "breadcrumb": [{ "label": "Analytics" }],
+  "sections": [
+    {
+      "id": "privacy",
+      "title": "Privacy and compliance",
+      "content": "QRise is built with privacy-first principles. We use non-invasive fingerprinting to track unique scans without storing PII (Personally Identifiable Information). Our analytics are GDPR and CCPA compliant by default."
+    },
+    {
+      "id": "bot-filtering",
+      "title": "Bot filtering",
+      "content": "We automatically filter out scans from known bots, spiders, and search engine crawlers. This ensures your analytics represent real human engagement."
+    },
+    {
+      "id": "endpoints",
+      "title": "Endpoints",
+      "links": [
+        { "text": "GET /qr/:id/analytics — Get QR analytics", "href": "/docs/analytics" }
+      ]
+    }
+  ]
+}

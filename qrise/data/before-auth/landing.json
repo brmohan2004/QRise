@@ -1,0 +1,100 @@
+{
+  "features": [
+    {
+      "icon": "QrCode",
+      "name": "Dynamic QR",
+      "description": "Edit your destination URL anytime without reprinting"
+    },
+    {
+      "icon": "GitBranch",
+      "name": "Smart Routing",
+      "description": "Route scans by device, location, or time"
+    },
+    {
+      "icon": "BarChart3",
+      "name": "Deep Analytics",
+      "description": "Track every scan with detailed insights"
+    },
+    {
+      "icon": "Palette",
+      "name": "Design Studio",
+      "description": "Full branding control for your QR codes"
+    },
+    {
+      "icon": "FileText",
+      "name": "Form Builder",
+      "description": "Collect data with drag-and-drop forms"
+    },
+    {
+      "icon": "Layers",
+      "name": "Bulk Generator",
+      "description": "Create hundreds of QR codes from CSV"
+    }
+  ],
+  "companies": [
+    "Acme Corp",
+    "TechStart",
+    "Growth Lab",
+    "DataFlow",
+    "Quantum",
+    "Nexus"
+  ],
+  "comparison": [
+    { "feature": "Dynamic QR", "free": false, "basic": false, "qrise": true },
+    { "feature": "Analytics", "free": false, "basic": true, "qrise": true },
+    { "feature": "Design Studio", "free": false, "basic": false, "qrise": true },
+    { "feature": "Bulk Generate", "free": false, "basic": false, "qrise": true },
+    { "feature": "API Access", "free": false, "basic": false, "qrise": true },
+    { "feature": "Smart Routing", "free": false, "basic": false, "qrise": true }
+  ],
+  "reviews": [
+    {
+      "initials": "JD",
+      "name": "John D.",
+      "role": "Marketing Manager",
+      "company": "TechCorp",
+      "rating": 5,
+      "text": "QRise has transformed how we track our marketing campaigns. The analytics are incredible."
+    },
+    {
+      "initials": "SM",
+      "name": "Sarah M.",
+      "role": "Founder",
+      "company": "StartupXYZ",
+      "rating": 5,
+      "text": "The dynamic QR feature is a game changer. We never have to reprint materials again."
+    },
+    {
+      "initials": "RK",
+      "name": "Robert K.",
+      "role": "Operations",
+      "company": "RetailCo",
+      "rating": 5,
+      "text": "Bulk generation saved us hours of work. Created 500 QR codes in minutes."
+    },
+    {
+      "initials": "AL",
+      "name": "Amy L.",
+      "role": "Events Director",
+      "company": "EventPro",
+      "rating": 5,
+      "text": "The smart routing feature lets us send different content to different audiences seamlessly."
+    },
+    {
+      "initials": "MP",
+      "name": "Mike P.",
+      "role": "Developer",
+      "company": "DevShop",
+      "rating": 5,
+      "text": "Great API support. Integrated QR generation into our app in under an hour."
+    },
+    {
+      "initials": "EW",
+      "name": "Emma W.",
+      "role": "Brand Manager",
+      "company": "FashionHub",
+      "rating": 5,
+      "text": "The design studio is amazing. Our QR codes actually look good now!"
+    }
+  ]
+}

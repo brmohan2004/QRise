@@ -1,0 +1,104 @@
+{
+  "plans": [
+    {
+      "name": "Free",
+      "price": 0,
+      "description": "Perfect for getting started",
+      "features": [
+        "10 QR codes",
+        "1,000 scans/month",
+        "Basic analytics",
+        "Standard support"
+      ],
+      "cta": "Get Started",
+      "href": "/register",
+      "popular": false
+    },
+    {
+      "name": "Pro",
+      "price": 12,
+      "annualPrice": 9.6,
+      "description": "For growing businesses",
+      "features": [
+        "Unlimited QR codes",
+        "50,000 scans/month",
+        "Advanced analytics",
+        "Design Studio",
+        "Smart Routing",
+        "Priority support"
+      ],
+      "cta": "Start Pro Trial",
+      "href": "/register?plan=pro",
+      "popular": true
+    },
+    {
+      "name": "Business",
+      "price": 39,
+      "annualPrice": 31.2,
+      "description": "For larger teams",
+      "features": [
+        "Everything in Pro",
+        "Unlimited scans",
+        "Bulk Generator",
+        "API Access",
+        "Team workspaces",
+        "White label",
+        "Dedicated support"
+      ],
+      "cta": "Contact Sales",
+      "href": "/contact",
+      "popular": false
+    },
+    {
+      "name": "Enterprise",
+      "price": 99,
+      "annualPrice": 79.2,
+      "description": "For large organizations",
+      "features": [
+        "Everything in Business",
+        "Custom integrations",
+        "Dedicated support",
+        "SLA guarantee",
+        "Custom contracts"
+      ],
+      "cta": "Contact Sales",
+      "href": "/contact",
+      "popular": false
+    }
+  ],
+  "comparisonFeatures": [
+    { "feature": "QR Codes", "free": "10", "pro": "Unlimited", "business": "Unlimited", "enterprise": "Unlimited" },
+    { "feature": "Scans/month", "free": "1,000", "pro": "50,000", "business": "Unlimited", "enterprise": "Unlimited" },
+    { "feature": "Analytics", "free": "Basic", "pro": "Advanced", "business": "Advanced", "enterprise": "Advanced" },
+    { "feature": "Design Studio", "free": false, "pro": true, "business": true, "enterprise": true },
+    { "feature": "Smart Routing", "free": false, "pro": true, "business": true, "enterprise": true },
+    { "feature": "Bulk Generator", "free": false, "pro": false, "business": true, "enterprise": true },
+    { "feature": "API Access", "free": false, "pro": false, "business": true, "enterprise": true },
+    { "feature": "Team Workspaces", "free": false, "pro": false, "business": true, "enterprise": true },
+    { "feature": "White Label", "free": false, "pro": false, "business": true, "enterprise": true },
+    { "feature": "Custom Integrations", "free": false, "pro": false, "business": false, "enterprise": true },
+    { "feature": "SLA Guarantee", "free": false, "pro": false, "business": false, "enterprise": true }
+  ],
+  "faqs": [
+    {
+      "question": "Can I cancel anytime?",
+      "answer": "Yes, you can cancel your subscription at any time. You'll continue to have access until the end of your billing period."
+    },
+    {
+      "question": "What happens if I exceed my scan limit?",
+      "answer": "Your QR codes will continue to work, but analytics may be paused until the next billing cycle. You can upgrade anytime."
+    },
+    {
+      "question": "Do you offer refunds?",
+      "answer": "We offer a 14-day money-back guarantee for all paid plans. Contact support for assistance."
+    },
+    {
+      "question": "Can I upgrade or downgrade?",
+      "answer": "Yes, you can change your plan at any time. Changes take effect immediately and billing is prorated."
+    },
+    {
+      "question": "Is there a discount for annual billing?",
+      "answer": "Yes! Annual billing saves you 20% compared to monthly billing."
+    }
+  ]
+}

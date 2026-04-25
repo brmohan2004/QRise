@@ -1,0 +1,34 @@
+{
+  "title": "QR Codes",
+  "description": "Create and manage QR codes with different types and capabilities.",
+  "breadcrumb": [{ "label": "QR codes" }],
+  "sections": [
+    {
+      "id": "types",
+      "title": "QR code types",
+      "table": {
+        "headers": ["Type", "Dynamic", "Analytics", "Routing", "Password"],
+        "rows": [
+          ["URL", "Optional", "Optional", "—", "—"],
+          ["Smart Routing", "Always", "✓", "✓", "—"],
+          ["Password", "Always", "✓", "—", "✓"],
+          ["Multi Action", "Optional", "✓", "—", "—"],
+          ["Bulk", "Optional", "Optional", "—", "—"]
+        ]
+      }
+    },
+    {
+      "id": "endpoints",
+      "title": "Endpoints",
+      "links": [
+        { "text": "POST /qr — Create a QR code", "href": "/docs/qr-codes/create" },
+        { "text": "GET /qr — List QR codes", "href": "/docs/qr-codes/list" },
+        { "text": "GET /qr/:id — Get a QR code", "href": "/docs/qr-codes/get" },
+        { "text": "PUT /qr/:id — Update a QR code", "href": "/docs/qr-codes/update" },
+        { "text": "DELETE /qr/:id — Delete a QR code", "href": "/docs/qr-codes/delete" },
+        { "text": "GET /qr/:id/export — Export QR image", "href": "/docs/qr-codes/export" },
+        { "text": "GET /qr/:id/history — Redirect history", "href": "/docs/qr-codes/history" }
+      ]
+    }
+  ]
+}

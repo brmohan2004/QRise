@@ -1,0 +1,30 @@
+{
+  "title": "Smart Routing",
+  "description": "Smart Routing allows you to redirect users to different destinations based on their device, location, time, or language.",
+  "breadcrumb": [{ "label": "Smart routing" }],
+  "sections": [
+    {
+      "id": "how-it-works",
+      "title": "How it works",
+      "content": "When a user scans a Smart Routing QR code, QRise evaluates a list of rules from top to bottom. The first rule that matches the user's scan context (device, location, etc.) determines the destination. If no rules match, the user is sent to the default URL."
+    },
+    {
+      "id": "rules-hierarchy",
+      "title": "Rule evaluation",
+      "items": [
+        "Rules are evaluated in order of priority (lowest number first)",
+        "The first matching rule 'wins'",
+        "If multiple conditions exist in a rule, ALL must match (AND logic)",
+        "If no rule matches, the default destination is used"
+      ]
+    },
+    {
+      "id": "endpoints",
+      "title": "Endpoints",
+      "links": [
+        { "text": "GET /qr/:id/routing-rules — Get routing rules", "href": "/docs/smart-routing/get-rules" },
+        { "text": "PUT /qr/:id/routing-rules — Update routing rules", "href": "/docs/smart-routing/update-rules" }
+      ]
+    }
+  ]
+}

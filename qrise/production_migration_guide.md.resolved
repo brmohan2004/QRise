@@ -1,0 +1,33 @@
+# Production Migration Guide: Cloudinary Signed Uploads
+
+This document outlines how to move from current **Unsigned** testing to **Signed** production uploads.
+
+## Why Switch?
+Unsigned uploads allow anyone with your `cloud_name` and `upload_preset` to upload images to your Cloudinary account. Signed uploads require a server-side signature, ensuring only your application can upload.
+
+## Final Implementation Prompt
+Copy and paste this prompt when you are ready to transition:
+
+> "Please upgrade my Cloudinary implementation to **Signed Uploads**. 
+> 1. Create a server-side signature endpoint in `app/api/upload/sign/route.ts` using the `cloudinary` SDK and `CLOUDINARY_API_SECRET`.
+> 2. Update `lib/cloudinary-upload.ts` to request a timestamp and signature from that endpoint before performing the `fetch` to Cloudinary.
+> 3. Add `NEXT_PUBLIC_CLOUDINARY_API_KEY` to the upload payload.
+> 4. Ensure the CSP in `next.config.ts` handles the new flow."
+
+## Implementation Checklist
+
+### 1. Cloudinary Dashboard
+- [ ] Create a new **Signed** upload preset.
+- [ ] Set "Return delete token" to off (unless needed).
+- [ ] Restrict allowed formats to `png, jpg, svg, webp`.
+
+### 2. Environment Variables
+Add these to your production `.env`:
+- `CLOUDINARY_API_SECRET` (Keep this secret!)
+- `NEXT_PUBLIC_CLOUDINARY_API_KEY` (Publicly safe)
+- `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` (Set to your signed preset name)
+
+### 3. Files to Update
+- `lib/cloudinary-upload.ts`: Add signature fetching logic.
+- `app/api/upload/sign/route.ts`: New file for backend signing.
+- `next.config.ts`: Ensure `connect-src` and `img-src` are still valid.

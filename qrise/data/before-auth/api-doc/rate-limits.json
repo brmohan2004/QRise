@@ -1,0 +1,35 @@
+{
+  "title": "Rate Limits",
+  "description": "API rate limits ensure stability and fair usage for todos los usuarios.",
+  "breadcrumb": [{ "label": "Rate limits" }],
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "content": "QRise enforces rate limits on a per-API-key basis. If you exceed these limits, the API will respond with a 429 Too Many Requests error."
+    },
+    {
+      "id": "limits",
+      "title": "Limits by plan",
+      "table": {
+        "headers": ["Plan", "Requests per second", "Requests per month"],
+        "rows": [
+          ["Free", "2", "1,000"],
+          ["Pro", "10", "50,000"],
+          ["Business", "50", "Unlimited"],
+          ["Enterprise", "Custom", "Unlimited"]
+        ]
+      }
+    },
+    {
+      "id": "headers",
+      "title": "Rate limit headers",
+      "content": "Every response includes headers to help you track your usage:",
+      "items": [
+        "X-RateLimit-Limit: Total requests allowed per window",
+        "X-RateLimit-Remaining: Requests remaining in current window",
+        "X-RateLimit-Reset: Seconds until window resets"
+      ]
+    }
+  ]
+}

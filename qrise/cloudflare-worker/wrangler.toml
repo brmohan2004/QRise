@@ -1,0 +1,13 @@
+name = "qrise-redirect"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "QR_KV"
+id = "REPLACE_WITH_ACTUAL_KV_ID"
+preview_id = "REPLACE_WITH_PREVIEW_KV_ID"
+
+[vars]
+SUPABASE_URL = ""
+SUPABASE_SERVICE_KEY = ""
+APP_URL = ""
