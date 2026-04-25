@@ -18,10 +18,6 @@ const cspHeader = `
 `.replace(/\n/g, ' ').trim();
 
 const nextConfig: NextConfig = {
-  // Cloudflare Pages compatibility: 
-  // We specify the runtime as 'edge' for all routes that need server-side logic.
-  // Note: next-on-pages will handle the conversion.
-  
   async headers() {
     return [
       {
@@ -60,7 +56,6 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    unoptimized: true, // Cloudflare Pages doesn't support next/image optimization by default
     remotePatterns: [
       {
         protocol: 'https',
@@ -72,9 +67,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // 'sharp' is not compatible with Cloudflare Edge runtime.
-  // We remove it from external packages or ensure it's not used in Edge routes.
-  serverExternalPackages: ['bcryptjs', 'qrcode'], 
+  serverExternalPackages: ['bcryptjs', 'qrcode', 'sharp'],
 };
 
 export default nextConfig;

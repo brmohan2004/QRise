@@ -21,7 +21,6 @@ dist-ssr/
 .env
 .env.*
 !.env.example
-!.env.local.example
 
 # Miscellaneous
 .DS_Store
