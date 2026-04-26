@@ -10,6 +10,10 @@ export function PlatformTrendChart() {
     queryKey: ['admin', 'analytics', 'scans_trend'],
     queryFn: async () => {
       const res = await fetch('/api/admin/analytics?view=scans_trend')
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to fetch')
+      }
       return res.json()
     }
   })
@@ -27,15 +31,19 @@ export function PlatformTrendChart() {
     )
   }
 
+  const chartData = Array.isArray(data) ? data : []
+  const hasData = chartData.length > 0
+
   return (
     <Card className="bg-[#111] border-[#222] text-white">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Platform Scan Trends</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data}>
+        <div className="h-[300px] w-full flex items-center justify-center" style={{ minWidth: 0 }}>
+          {hasData ? (
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+              <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#fff" stopOpacity={0.3}/>
@@ -72,8 +80,11 @@ export function PlatformTrendChart() {
                 fillOpacity={1} 
                 fill="url(#colorCount)" 
               />
-            </AreaChart>
-          </ResponsiveContainer>
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="text-gray-500 text-sm italic">No scan data available for this period</div>
+          )}
         </div>
       </CardContent>
     </Card>

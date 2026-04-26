@@ -73,7 +73,11 @@ export default function UserDetailPage() {
 
         {/* Right Column: Actions & Log */}
         <div className="space-y-8">
-          <UserActionsPanel userId={data.user.id} isSuspended={data.user.is_suspended} />
+          <UserActionsPanel 
+            userId={data.user.id} 
+            isSuspended={data.user.is_suspended} 
+            currentPlanName={data.user.plan}
+          />
           <UserActivityLog scans={data.scans} />
         </div>
       </div>

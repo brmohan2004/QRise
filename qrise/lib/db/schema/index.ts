@@ -6,6 +6,7 @@ import { scanEvents, scanDailyRollups, type ScanEvent, type NewScanEvent, type S
 import { forms, formSubmissions, type Form, type NewForm, type FormSubmission, type NewFormSubmission } from './forms';
 import { apiKeys, webhooks, webhookDeliveries, type ApiKey, type NewApiKey, type Webhook, type NewWebhook, type WebhookDelivery } from './api-keys';
 import { bulkJobs, type BulkJob, type NewBulkJob } from './bulk-jobs';
+import { featureFlags, type FeatureFlag, type NewFeatureFlag } from './feature-flags';
 import { relations } from 'drizzle-orm';
 
 // Users relations
@@ -133,10 +134,13 @@ export {
   webhooks,
   webhookDeliveries,
   bulkJobs,
+  featureFlags,
   type User,
   type NewUser,
   type Plan,
   type NewPlan,
+  type FeatureFlag,
+  type NewFeatureFlag,
   type QRCode,
   type NewQRCode,
   type QRRedirectHistory,

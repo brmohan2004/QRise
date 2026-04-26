@@ -40,7 +40,11 @@ const qrTypes = [
   },
 ];
 
-export function TypeSelector() {
+export function TypeSelector({ 
+  enabledFlags = { password: true, multiAction: true, bulk: true, smartRouting: true, designStudio: true } 
+}: { 
+  enabledFlags?: { password: boolean; multiAction: boolean; bulk: boolean; smartRouting: boolean; designStudio: boolean } 
+}) {
   const router = useRouter();
   const { qrType, isDynamic, setType, setDynamic, reset } = useWizardStore();
   const [selected, setSelected] = useState<QRType | null>(null);
@@ -49,6 +53,14 @@ export function TypeSelector() {
   useEffect(() => {
     reset();
   }, [reset]);
+
+  const filteredTypes = qrTypes.filter(item => {
+    if (item.type === "password") return enabledFlags.password;
+    if (item.type === "multi_action") return enabledFlags.multiAction;
+    if (item.type === "bulk") return enabledFlags.bulk;
+    if (item.type === "smart_routing") return enabledFlags.smartRouting;
+    return true;
+  });
 
   const handleContinue = () => {
     if (selected) {
@@ -65,7 +77,7 @@ export function TypeSelector() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {qrTypes.map((item) => (
+        {filteredTypes.map((item) => (
           <button
             key={item.type}
             onClick={() => setSelected(item.type)}

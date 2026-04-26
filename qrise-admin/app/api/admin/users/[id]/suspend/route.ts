@@ -14,7 +14,15 @@ export async function POST(
   }
 
   const { id } = await params
-  const { reason } = await request.json()
+  let reason = 'Suspended by administrator'
+  
+  try {
+    const body = await request.json()
+    if (body.reason) reason = body.reason
+  } catch (e) {
+    // No body or invalid JSON, use default reason
+  }
+
   const adminClient = createAdminClient()
 
   // 1. Update user record

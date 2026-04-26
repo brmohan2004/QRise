@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
-import { Loader2, AlertTriangle } from 'lucide-react'
+import { Loader2, AlertTriangle, Trash2 } from 'lucide-react'
 
 interface FeatureFlag {
   id: string
@@ -27,11 +27,13 @@ interface FeatureFlag {
 interface FlagToggleRowProps {
   flag: FeatureFlag
   onUpdate: (updated: FeatureFlag) => void
+  onDelete: () => void
 }
 
-export function FlagToggleRow({ flag, onUpdate }: FlagToggleRowProps) {
+export function FlagToggleRow({ flag, onUpdate, onDelete }: FlagToggleRowProps) {
   const [isPending, setIsPending] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [pendingValue, setPendingValue] = useState(flag.is_enabled)
 
   const handleToggle = (checked: boolean) => {
@@ -96,9 +98,16 @@ export function FlagToggleRow({ flag, onUpdate }: FlagToggleRowProps) {
             onCheckedChange={handleToggle}
             disabled={isPending}
           />
+          <button 
+            onClick={() => setShowDeleteConfirm(true)}
+            className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
+      {/* Disable Confirmation */}
       <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
         <AlertDialogContent className="bg-[#0a0a0a] border border-[#222] text-white">
           <AlertDialogHeader>
@@ -119,6 +128,33 @@ export function FlagToggleRow({ flag, onUpdate }: FlagToggleRowProps) {
               className="bg-red-600 hover:bg-red-700 text-white"
             >
               Disable Feature
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent className="bg-[#0a0a0a] border border-[#222] text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-red-500" />
+              Delete Feature Flag?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-400">
+              This will permanently delete the feature flag <strong>{flag.name}</strong> ({flag.key}). 
+              Any code relying on this flag will default to being enabled.
+              <br /><br />
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-transparent border-[#222] hover:bg-[#111] text-white">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={onDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete Permanently
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

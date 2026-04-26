@@ -8,6 +8,8 @@ import { DeviceSplitChart } from '@/components/analytics/device-split-chart'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MousePointer2, Users, QrCode, Globe } from 'lucide-react'
 
+import { UserGrowthChart } from '@/components/analytics/user-growth-chart'
+
 export default function AnalyticsPage() {
   return (
     <div className="space-y-8">
@@ -46,16 +48,9 @@ export default function AnalyticsPage() {
         </TabsContent>
 
         <TabsContent value="users" className="space-y-6">
-          <Card className="bg-[#111] border-[#222] text-white">
-            <CardHeader>
-              <CardTitle>User Growth Trend</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* Reuse trend chart with user data if needed, or implement a separate one */}
-              <p className="text-gray-500 text-sm">User acquisition trends visualization coming soon.</p>
-            </CardContent>
-          </Card>
+          <UserGrowthChart />
         </TabsContent>
+
 
         <TabsContent value="qrs" className="space-y-6">
           <TopQRsTable />

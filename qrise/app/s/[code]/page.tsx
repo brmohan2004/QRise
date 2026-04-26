@@ -69,6 +69,11 @@ export default async function ShortCodePage({
         <div className="text-center">
           <h1 className="text-2xl font-bold text-slate-900">QR Code Inactive</h1>
           <p className="text-slate-500 mt-2">This QR code has been disabled or removed.</p>
+          <div className="mt-6">
+            <a href={`/report/abuse/${code}`} className="text-sm text-red-600 hover:underline font-medium">
+              Report this QR code
+            </a>
+          </div>
         </div>
       </div>
     );
@@ -104,6 +109,11 @@ export default async function ShortCodePage({
         <div className="text-center">
           <h1 className="text-2xl font-bold text-slate-900">No Destination</h1>
           <p className="text-slate-500 mt-2">This QR code doesn't have a destination set.</p>
+          <div className="mt-6">
+            <a href={`/report/abuse/${code}`} className="text-sm text-red-600 hover:underline font-medium">
+              Report this QR code
+            </a>
+          </div>
         </div>
       </div>
     );

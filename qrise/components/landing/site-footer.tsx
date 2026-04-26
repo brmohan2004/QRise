@@ -30,9 +30,14 @@ const footerLinks: Record<string, FooterLink[]> = {
   ],
 };
 
-export function SiteFooter() {
+export function SiteFooter({ pricingEnabled = true }: { pricingEnabled?: boolean }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+
+  const filteredFooterLinks = {
+    ...footerLinks,
+    Product: footerLinks.Product.filter(link => link.name !== "Pricing" || pricingEnabled)
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +103,7 @@ export function SiteFooter() {
 
         {/* Links */}
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 pt-12">
-          {Object.entries(footerLinks).map(([category, links]) => (
+          {Object.entries(filteredFooterLinks).map(([category, links]) => (
             <div key={category}>
               <h4 className="font-semibold mb-4">{category}</h4>
               <ul className="space-y-3">

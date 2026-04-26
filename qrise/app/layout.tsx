@@ -40,6 +40,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://qrise.app"),
 };
 
+import { ImpersonateBanner } from "@/components/auth/impersonate-banner";
 import { Toaster } from "sonner";
 import { BugReportButton } from "@/components/bug-report-button";
 
@@ -55,6 +56,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body className="min-h-full flex flex-col">
+        <ImpersonateBanner />
         {children}
         <Toaster position="top-center" richColors />
         <BugReportButton />

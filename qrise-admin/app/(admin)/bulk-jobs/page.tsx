@@ -55,12 +55,13 @@ export default function BulkJobsPage() {
           <Button 
             variant="outline" 
             size="icon" 
-            className="bg-transparent border-[#222] hover:bg-[#111]"
+            className="bg-[#111] border-[#333] hover:border-white/50 transition-all text-white"
             onClick={() => queryClient.invalidateQueries({ queryKey: ['admin', 'bulk_jobs'] })}
             disabled={isFetching}
           >
-            <RefreshCcw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+            <RefreshCcw className={`h-4 w-4 ${isFetching ? 'animate-spin' : 'text-blue-400'}`} />
           </Button>
+
         </div>
       </div>
 

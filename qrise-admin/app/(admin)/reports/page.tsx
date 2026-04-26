@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useDebounce } from '@/lib/hooks/use-debounce'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ReportsTable } from '@/components/reports/reports-table'
 import { 
@@ -20,11 +21,16 @@ export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState<'abuse' | 'bug'>('abuse')
   const [statusFilter, setStatusFilter] = useState('pending')
   const [search, setSearch] = useState('')
+  const [debouncedSearch] = useDebounce(search, 500)
 
-  const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['admin', 'reports', activeTab, statusFilter],
+  const { data, isLoading, isFetching, refetch } = useQuery({
+    queryKey: ['admin', 'reports', activeTab, statusFilter, debouncedSearch],
     queryFn: async () => {
-      const res = await fetch(`/api/admin/reports?type=${activeTab}&status=${statusFilter}`)
+      const res = await fetch(`/api/admin/reports?type=${activeTab}&status=${statusFilter}&q=${debouncedSearch}`)
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to fetch reports')
+      }
       return res.json()
     }
   })
@@ -39,11 +45,12 @@ export default function ReportsPage() {
         <Button 
           variant="outline" 
           size="icon" 
-          className="bg-transparent border-[#222] hover:bg-[#111]"
-          onClick={() => queryClient.invalidateQueries({ queryKey: ['admin', 'reports'] })}
+          className="bg-[#0a0a0a] border-[#222] hover:border-blue-500/50 hover:bg-[#111] transition-all duration-300 shadow-lg group"
+          onClick={() => refetch()}
           disabled={isFetching}
+          title="Refresh reports"
         >
-          <RefreshCcw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+          <RefreshCcw className={`h-4 w-4 text-gray-400 group-hover:text-blue-400 ${isFetching ? 'animate-spin' : ''}`} />
         </Button>
       </div>
 

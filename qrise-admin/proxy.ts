@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import * as jose from "jose";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -46,8 +46,8 @@ export async function middleware(request: NextRequest) {
         const { payload } = await jose.jwtVerify(adminToken, secret);
         if (payload.is_admin && payload.email === process.env.ADMIN_EMAIL) {
           user = {
-            id: payload.id,
-            email: payload.email,
+            id: payload.id as string,
+            email: payload.email as string,
             app_metadata: { is_admin: true },
             user_metadata: { is_admin: true },
             last_sign_in_at: new Date().toISOString()
@@ -71,15 +71,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // 3. Verify Admin Status
-  // Note: We bypass RLS in the app using service role, but in middleware 
-  // we check the user's JWT/metadata or a quick DB check.
-  // The prompt says: verify is_admin = true + email in ADMIN_EMAIL_ALLOWLIST
-  
   const isAdminMetadata = user.app_metadata?.is_admin || user.user_metadata?.is_admin;
   const allowList = process.env.ADMIN_EMAIL_ALLOWLIST?.split(",") || [];
   const isEmailAllowed = allowList.includes(user.email || "") || user.email === process.env.ADMIN_EMAIL;
 
-  // If not in metadata, check the database users table
   let isDbAdmin = false;
   if (!isAdminMetadata) {
     const { createClient: createAdminSupabase } = await import('@supabase/supabase-js');
@@ -107,7 +102,6 @@ export async function middleware(request: NextRequest) {
   const eightHours = 8 * 60 * 60 * 1000;
   
   if (now - authTime > eightHours) {
-    // Force re-login
     await supabase.auth.signOut();
     return NextResponse.redirect(new URL("/login?error=session_expired", request.url));
   }

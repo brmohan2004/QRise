@@ -6,16 +6,31 @@ import {
   Eye, 
   CheckCircle2, 
   XCircle,
-  ShieldAlert
+  ShieldAlert,
+  Trash2,
+  Loader2
 } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { useState } from 'react'
+import { ReportDetailsModal } from './report-details-modal'
 import { 
   Table, 
   TableBody, 
@@ -45,6 +60,17 @@ interface ReportsTableProps {
 }
 
 export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
+  const [selectedReport, setSelectedReport] = useState<ReportData | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [reportToDelete, setReportToDelete] = useState<string | null>(null)
+
+  const handleViewDetails = (report: ReportData) => {
+    setSelectedReport(report)
+    setIsModalOpen(true)
+  }
+
   const handleStatusUpdate = async (id: string, status: string) => {
     try {
       const res = await fetch(`/api/admin/reports/${id}`, {
@@ -53,11 +79,37 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
         body: JSON.stringify({ type, status }),
       })
 
-      if (!res.ok) throw new Error('Failed to update status')
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to update status')
+      }
+
       toast.success(`Report ${status}`)
       onUpdate()
-    } catch {
-      toast.error('Error updating status')
+    } catch (error: any) {
+      toast.error(error.message || 'Error updating status')
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    setIsDeleting(true)
+    try {
+      const res = await fetch(`/api/admin/reports/${id}?type=${type}`, {
+        method: 'DELETE',
+      })
+
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to delete report')
+      }
+
+      toast.success('Report deleted successfully')
+      setIsDeleteDialogOpen(false)
+      onUpdate()
+    } catch (error: any) {
+      toast.error(error.message || 'Error deleting report')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -98,7 +150,7 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-20 text-gray-500 font-medium">
+              <TableCell colSpan={6} className="h-64 text-center text-gray-400">
                 No {type} reports found.
               </TableCell>
             </TableRow>
@@ -160,7 +212,10 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-[#0a0a0a] border-[#222] text-white">
-                      <DropdownMenuItem className="focus:bg-[#111] focus:text-white cursor-pointer">
+                      <DropdownMenuItem 
+                        className="focus:bg-[#111] focus:text-white cursor-pointer"
+                        onClick={() => handleViewDetails(report)}
+                      >
                         <Eye className="h-4 w-4 mr-2" />
                         View Details
                       </DropdownMenuItem>
@@ -187,6 +242,17 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
                         <XCircle className="h-4 w-4 mr-2 text-red-500" />
                         Dismiss
                       </DropdownMenuItem>
+                      <DropdownMenuSeparator className="bg-[#222]" />
+                      <DropdownMenuItem 
+                        className="focus:bg-red-500/10 focus:text-red-500 cursor-pointer text-red-500"
+                        onClick={() => {
+                          setReportToDelete(report.id)
+                          setIsDeleteDialogOpen(true)
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Report
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -195,6 +261,48 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
           )}
         </TableBody>
       </Table>
+
+      <ReportDetailsModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        report={selectedReport}
+        type={type}
+      />
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="bg-[#0a0a0a] border border-[#222] text-white rounded-3xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold">
+              Are you sure you want to delete this {type === 'abuse' ? 'abuse' : 'bug'} report?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-400">
+              This action cannot be undone. This will permanently delete the report and remove it from the system.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              className="bg-[#111] border-[#222] text-white hover:bg-[#1a1a1a] rounded-xl"
+              disabled={isDeleting}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <Button 
+              className="bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold px-6"
+              onClick={() => reportToDelete && handleDelete(reportToDelete)}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete Report'
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

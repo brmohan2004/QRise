@@ -7,7 +7,7 @@ export async function getPlatformSummary() {
     adminClient.from('users').select('*', { count: 'exact', head: true }),
     adminClient.from('qr_codes').select('*', { count: 'exact', head: true }),
     adminClient.from('scan_events').select('*', { count: 'exact', head: true }),
-    adminClient.from('scan_events').select('*', { count: 'exact', head: true }).gte('created_at', new Date(new Date().setHours(0,0,0,0)).toISOString()),
+    adminClient.from('scan_events').select('*', { count: 'exact', head: true }).gte('scanned_at', new Date(new Date().setHours(0,0,0,0)).toISOString()),
     adminClient.from('competitions').select('*', { count: 'exact', head: true }).eq('is_public', true)
   ])
 
@@ -34,11 +34,11 @@ export async function getScansTrend(days = 30) {
     // Fallback if RPC doesn't exist
     const { data: scans } = await adminClient
       .from('scan_events')
-      .select('created_at')
-      .gte('created_at', startDate.toISOString())
+      .select('scanned_at')
+      .gte('scanned_at', startDate.toISOString())
     
-    const trend = scans?.reduce((acc: Record<string, number>, scan: { created_at: string }) => {
-      const date = new Date(scan.created_at).toISOString().split('T')[0]
+    const trend = scans?.reduce((acc: Record<string, number>, scan: { scanned_at: string }) => {
+      const date = new Date(scan.scanned_at).toISOString().split('T')[0]
       acc[date] = (acc[date] || 0) + 1
       return acc
     }, {})
@@ -71,11 +71,11 @@ export async function getDeviceSplit() {
   const adminClient = createAdminClient()
   const { data } = await adminClient
     .from('scan_events')
-    .select('device')
-    .not('device', 'is', null)
+    .select('device_type')
+    .not('device_type', 'is', null)
   
-  const counts = data?.reduce((acc: Record<string, number>, item: { device: string }) => {
-    acc[item.device] = (acc[item.device] || 0) + 1
+  const counts = data?.reduce((acc: Record<string, number>, item: { device_type: string }) => {
+    acc[item.device_type] = (acc[item.device_type] || 0) + 1
     return acc
   }, {})
 

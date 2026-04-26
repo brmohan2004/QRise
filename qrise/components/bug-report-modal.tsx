@@ -92,7 +92,7 @@ export function BugReportModal({ isOpen, onClose }: BugReportModalProps) {
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
           <div className="space-y-2">
             <Label htmlFor="severity">Severity</Label>
-            <Select value={severity} onValueChange={setSeverity}>
+            <Select value={severity} onValueChange={(val) => val && setSeverity(val)}>
               <SelectTrigger className="bg-black border-[#333]">
                 <SelectValue placeholder="Select severity" />
               </SelectTrigger>

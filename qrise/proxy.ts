@@ -74,6 +74,19 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (user) {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('is_suspended')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.is_suspended) {
+      await supabase.auth.signOut();
+      return NextResponse.redirect(new URL('/login?error=suspended', request.url));
+    }
+  }
+
   if (isAuthPath && user) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }

@@ -10,6 +10,10 @@ export function GeoBreakdownChart() {
     queryKey: ['admin', 'analytics', 'geo'],
     queryFn: async () => {
       const res = await fetch('/api/admin/analytics?view=geo')
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to fetch')
+      }
       return res.json()
     }
   })
@@ -27,15 +31,19 @@ export function GeoBreakdownChart() {
     )
   }
 
+  const chartData = Array.isArray(data) ? data : []
+  const hasData = chartData.length > 0
+
   return (
     <Card className="bg-[#111] border-[#222] text-white">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Geographic Breakdown</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} layout="vertical">
+        <div className="h-[300px] w-full flex items-center justify-center" style={{ minWidth: 0 }}>
+          {hasData ? (
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+              <BarChart data={chartData} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#222" horizontal={false} />
               <XAxis type="number" stroke="#444" fontSize={12} tickLine={false} axisLine={false} />
               <YAxis 
@@ -55,6 +63,9 @@ export function GeoBreakdownChart() {
               <Bar dataKey="value" fill="#fff" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        ) : (
+          <div className="text-gray-500 text-sm italic">No geographic data available</div>
+        )}
         </div>
       </CardContent>
     </Card>

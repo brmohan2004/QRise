@@ -30,6 +30,12 @@ import {
   SlidersHorizontal,
   Download
 } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -37,6 +43,33 @@ interface DataTableProps<TData, TValue> {
   searchKey?: string
   placeholder?: string
   onSearchChange?: (value: string) => void
+}
+
+const exportToCSV = <TData, TValue>(data: TData[], columns: ColumnDef<TData, TValue>[]) => {
+  const headers = columns
+    .filter(col => col.id !== 'actions' && typeof col.header === 'string')
+    .map(col => col.header as string)
+  
+  const csvRows = [
+    headers.join(','),
+    ...data.map(row => {
+      return columns
+        .filter(col => col.id !== 'actions' && typeof col.header === 'string')
+        .map(col => {
+          const value = (row as any)[(col as any).accessorKey]
+          return typeof value === 'string' ? `"${value.replace(/"/g, '""')}"` : value
+        })
+        .join(',')
+    })
+  ]
+  
+  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.setAttribute('download', `export-${new Date().toISOString().split('T')[0]}.csv`)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 export function DataTable<TData, TValue>({
@@ -89,11 +122,38 @@ export function DataTable<TData, TValue>({
           </div>
         )}
         <div className="flex items-center gap-2">
-           <Button variant="outline" size="sm" className="h-9 bg-transparent border-[#1a1a1a] text-gray-400 hover:text-white">
-              <SlidersHorizontal className="h-4 w-4 mr-2" />
-              View
-           </Button>
-           <Button variant="outline" size="sm" className="h-9 bg-transparent border-[#1a1a1a] text-gray-400 hover:text-white">
+           <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9 bg-transparent border-[#1a1a1a] text-gray-400 hover:text-white">
+                   <SlidersHorizontal className="h-4 w-4 mr-2" />
+                   View
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[150px] bg-[#0a0a0a] border-[#1a1a1a] text-white">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize focus:bg-[#111] focus:text-white"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                      >
+                        {column.id.replace('_', ' ')}
+                      </DropdownMenuCheckboxItem>
+                    )
+                  })}
+              </DropdownMenuContent>
+           </DropdownMenu>
+
+           <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-9 bg-transparent border-[#1a1a1a] text-gray-400 hover:text-white"
+              onClick={() => exportToCSV(data, columns)}
+           >
               <Download className="h-4 w-4 mr-2" />
               Export
            </Button>

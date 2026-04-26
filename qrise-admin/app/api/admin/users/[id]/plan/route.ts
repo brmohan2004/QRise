@@ -13,21 +13,25 @@ export async function PATCH(
   }
 
   const { id } = await params
-  const { plan, expiresAt } = await request.json()
+  const { planId } = await request.json()
   const adminClient = createAdminClient()
 
-  // Get current plan for audit log
-  const { data: currentUser } = await adminClient
-    .from('users')
-    .select('plan')
-    .eq('id', id)
+  // 1. Get the plan name from the ID
+  const { data: plan, error: planError } = await adminClient
+    .from('plans')
+    .select('name')
+    .eq('id', planId)
     .single()
 
+  if (planError || !plan) {
+    return NextResponse.json({ error: 'Selected plan not found' }, { status: 404 })
+  }
+
+  // 2. Update the user's plan
   const { error: updateError } = await adminClient
     .from('users')
-    .update({
-      plan,
-      plan_expires_at: expiresAt || null
+    .update({ 
+      plan: plan.name.toLowerCase() 
     })
     .eq('id', id)
 
@@ -35,16 +39,13 @@ export async function PATCH(
     return NextResponse.json({ error: updateError.message }, { status: 500 })
   }
 
+  // 3. Write audit log
   await writeAuditLog({
     adminUserId: admin.adminId,
-    action: 'user.plan_change',
+    action: 'user.plan_update',
     targetType: 'user',
     targetId: id,
-    details: { 
-      old_plan: currentUser?.plan, 
-      new_plan: plan,
-      expires_at: expiresAt
-    },
+    details: { new_plan: plan.name },
     ipAddress: admin.ipAddress
   })
 

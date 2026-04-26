@@ -50,25 +50,45 @@ export default function FeatureFlagsPage() {
         body: JSON.stringify({ ...newFlag, is_enabled: true }),
       })
 
-      if (!res.ok) throw new Error('Failed to create flag')
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to create flag')
 
       toast.success('Feature flag created')
       setIsAdding(false)
       setNewFlag({ key: '', name: '', description: '' })
       queryClient.invalidateQueries({ queryKey: ['admin', 'feature_flags'] })
-    } catch {
-      toast.error('Error creating flag')
+    } catch (err: any) {
+      toast.error(err.message || 'Error creating flag')
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/feature-flags/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed to delete flag')
+      }
+
+      toast.success('Feature flag deleted')
+      queryClient.invalidateQueries({ queryKey: ['admin', 'feature_flags'] })
+    } catch (err: any) {
+      toast.error(err.message || 'Error deleting flag')
     }
   }
 
   const handleUpdate = (updatedFlag: FeatureFlag) => {
     queryClient.setQueryData(['admin', 'feature_flags'], (old: FeatureFlag[]) => 
-      old.map(f => f.id === updatedFlag.id ? updatedFlag : f)
+      old ? old.map(f => f.id === updatedFlag.id ? updatedFlag : f) : []
     )
   }
 
   return (
     <div className="space-y-8">
+      {/* ... existing header ... */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Feature Flags</h1>
@@ -154,6 +174,7 @@ export default function FeatureFlagsPage() {
               key={flag.id} 
               flag={flag} 
               onUpdate={handleUpdate} 
+              onDelete={() => handleDelete(flag.id)}
             />
           ))
         )}

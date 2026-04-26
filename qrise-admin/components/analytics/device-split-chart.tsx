@@ -35,8 +35,8 @@ export function DeviceSplitChart() {
         <CardTitle className="text-lg font-semibold">Device Distribution</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-[300px] w-full" style={{ minWidth: 0 }}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <PieChart>
               <Pie
                 data={data}

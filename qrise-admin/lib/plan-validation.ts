@@ -91,7 +91,7 @@ export function validateFeatureAccess(
     return { 
       allowed: false, 
       reason: `Your current plan (${userPlan.name}) doesn't include access to this feature.`,
-      upgradeUrl: '/pricing'
+      upgradeUrl: process.env.NEXT_PUBLIC_MAIN_APP_URL ? `${process.env.NEXT_PUBLIC_MAIN_APP_URL}/pricing` : 'https://qrise.app/pricing'
     }
   }
 
@@ -112,7 +112,7 @@ export function validateLimit(
     return {
       allowed: false,
       reason: `You've reached your ${limitKey.replace('_', ' ')} of ${limit}.`,
-      upgradeUrl: '/pricing'
+      upgradeUrl: process.env.NEXT_PUBLIC_MAIN_APP_URL ? `${process.env.NEXT_PUBLIC_MAIN_APP_URL}/pricing` : 'https://qrise.app/pricing'
     }
   }
 

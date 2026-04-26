@@ -12,6 +12,10 @@ import { Button } from '@/components/ui/button'
 import { MoreHorizontal, Eye, Ban, UserCheck, Trash2, UserCog } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface UserActionsMenuProps {
   userId: string
@@ -19,7 +23,10 @@ interface UserActionsMenuProps {
 }
 
 export function UserActionsMenu({ userId, isSuspended }: UserActionsMenuProps) {
+  const router = useRouter()
+  const queryClient = useQueryClient()
   const [isLoading, setIsLoading] = useState(false)
+  const [activeDialog, setActiveDialog] = useState<'suspend' | 'delete' | 'impersonate' | null>(null)
 
   const handleImpersonate = async () => {
     setIsLoading(true)
@@ -27,55 +34,146 @@ export function UserActionsMenu({ userId, isSuspended }: UserActionsMenuProps) {
       const res = await fetch(`/api/admin/users/${userId}/impersonate`, { method: 'POST' })
       const data = await res.json()
       if (data.url) {
+        toast.success('Starting impersonation session...')
         window.location.href = data.url
+      } else {
+        throw new Error(data.error || 'Failed to impersonate')
       }
+    } catch (err: any) {
+      toast.error(err.message)
     } finally {
       setIsLoading(false)
+      setActiveDialog(null)
+    }
+  }
+
+  const handleToggleSuspension = async () => {
+    setIsLoading(true)
+    const action = isSuspended ? 'unsuspend' : 'suspend'
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/${action}`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: 'Suspended by Admin' })
+      })
+      if (!res.ok) throw new Error(`Failed to ${action} user`)
+      
+      toast.success(`User account ${isSuspended ? 'unsuspended' : 'suspended'} successfully`)
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
+      router.refresh()
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setIsLoading(false)
+      setActiveDialog(null)
+    }
+  }
+
+  const handleDelete = async () => {
+    setIsLoading(true)
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed to delete user')
+      
+      toast.success('User account deleted permanently')
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
+      router.refresh()
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setIsLoading(false)
+      setActiveDialog(null)
     }
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-[#1a1a1a] text-gray-400">
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-[#111] border-[#222] text-white w-[160px]">
-        <DropdownMenuLabel className="text-gray-500 text-[10px] uppercase font-bold">Actions</DropdownMenuLabel>
-        <DropdownMenuItem asChild className="cursor-pointer focus:bg-[#1a1a1a] focus:text-white">
-          <Link href={`/users/${userId}`} className="flex items-center gap-2">
-            <Eye className="h-4 w-4" />
-            View Details
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          className="cursor-pointer focus:bg-[#1a1a1a] focus:text-white flex items-center gap-2"
-          onClick={handleImpersonate}
-          disabled={isLoading}
-        >
-          <UserCog className="h-4 w-4" />
-          Impersonate
-        </DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-[#222]" />
-        <DropdownMenuItem className="cursor-pointer focus:bg-[#1a1a1a] focus:text-white flex items-center gap-2">
-          {isSuspended ? (
-            <>
-              <UserCheck className="h-4 w-4 text-green-500" />
-              Unsuspend
-            </>
-          ) : (
-            <>
-              <Ban className="h-4 w-4 text-amber-500" />
-              Suspend User
-            </>
-          )}
-        </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer focus:bg-red-900/20 focus:text-red-400 flex items-center gap-2 text-red-400">
-          <Trash2 className="h-4 w-4" />
-          Delete Account
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-[#1a1a1a] text-gray-400">
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="bg-[#111] border-[#222] text-white w-[160px]">
+          <DropdownMenuLabel className="text-gray-500 text-[10px] uppercase font-bold">Actions</DropdownMenuLabel>
+          <DropdownMenuItem asChild className="cursor-pointer focus:bg-[#1a1a1a] focus:text-white">
+            <Link href={`/users/${userId}`} className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              View Details
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem 
+            className="cursor-pointer focus:bg-[#1a1a1a] focus:text-white flex items-center gap-2"
+            onClick={() => setActiveDialog('impersonate')}
+            disabled={isLoading}
+          >
+            <UserCog className="h-4 w-4" />
+            Impersonate
+          </DropdownMenuItem>
+          <DropdownMenuSeparator className="bg-[#222]" />
+          <DropdownMenuItem 
+            className="cursor-pointer focus:bg-[#1a1a1a] focus:text-white flex items-center gap-2"
+            onClick={() => setActiveDialog('suspend')}
+            disabled={isLoading}
+          >
+            {isSuspended ? (
+              <>
+                <UserCheck className="h-4 w-4 text-green-500" />
+                Unsuspend
+              </>
+            ) : (
+              <>
+                <Ban className="h-4 w-4 text-amber-500" />
+                Suspend User
+              </>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuItem 
+            className="cursor-pointer focus:bg-red-900/20 focus:text-red-400 flex items-center gap-2 text-red-400"
+            onClick={() => setActiveDialog('delete')}
+            disabled={isLoading}
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete Account
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <ConfirmDialog 
+        isOpen={activeDialog === 'impersonate'}
+        onClose={() => setActiveDialog(null)}
+        onConfirm={handleImpersonate}
+        title="Start Impersonation?"
+        description="You are about to log in as this user. Your administrative actions will be logged."
+        confirmText="Start Session"
+        variant="info"
+        isLoading={isLoading}
+      />
+
+      <ConfirmDialog 
+        isOpen={activeDialog === 'suspend'}
+        onClose={() => setActiveDialog(null)}
+        onConfirm={handleToggleSuspension}
+        title={isSuspended ? "Lift Suspension?" : "Suspend Account?"}
+        description={isSuspended 
+          ? "This will restore user access and reactivate their QR codes."
+          : "This will immediately block user access and disable all their active QR codes."
+        }
+        confirmText={isSuspended ? "Unsuspend" : "Confirm Suspension"}
+        variant="warning"
+        isLoading={isLoading}
+      />
+
+      <ConfirmDialog 
+        isOpen={activeDialog === 'delete'}
+        onClose={() => setActiveDialog(null)}
+        onConfirm={handleDelete}
+        title="Permanently Delete Account?"
+        description="This action is irreversible. All user data, QR codes, and forms will be removed."
+        confirmText="Delete Now"
+        variant="danger"
+        isLoading={isLoading}
+      />
+    </>
   )
 }

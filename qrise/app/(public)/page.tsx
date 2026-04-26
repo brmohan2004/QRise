@@ -5,8 +5,13 @@ import { FeaturesSection } from "@/components/landing/features-section";
 import { WhyQRise } from "@/components/landing/why-qrise";
 import { ReviewsCarousel } from "@/components/landing/reviews-carousel";
 import { SiteFooter } from "@/components/landing/site-footer";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
-export default function LandingPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function LandingPage() {
+  const pricingEnabled = await isFeatureEnabled("pricing_page_enabled");
+
   return (
     <>
       <Hero />
@@ -15,7 +20,7 @@ export default function LandingPage() {
       <FeaturesSection />
       <WhyQRise />
       <ReviewsCarousel />
-      <SiteFooter />
+      <SiteFooter pricingEnabled={pricingEnabled} />
     </>
   );
 }
