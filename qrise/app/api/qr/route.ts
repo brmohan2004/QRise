@@ -97,6 +97,7 @@ export async function POST(request: Request) {
         rows: config.rows,
         isDynamic: isDynamic ?? true,
         designConfig: design || {},
+        bulkType: config.bulkType || "url",
       });
     } else {
       result = await createQR(user.id, {

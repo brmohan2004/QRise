@@ -71,9 +71,10 @@ export async function createBulkQR(
   userId: string,
   data: {
     name: string;
-    rows: { name: string; url: string }[];
+    rows: any[];
     isDynamic?: boolean;
     designConfig?: any;
+    bulkType?: 'url' | 'multi_action' | 'password' | 'smart_routing';
   }
 ): Promise<BulkJob> {
   // 1. Create the bulk job record
@@ -90,13 +91,22 @@ export async function createBulkQR(
   // We do this in chunks if there are many, but for now we'll do all at once
   const qrsToInsert = await Promise.all(data.rows.map(async (row) => {
     const shortCode = await generateUniqueShortCode();
+    let passwordHash: string | undefined;
+    if (data.bulkType === 'password' && row.password) {
+      passwordHash = await bcrypt.hash(row.password, 12);
+    }
+    
+    // Default to data.isDynamic if row.isDynamic is not explicitly defined
+    const isDynamic = row.isDynamic !== undefined ? row.isDynamic : (data.isDynamic ?? true);
+    
     return {
       userId,
       name: row.name || data.name || "Bulk QR",
-      type: "url" as const,
+      type: data.bulkType || "url",
       shortCode,
-      targetUrl: row.url,
-      isDynamic: data.isDynamic ?? true,
+      targetUrl: (data.bulkType === "url" || data.bulkType === "password" || data.bulkType === "smart_routing") ? row.url : undefined,
+      isDynamic,
+      passwordHash,
       designConfig: data.designConfig || {},
       bulkJobId: job.id,
     } as NewQRCode;
@@ -104,6 +114,49 @@ export async function createBulkQR(
 
   // 3. Bulk insert QR codes
   const insertedQRs = await db.insert(qrCodes).values(qrsToInsert).returning();
+  
+  // 3.5 If multi_action, insert actions
+  if (data.bulkType === 'multi_action') {
+    const allActions: NewQRAction[] = [];
+    insertedQRs.forEach((qr, index) => {
+      const row = data.rows[index];
+      if (row.actions && Array.isArray(row.actions)) {
+        row.actions.forEach((action: any, aIndex: number) => {
+          allActions.push({
+            qrId: qr.id,
+            actionType: action.actionType || action.type,
+            label: action.label,
+            actionValue: action.actionValue || action.value,
+            displayOrder: aIndex,
+          });
+        });
+      }
+    });
+    if (allActions.length > 0) {
+      await db.insert(qrActions).values(allActions);
+    }
+  }
+
+  // 3.6 If smart_routing, insert rules
+  if (data.bulkType === 'smart_routing') {
+    const allRules: NewRoutingRule[] = [];
+    insertedQRs.forEach((qr, index) => {
+      const row = data.rows[index];
+      if (row.rules && Array.isArray(row.rules)) {
+        row.rules.forEach((rule: any, rIndex: number) => {
+          allRules.push({
+            qrId: qr.id,
+            priority: rIndex,
+            conditions: rule.conditions,
+            targetUrl: rule.targetUrl,
+          } as NewRoutingRule);
+        });
+      }
+    });
+    if (allRules.length > 0) {
+      await db.insert(routingRules).values(allRules);
+    }
+  }
   
   // 4. Invalidate cache for all new shortcodes
   await Promise.all(insertedQRs.map(qr => invalidateKVCache(qr.shortCode)));

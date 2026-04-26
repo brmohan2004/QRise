@@ -40,7 +40,7 @@ export type QRConfig =
   | { type: 'smart_routing'; defaultUrl: string; rules: RoutingRule[]; bulkJobId?: string; rows?: any[] }
   | { type: 'password'; targetUrl: string; password: string; bulkJobId?: string; rows?: any[] }
   | { type: 'multi_action'; actions: QRAction[]; bulkJobId?: string; rows?: any[] }
-  | { type: 'bulk'; totalRows: number; rows: any[]; bulkJobId?: string };
+  | { type: 'bulk'; totalRows: number; rows: any[]; bulkJobId?: string; bulkType?: 'url' | 'multi_action' | 'password' | 'smart_routing' };
 
 export interface WizardState {
   step: 1 | 2 | 3;
