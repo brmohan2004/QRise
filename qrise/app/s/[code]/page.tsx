@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import { redirect, notFound } from 'next/navigation';
 import { headers } from 'next/headers';
 import { PasswordEntryForm } from '@/components/qr/password-entry-form';
+import { Globe, Phone, Mail, MapPin, Download, MessageCircle } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -45,6 +46,7 @@ export default async function ShortCodePage({
       where: eq(qrCodes.shortCode, code),
       with: {
         routingRules: true,
+        qrActions: true,
       },
     });
   } catch (error) {
@@ -105,7 +107,68 @@ export default async function ShortCodePage({
     return <PasswordEntryForm qrId={qr.id} label={qr.name} />;
   }
 
-  // 4. Evaluate Smart Routing Rules
+  // 4. Handle Multi Action QRs
+  if (qr.type === 'multi_action' && qr.qrActions && qr.qrActions.length > 0) {
+    const sortedActions = [...qr.qrActions].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-50 px-4 py-12">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="p-6 text-center bg-[#0F6E56] text-white">
+            <h1 className="text-2xl font-bold">{qr.name}</h1>
+            <p className="mt-2 text-emerald-100">Choose an action below</p>
+          </div>
+          
+          <div className="p-6 space-y-4">
+            {sortedActions.map((action) => {
+              let href = action.actionValue || '#';
+              let Icon = Globe;
+              
+              if (action.actionType === 'phone') {
+                href = `tel:${action.actionValue}`;
+                Icon = Phone;
+              } else if (action.actionType === 'email') {
+                href = `mailto:${action.actionValue}`;
+                Icon = Mail;
+              } else if (action.actionType === 'whatsapp') {
+                const cleanPhone = action.actionValue?.replace(/\D/g, '') || '';
+                href = `https://wa.me/${cleanPhone}`;
+                Icon = MessageCircle;
+              } else if (action.actionType === 'map') {
+                href = `https://maps.google.com/?q=${encodeURIComponent(action.actionValue || '')}`;
+                Icon = MapPin;
+              } else if (action.actionType === 'download') {
+                Icon = Download;
+              }
+
+              return (
+                <a
+                  key={action.id}
+                  href={href}
+                  target={action.actionType === 'url' || action.actionType === 'whatsapp' || action.actionType === 'map' ? "_blank" : undefined}
+                  rel="noopener noreferrer"
+                  className="flex items-center p-4 border border-gray-200 rounded-xl hover:border-[#0F6E56] hover:bg-emerald-50 transition-colors group"
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-emerald-100 text-[#0F6E56] rounded-full flex items-center justify-center group-hover:bg-[#0F6E56] group-hover:text-white transition-colors">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <div className="ml-4 flex-1 overflow-hidden">
+                    <p className="text-lg font-semibold text-gray-900 group-hover:text-[#0F6E56] transition-colors truncate">
+                      {action.label}
+                    </p>
+                    <p className="text-sm text-gray-500 truncate">
+                      {action.actionValue}
+                    </p>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 5. Evaluate Smart Routing Rules
   let finalTargetUrl = qr.targetUrl;
 
   if (qr.type === 'smart_routing' && qr.routingRules && qr.routingRules.length > 0) {
@@ -145,7 +208,7 @@ export default async function ShortCodePage({
     }
   }
 
-  // 5. Redirect
+  // 6. Redirect
   if (!finalTargetUrl) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50 px-4">
