@@ -110,7 +110,11 @@ export function UserActionsPanel({ userId, isSuspended, currentPlanName }: UserA
   const handleDelete = async () => {
     setIsLoading(true)
     try {
-      const res = await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' })
+      const res = await fetch(`/api/admin/users/${userId}/delete`, { 
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirm: true })
+      })
       if (!res.ok) throw new Error('Failed to delete user')
       
       toast.success('User account deleted permanently')
