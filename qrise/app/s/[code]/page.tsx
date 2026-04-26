@@ -17,7 +17,7 @@ function parseUA(ua: string | null) {
   
   let os = 'unknown';
   if (/windows/i.test(ua)) os = 'Windows';
-  else if (/mac/i.test(ua)) os = 'macOS';
+  else if (/mac/i.test(ua)) os = 'Mac'; // Changed from macOS to Mac to match frontend config
   else if (/linux/i.test(ua)) os = 'Linux';
   else if (/android/i.test(ua)) os = 'Android';
   else if (/iphone|ipad|ipod/i.test(ua)) os = 'iOS';
@@ -43,6 +43,9 @@ export default async function ShortCodePage({
   try {
     qr = await db.query.qrCodes.findFirst({
       where: eq(qrCodes.shortCode, code),
+      with: {
+        routingRules: true,
+      },
     });
   } catch (error) {
     console.error('Database connection error in ShortCodePage:', error);
@@ -102,8 +105,48 @@ export default async function ShortCodePage({
     return <PasswordEntryForm qrId={qr.id} label={qr.name} />;
   }
 
-  // 4. Redirect
-  if (!qr.targetUrl) {
+  // 4. Evaluate Smart Routing Rules
+  let finalTargetUrl = qr.targetUrl;
+
+  if (qr.type === 'smart_routing' && qr.routingRules && qr.routingRules.length > 0) {
+    const country = headerList.get('x-vercel-ip-country') || headerList.get('cf-ipcountry') || 'unknown';
+    const language = headerList.get('accept-language') || 'unknown';
+
+    const context = {
+      device: deviceType,
+      os: os,
+      country: country,
+      language: language,
+    };
+
+    // Sort rules by priority
+    const sortedRules = [...qr.routingRules].sort((a, b) => (a.priority || 0) - (b.priority || 0));
+
+    for (const rule of sortedRules) {
+      if (!rule.conditions || !Array.isArray(rule.conditions)) continue;
+
+      const isMatch = rule.conditions.every((cond: any) => {
+        const { field, op, value } = cond;
+        if (!field || !op || value === undefined) return false;
+
+        const actualValue = context[field as keyof typeof context] || 'unknown';
+        const actStr = String(actualValue).toLowerCase();
+        const expStr = String(value).toLowerCase();
+
+        if (op === 'eq') return actStr === expStr;
+        if (op === 'in') return expStr.split(',').map(s => s.trim()).includes(actStr);
+        return false;
+      });
+
+      if (isMatch && rule.targetUrl) {
+        finalTargetUrl = rule.targetUrl;
+        break; // Match found, stop evaluating
+      }
+    }
+  }
+
+  // 5. Redirect
+  if (!finalTargetUrl) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50 px-4">
         <div className="text-center">
@@ -119,5 +162,5 @@ export default async function ShortCodePage({
     );
   }
 
-  redirect(qr.targetUrl);
+  redirect(finalTargetUrl);
 }
