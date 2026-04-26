@@ -42,8 +42,8 @@ export async function GET() {
     // Ensure we have some plan object even if not in DB
     const plan = planData || {
       name: userData.plan || 'free',
-      hasApi: userData.plan === 'business' || userData.plan === 'enterprise',
-      hasBulk: userData.plan === 'business' || userData.plan === 'enterprise',
+      hasApiAccess: userData.plan === 'business' || userData.plan === 'enterprise',
+      hasBulkGenerator: userData.plan === 'business' || userData.plan === 'enterprise',
       hasSmartRouting: userData.plan !== 'free',
       hasAnalytics: true,
       hasDesignStudio: true,
@@ -53,8 +53,8 @@ export async function GET() {
       ...userData,
       plan: {
          name: plan.name,
-         has_api: plan.hasApi,
-         has_bulk: plan.hasBulk,
+         has_api: 'hasApiAccess' in plan ? plan.hasApiAccess : (plan as any).hasApi,
+         has_bulk: 'hasBulkGenerator' in plan ? plan.hasBulkGenerator : (plan as any).hasBulk,
          has_smart_routing: plan.hasSmartRouting,
          has_analytics: plan.hasAnalytics,
          has_design_studio: plan.hasDesignStudio,

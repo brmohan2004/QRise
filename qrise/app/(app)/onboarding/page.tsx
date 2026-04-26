@@ -23,7 +23,7 @@ export default function OnboardingPage() {
             Welcome to QRise!
           </h1>
           <p className="text-lg text-gray-500 mb-12 max-w-xl mx-auto">
-            You're just moments away from creating your first dynamic QR code. Here's how it works:
+            You&apos;re just moments away from creating your first dynamic QR code. Here&apos;s how it works:
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">

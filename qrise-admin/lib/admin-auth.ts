@@ -21,9 +21,9 @@ export async function verifyAdmin(request: NextRequest) {
             app_metadata: { is_admin: true },
             user_metadata: { is_admin: true },
             last_sign_in_at: new Date().toISOString()
-          } as any;
+          } as unknown as any;
         }
-      } catch (e) {
+      } catch {
         // invalid token
       }
     }

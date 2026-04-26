@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     const status = searchParams.get("status");
     const sort = searchParams.get("sort") || "newest";
 
-    let query = db.select().from(qrCodes).where(eq(qrCodes.userId, user.id));
+    const query = db.select().from(qrCodes).where(eq(qrCodes.userId, user.id));
 
     // Filters
     const conditions = [eq(qrCodes.userId, user.id), eq(qrCodes.isDeleted, false)];

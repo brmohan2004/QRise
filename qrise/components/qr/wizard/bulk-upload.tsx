@@ -126,11 +126,11 @@ export function BulkUpload() {
       header: true,
       skipEmptyLines: 'greedy',
       complete: (results) => {
-        let headers = results.meta.fields || [];
+        const headers = results.meta.fields || [];
         const cleanHeader = (h: string) => h?.trim().replace(/^\ufeff/, "").toLowerCase() || "";
         
-        let nameKey = headers.find(h => cleanHeader(h) === 'name' || cleanHeader(h).includes('name'));
-        let urlKey = headers.find(h => cleanHeader(h) === 'url' || cleanHeader(h).includes('url') || cleanHeader(h).includes('link'));
+        const nameKey = headers.find(h => cleanHeader(h) === 'name' || cleanHeader(h).includes('name'));
+        const urlKey = headers.find(h => cleanHeader(h) === 'url' || cleanHeader(h).includes('url') || cleanHeader(h).includes('link'));
 
         // If we found headers, process normally
         if (nameKey && urlKey) {

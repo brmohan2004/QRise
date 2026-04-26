@@ -119,7 +119,7 @@ export async function getTopQRs() {
     .order('scan_count', { ascending: false })
     .limit(10)
 
-  return data?.map((qr: { id: string; name: string; type: string; scan_count: number; users: any }) => ({
+  return data?.map((qr: { id: string; name: string; type: string; scan_count: number; users: { email: string } | { email: string }[] | null }) => ({
     id: qr.id,
     name: qr.name,
     type: qr.type,
