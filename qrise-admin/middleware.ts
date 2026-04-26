@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import * as jose from "jose";
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -38,24 +38,24 @@ export async function proxy(request: NextRequest) {
 
   let user = supabaseUser;
 
-  if (!user) {
-    const adminToken = request.cookies.get('admin_session')?.value;
-    if (adminToken) {
-      try {
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-        const { payload } = await jose.jwtVerify(adminToken, secret);
-        if (payload.is_admin && payload.email === process.env.ADMIN_EMAIL) {
-          user = {
-            id: payload.id as string,
-            email: payload.email as string,
-            app_metadata: { is_admin: true },
-            user_metadata: { is_admin: true },
-            last_sign_in_at: new Date().toISOString()
-          } as unknown as any;
-        }
-      } catch {
-        // Invalid token
+  // Check for .env admin session regardless of Supabase session
+  const adminToken = request.cookies.get('admin_session')?.value;
+  if (adminToken) {
+    try {
+      const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+      const { payload } = await jose.jwtVerify(adminToken, secret);
+      if (payload.is_admin && payload.email === process.env.ADMIN_EMAIL) {
+        // If we have a valid admin token, use it (it takes precedence for the admin panel)
+        user = {
+          id: payload.id as string,
+          email: payload.email as string,
+          app_metadata: { is_admin: true },
+          user_metadata: { is_admin: true },
+          last_sign_in_at: new Date().toISOString()
+        } as unknown as any;
       }
+    } catch {
+      // Invalid token, fall back to supabaseUser if it exists
     }
   }
 

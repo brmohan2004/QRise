@@ -4,28 +4,28 @@ import { NextRequest } from 'next/server'
 
 export async function verifyAdmin(request: NextRequest) {
   const supabase = await createClient()
-  const { data: { user: supabaseUser }, error } = await supabase.auth.getUser()
+  const { data: { user: supabaseUser } } = await supabase.auth.getUser()
   let user = supabaseUser;
 
-  if (error || !user) {
-    const adminToken = request.cookies.get('admin_session')?.value;
-    if (adminToken) {
-      try {
-        const { jwtVerify } = await import('jose');
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-        const { payload } = await jwtVerify(adminToken, secret);
-        if (payload.is_admin && payload.email === process.env.ADMIN_EMAIL) {
-          user = {
-            id: payload.id as string,
-            email: payload.email as string,
-            app_metadata: { is_admin: true },
-            user_metadata: { is_admin: true },
-            last_sign_in_at: new Date().toISOString()
-          } as unknown as any;
-        }
-      } catch {
-        // invalid token
+  // Check for .env admin session regardless of Supabase session
+  const adminToken = request.cookies.get('admin_session')?.value;
+  if (adminToken) {
+    try {
+      const { jwtVerify } = await import('jose');
+      const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+      const { payload } = await jwtVerify(adminToken, secret);
+      if (payload.is_admin && payload.email === process.env.ADMIN_EMAIL) {
+        // Prioritize the admin user from the JWT
+        user = {
+          id: 'admin_env_user',
+          email: payload.email as string,
+          app_metadata: { is_admin: true },
+          user_metadata: { is_admin: true },
+          last_sign_in_at: new Date().toISOString()
+        } as unknown as any;
       }
+    } catch {
+      // Invalid token, fall back to supabaseUser
     }
   }
 

@@ -44,7 +44,7 @@ export function TopQRsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.map((qr: { id: string, name: string, owner: string, type: string, scans: number }) => (
+            {Array.isArray(data) ? data.map((qr: { id: string, name: string, owner: string, type: string, scans: number }) => (
               <TableRow key={qr.id} className="border-[#222] hover:bg-[#1a1a1a]">
                 <TableCell className="font-medium">{qr.name}</TableCell>
                 <TableCell className="text-gray-400">{qr.owner}</TableCell>
@@ -55,7 +55,13 @@ export function TopQRsTable() {
                 </TableCell>
                 <TableCell className="text-right font-bold">{qr.scans.toLocaleString()}</TableCell>
               </TableRow>
-            ))}
+            )) : (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-8 text-gray-500">
+                  {data?.error || 'No data available'}
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </CardContent>

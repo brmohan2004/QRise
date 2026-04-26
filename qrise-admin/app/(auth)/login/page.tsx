@@ -47,7 +47,8 @@ function LoginContent() {
 
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
+      // Only redirect to dashboard if there's a session AND no error in the URL
+      if (session && !queryError) {
         router.push('/dashboard')
       }
     }

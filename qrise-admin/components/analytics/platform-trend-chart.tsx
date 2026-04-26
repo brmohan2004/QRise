@@ -40,7 +40,7 @@ export function PlatformTrendChart() {
         <CardTitle className="text-lg font-semibold">Platform Scan Trends</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full flex items-center justify-center" style={{ minWidth: 0 }}>
+        <div className="h-[300px] w-full" style={{ minWidth: 0 }}>
           {hasData ? (
             <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <AreaChart data={chartData}>
