@@ -10,20 +10,25 @@ export async function isFeatureEnabled(
   flagKey: string,
   planName?: string
 ): Promise<boolean> {
-  const [flag] = await db
-    .select()
-    .from(featureFlags)
-    .where(eq(featureFlags.key, flagKey))
-    .limit(1);
+  try {
+    const [flag] = await db
+      .select()
+      .from(featureFlags)
+      .where(eq(featureFlags.key, flagKey))
+      .limit(1);
 
-  if (!flag) return true; // Default to true if flag doesn't exist? Or false? 
-                         // For QRise, we'll assume true unless explicitly disabled.
-  
-  if (!flag.isEnabled) return false;
+    if (!flag) return true; // Default to true if flag doesn't exist
+    
+    if (!flag.isEnabled) return false;
 
-  if (planName && flag.enabledForPlans && flag.enabledForPlans.length > 0) {
-    return flag.enabledForPlans.includes(planName.toLowerCase());
+    if (planName && flag.enabledForPlans && flag.enabledForPlans.length > 0) {
+      return flag.enabledForPlans.includes(planName.toLowerCase());
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`Error checking feature flag "${flagKey}":`, error);
+    // Fallback to true in case of DB error so the site doesn't crash
+    return true;
   }
-
-  return true;
 }
