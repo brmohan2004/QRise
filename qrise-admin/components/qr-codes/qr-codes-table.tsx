@@ -149,7 +149,7 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
       cell: ({ row }) => {
         const qr = row.original
         const isToggling = toggleStatus.isPending && toggleStatus.variables?.id === qr.id
-        const isDeleting = deleteQR.isPending && deleteQR.variables === qr.id
+        const isDeleting = deleteQR.isPending && deleteQR.variables?.id === qr.id
 
         return (
           <DropdownMenu>

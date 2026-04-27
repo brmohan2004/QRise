@@ -21,8 +21,18 @@ function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
   return <TooltipPrimitive.Root data-slot="tooltip" {...props} />
 }
 
-function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
+interface TooltipTriggerProps extends TooltipPrimitive.Trigger.Props {
+  asChild?: boolean
+}
+
+function TooltipTrigger({ asChild, ...props }: TooltipTriggerProps) {
+  return (
+    <TooltipPrimitive.Trigger
+      data-slot="tooltip-trigger"
+      render={asChild ? (props.children as React.ReactElement) : undefined}
+      {...props}
+    />
+  )
 }
 
 function TooltipContent({

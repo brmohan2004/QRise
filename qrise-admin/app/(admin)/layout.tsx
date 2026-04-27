@@ -29,7 +29,7 @@ export default async function AdminLayout({
             </div>
           )}
           
-          <main className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#222]">
+          <main className="flex-1 overflow-y-auto no-scrollbar">
             <div className="p-8">
               {children}
             </div>
