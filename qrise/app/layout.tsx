@@ -42,7 +42,6 @@ export const metadata: Metadata = {
 
 import { ImpersonateBanner } from "@/components/auth/impersonate-banner";
 import { Toaster } from "sonner";
-import { BugReportButton } from "@/components/bug-report-button";
 
 export default function RootLayout({
   children,
@@ -59,7 +58,6 @@ export default function RootLayout({
         <ImpersonateBanner />
         {children}
         <Toaster position="top-center" richColors />
-        <BugReportButton />
       </body>
     </html>
   );

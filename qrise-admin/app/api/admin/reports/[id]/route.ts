@@ -13,42 +13,28 @@ export async function PATCH(
   }
 
   const { id } = await params
-  const { type, status, action_taken, resolution_notes } = await request.json()
+  const { status, action_taken } = await request.json()
 
   const adminClient = createAdminClient()
 
-  if (type === 'abuse') {
-    const { error } = await adminClient
-      .from('abuse_reports')
-      .update({ 
-        status, 
-        action_taken, 
-        reviewed_by: admin.adminId 
-      })
-      .eq('id', id)
+  const { error } = await adminClient
+    .from('abuse_reports')
+    .update({ 
+      status, 
+      action_taken, 
+      reviewed_by: admin.adminId 
+    })
+    .eq('id', id)
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  } else {
-    const { error } = await adminClient
-      .from('bug_reports')
-      .update({ 
-        status, 
-        resolution_notes, 
-        reviewed_by: admin.adminId,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  }
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   // Audit
   await writeAuditLog({
     adminUserId: admin.adminId,
-    action: `report.${type}.update`,
-    targetType: type === 'abuse' ? 'abuse_report' : 'bug_report',
+    action: 'abuse_report.update',
+    targetType: 'abuse_report',
     targetId: id,
-    details: { status, action_taken, resolution_notes },
+    details: { status, action_taken },
     ipAddress: admin.ipAddress
   })
 
@@ -65,14 +51,11 @@ export async function DELETE(
   }
 
   const { id } = await params
-  const { searchParams } = new URL(request.url)
-  const type = searchParams.get('type') || 'abuse'
 
   const adminClient = createAdminClient()
-  const table = type === 'abuse' ? 'abuse_reports' : 'bug_reports'
 
   const { error } = await adminClient
-    .from(table)
+    .from('abuse_reports')
     .delete()
     .eq('id', id)
 
@@ -83,8 +66,8 @@ export async function DELETE(
   // Audit
   await writeAuditLog({
     adminUserId: admin.adminId,
-    action: `report.${type}.delete`,
-    targetType: type === 'abuse' ? 'abuse_report' : 'bug_report',
+    action: 'abuse_report.delete',
+    targetType: 'abuse_report',
     targetId: id,
     details: { deleted: true },
     ipAddress: admin.ipAddress

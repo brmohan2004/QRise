@@ -54,7 +54,7 @@ interface ReportData {
 }
 
 interface ReportsTableProps {
-  type: 'abuse' | 'bug'
+  type: 'abuse'
   data: ReportData[]
   onUpdate: () => void
 }
@@ -76,7 +76,7 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
       const res = await fetch(`/api/admin/reports/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, status }),
+        body: JSON.stringify({ status }),
       })
 
       if (!res.ok) {
@@ -94,7 +94,7 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
   const handleDelete = async (id: string) => {
     setIsDeleting(true)
     try {
-      const res = await fetch(`/api/admin/reports/${id}?type=${type}`, {
+      const res = await fetch(`/api/admin/reports/${id}`, {
         method: 'DELETE',
       })
 
@@ -129,19 +129,9 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
       <Table>
         <TableHeader className="bg-[#111]/50">
           <TableRow className="border-[#1a1a1a] hover:bg-transparent">
-            {type === 'abuse' ? (
-              <>
-                <TableHead className="text-gray-400 font-bold">QR Code</TableHead>
-                <TableHead className="text-gray-400 font-bold">Reason</TableHead>
-                <TableHead className="text-gray-400 font-bold">Reporter</TableHead>
-              </>
-            ) : (
-              <>
-                <TableHead className="text-gray-400 font-bold">Issue</TableHead>
-                <TableHead className="text-gray-400 font-bold">Severity</TableHead>
-                <TableHead className="text-gray-400 font-bold">Reporter</TableHead>
-              </>
-            )}
+            <TableHead className="text-gray-400 font-bold">QR Code</TableHead>
+            <TableHead className="text-gray-400 font-bold">Reason</TableHead>
+            <TableHead className="text-gray-400 font-bold">Reporter</TableHead>
             <TableHead className="text-gray-400 font-bold">Date</TableHead>
             <TableHead className="text-gray-400 font-bold">Status</TableHead>
             <TableHead className="text-right text-gray-400 font-bold">Actions</TableHead>
@@ -157,47 +147,21 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
           ) : (
             data.map((report) => (
               <TableRow key={report.id} className="border-[#1a1a1a] hover:bg-[#111]/30 transition-colors">
-                {type === 'abuse' ? (
-                  <>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="text-white font-bold">{report.qr_codes?.name || 'Deleted QR'}</span>
-                        <span className="text-[10px] font-mono text-gray-500 uppercase tracking-tighter">/{report.qr_codes?.short_code}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                       <div className="flex items-center gap-2">
-                          <ShieldAlert className="h-3.5 w-3.5 text-red-500" />
-                          <span className="text-gray-300 text-sm">{report.reason}</span>
-                       </div>
-                    </TableCell>
-                    <TableCell className="text-gray-400 text-xs">
-                      {report.users?.email || 'Anonymous'}
-                    </TableCell>
-                  </>
-                ) : (
-                  <>
-                    <TableCell>
-                       <div className="flex flex-col max-w-[300px]">
-                          <span className="text-white font-bold line-clamp-1">{report.description}</span>
-                          <span className="text-[10px] text-gray-500 truncate">{report.url}</span>
-                       </div>
-                    </TableCell>
-                    <TableCell>
-                       <Badge variant="outline" className={`
-                          text-[10px] uppercase font-bold
-                          ${report.severity === 'critical' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 
-                            report.severity === 'high' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
-                            'bg-blue-500/10 text-blue-500 border-blue-500/20'}
-                       `}>
-                          {report.severity}
-                       </Badge>
-                    </TableCell>
-                    <TableCell className="text-gray-400 text-xs">
-                      {report.users?.email || 'Anonymous'}
-                    </TableCell>
-                  </>
-                )}
+                <TableCell>
+                  <div className="flex flex-col">
+                    <span className="text-white font-bold">{report.qr_codes?.name || 'Deleted QR'}</span>
+                    <span className="text-[10px] font-mono text-gray-500 uppercase tracking-tighter">/{report.qr_codes?.short_code}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                   <div className="flex items-center gap-2">
+                     <ShieldAlert className="h-3.5 w-3.5 text-red-500" />
+                     <span className="text-gray-300 text-sm">{report.reason}</span>
+                   </div>
+                </TableCell>
+                <TableCell className="text-gray-400 text-xs">
+                  {report.users?.email || 'Anonymous'}
+                </TableCell>
                 <TableCell className="text-gray-500 text-xs font-medium">
                   {format(new Date(report.created_at), 'MMM d, yyyy')}
                 </TableCell>
@@ -213,7 +177,7 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-[#0a0a0a] border-[#222] text-white">
                       <DropdownMenuItem 
-                        className="focus:bg-[#111] focus:text-white cursor-pointer"
+                        className="focus:bg-[#111] focus:text-white cursor-pointer" 
                         onClick={() => handleViewDetails(report)}
                       >
                         <Eye className="h-4 w-4 mr-2" />
@@ -230,10 +194,10 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
                       )}
                       <DropdownMenuItem 
                         className="focus:bg-[#111] focus:text-white cursor-pointer"
-                        onClick={() => handleStatusUpdate(report.id, type === 'abuse' ? 'actioned' : 'resolved')}
+                        onClick={() => handleStatusUpdate(report.id, 'actioned')}
                       >
                         <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                        Mark {type === 'abuse' ? 'Actioned' : 'Resolved'}
+                        Mark Actioned
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         className="focus:bg-[#111] focus:text-white cursor-pointer"
@@ -273,7 +237,7 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
         <AlertDialogContent className="bg-[#0a0a0a] border border-[#222] text-white rounded-3xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold">
-              Are you sure you want to delete this {type === 'abuse' ? 'abuse' : 'bug'} report?
+              Are you sure you want to delete this abuse report?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-gray-400">
               This action cannot be undone. This will permanently delete the report and remove it from the system.
