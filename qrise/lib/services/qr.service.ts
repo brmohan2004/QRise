@@ -171,6 +171,7 @@ export async function updateQR(
     name?: string;
     targetUrl?: string;
     isActive?: boolean;
+    status?: 'active' | 'suspended' | 'deleted';
     isDynamic?: boolean;
     design?: Record<string, unknown>;
     rules?: any[];
@@ -242,6 +243,10 @@ export async function updateQR(
     delete updateData.actions;
   }
 
+  if (data.isActive !== undefined) {
+    updateData.status = data.isActive ? 'active' : 'suspended';
+  }
+  
   const result = await db
     .update(qrCodes)
     .set(updateData)
@@ -260,9 +265,15 @@ export async function deleteQR(id: string, userId: string, existingQR?: any): Pr
     throw new Error('QR code not found');
   }
   
-  // Run DB update and KV invalidation in parallel to reduce latency
+  // Per requirement: Delete action marks as "suspended"
   await Promise.all([
-    db.update(qrCodes).set({ isDeleted: true, updatedAt: new Date() }).where(eq(qrCodes.id, id)),
+    db.update(qrCodes).set({ 
+      status: 'suspended', 
+      isActive: false,
+      isDeleted: true, // Marking as deleted so it doesn't show in active lists
+      deletedAt: new Date(),
+      updatedAt: new Date() 
+    }).where(eq(qrCodes.id, id)),
     invalidateKVCache(qr.shortCode)
   ]);
 }
@@ -275,10 +286,16 @@ export async function bulkDeleteQR(ids: string[], userId: string): Promise<void>
   
   if (qrs.length === 0) return;
 
-  // 2. Perform bulk soft-delete and cache invalidation
+  // 2. Perform bulk soft-delete (suspend) and cache invalidation
   await Promise.all([
     db.update(qrCodes)
-      .set({ isDeleted: true, updatedAt: new Date() })
+      .set({ 
+        status: 'suspended', 
+        isActive: false,
+        isDeleted: true, 
+        deletedAt: new Date(),
+        updatedAt: new Date() 
+      })
       .where(and(inArray(qrCodes.id, ids), eq(qrCodes.userId, userId))),
     ...qrs.map(qr => invalidateKVCache(qr.shortCode))
   ]);

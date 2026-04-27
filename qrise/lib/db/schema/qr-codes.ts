@@ -12,6 +12,8 @@ export const qrCodes = pgTable('qr_codes', {
   isDynamic: boolean('is_dynamic').default(true),
   isActive: boolean('is_active').default(true),
   isDeleted: boolean('is_deleted').default(false),
+  status: varchar('status', { length: 20 }).default('active'),
+  deletedAt: timestamp('deleted_at'),
   passwordHash: varchar('password_hash', { length: 60 }),
   designConfig: jsonb('design_config').$type<{ logoUrl?: string; logoPublicId?: string }>(),
   bulkJobId: uuid('bulk_job_id'),

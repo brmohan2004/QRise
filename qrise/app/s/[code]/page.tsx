@@ -68,7 +68,7 @@ export default async function ShortCodePage({
     notFound();
   }
 
-  if (!qr.isActive || qr.isDeleted) {
+  if (!qr.isActive || qr.isDeleted || qr.status !== 'active') {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50 px-4">
         <div className="text-center">

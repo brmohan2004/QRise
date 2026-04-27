@@ -58,7 +58,11 @@ export async function PATCH(
 
   const { error } = await adminClient
     .from('qr_codes')
-    .update({ is_active })
+    .update({ 
+      is_active,
+      status: is_active ? 'active' : 'suspended',
+      updated_at: new Date().toISOString()
+    })
     .eq('id', id)
 
   if (error) {
@@ -92,7 +96,12 @@ export async function DELETE(
 
   const { error } = await adminClient
     .from('qr_codes')
-    .delete()
+    .update({ 
+      is_deleted: true,
+      status: 'deleted',
+      deleted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
     .eq('id', id)
 
   if (error) {
