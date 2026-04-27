@@ -26,15 +26,19 @@ export default async function CreateTypePage({ params }: PageProps) {
 
   // Feature Flag checks
   if (type === "password") {
-    const isEnabled = await isFeatureEnabled("password_qr_enabled");
+    const isEnabled = await isFeatureEnabled("password_qr");
     if (!isEnabled) redirect("/create");
   }
   if (type === "multi_action") {
-    const isEnabled = await isFeatureEnabled("multi_action_qr_enabled");
+    const isEnabled = await isFeatureEnabled("multi_action_qr");
     if (!isEnabled) redirect("/create");
   }
   if (type === "bulk") {
-    const isEnabled = await isFeatureEnabled("bulk_qr_enabled");
+    const isEnabled = await isFeatureEnabled("bulk_qr_generator");
+    if (!isEnabled) redirect("/create");
+  }
+  if (type === "smart_routing") {
+    const isEnabled = await isFeatureEnabled("smart_routing");
     if (!isEnabled) redirect("/create");
   }
 

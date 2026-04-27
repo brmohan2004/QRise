@@ -41,9 +41,25 @@ const qrTypes = [
 ];
 
 export function TypeSelector({ 
-  enabledFlags = { password: true, multiAction: true, bulk: true, smartRouting: true, designStudio: true } 
+  enabledFlags = { 
+    password: true, 
+    multiAction: true, 
+    bulk: true, 
+    smartRouting: true, 
+    designStudio: true,
+    static_qr: true,
+    dynamic_qr: true 
+  } 
 }: { 
-  enabledFlags?: { password: boolean; multiAction: boolean; bulk: boolean; smartRouting: boolean; designStudio: boolean } 
+  enabledFlags?: { 
+    password: boolean; 
+    multiAction: boolean; 
+    bulk: boolean; 
+    smartRouting: boolean; 
+    designStudio: boolean;
+    static_qr: boolean;
+    dynamic_qr: boolean;
+  } 
 }) {
   const router = useRouter();
   const { qrType, isDynamic, setType, setDynamic, reset } = useWizardStore();
@@ -53,6 +69,15 @@ export function TypeSelector({
   useEffect(() => {
     reset();
   }, [reset]);
+
+  // Handle forcing dynamic/static based on flags
+  useEffect(() => {
+    if (enabledFlags.dynamic_qr && !enabledFlags.static_qr) {
+      setDynamic(true);
+    } else if (!enabledFlags.dynamic_qr && enabledFlags.static_qr) {
+      setDynamic(false);
+    }
+  }, [enabledFlags.dynamic_qr, enabledFlags.static_qr, setDynamic]);
 
   const filteredTypes = qrTypes.filter(item => {
     if (item.type === "password") return enabledFlags.password;
@@ -68,6 +93,17 @@ export function TypeSelector({
       router.push(`/create/${selected}`);
     }
   };
+
+  const allDisabled = !enabledFlags.static_qr && !enabledFlags.dynamic_qr;
+
+  if (allDisabled) {
+    return (
+      <div className="p-8 text-center bg-red-50 border border-red-200 rounded-xl">
+        <h2 className="text-xl font-semibold text-red-900">QR Generation Disabled</h2>
+        <p className="text-sm text-red-700 mt-2">QR code generation is currently disabled. Please contact support for more information.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -102,32 +138,47 @@ export function TypeSelector({
         ))}
       </div>
 
-      {/* Dynamic QR Toggle */}
-      <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-        <div className="flex items-center h-5">
-          <input
-            id="dynamic"
-            type="checkbox"
-            checked={isDynamic}
-            onChange={(e) => setDynamic(e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 text-[#0F6E56] focus:ring-[#0F6E56]"
-          />
-        </div>
-        <div className="ml-2">
-          <label htmlFor="dynamic" className="text-sm font-medium text-gray-900">
-            Make this QR dynamic
-          </label>
-          <p className="text-xs text-gray-500">
-            Change your destination URL anytime without reprinting
-          </p>
-        </div>
-        <div className="ml-auto group relative">
-          <HelpCircle className="h-4 w-4 text-gray-400" />
-          <div className="absolute right-0 w-64 p-2 bg-gray-900 text-white text-xs rounded hidden group-hover:block z-10">
-            Dynamic QRs store a short link that points to your URL. You can update the destination anytime in your dashboard.
+      {/* Dynamic QR Toggle - Only show if both are enabled or handle specifically */}
+      {enabledFlags.dynamic_qr && enabledFlags.static_qr && (
+        <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center h-5">
+            <input
+              id="dynamic"
+              type="checkbox"
+              checked={isDynamic}
+              onChange={(e) => setDynamic(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-[#0F6E56] focus:ring-[#0F6E56]"
+            />
+          </div>
+          <div className="ml-2">
+            <label htmlFor="dynamic" className="text-sm font-medium text-gray-900">
+              Make this QR dynamic
+            </label>
+            <p className="text-xs text-gray-500">
+              Change your destination URL anytime without reprinting
+            </p>
+          </div>
+          <div className="ml-auto group relative">
+            <HelpCircle className="h-4 w-4 text-gray-400" />
+            <div className="absolute right-0 w-64 p-2 bg-gray-900 text-white text-xs rounded hidden group-hover:block z-10">
+              Dynamic QRs store a short link that points to your URL. You can update the destination anytime in your dashboard.
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {!enabledFlags.dynamic_qr && enabledFlags.static_qr && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <p className="text-sm text-amber-700">Dynamic QR codes are currently disabled. You are creating a static QR code.</p>
+        </div>
+      )}
+
+      {enabledFlags.dynamic_qr && !enabledFlags.static_qr && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-700 font-medium">All QR codes will be dynamic.</p>
+          <p className="text-xs text-blue-600 mt-1">Static QR code generation is currently disabled.</p>
+        </div>
+      )}
 
       <button
         onClick={handleContinue}

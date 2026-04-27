@@ -71,6 +71,24 @@ const DEFAULT_FLAGS = [
     is_enabled: true,
     enabled_for_plans: ['business', 'enterprise'],
   },
+  {
+    key: 'static_qr',
+    name: 'Static QR Codes',
+    description: 'Allow generation of static QR codes (non-trackable)',
+    is_enabled: true,
+  },
+  {
+    key: 'dynamic_qr',
+    name: 'Dynamic QR Codes',
+    description: 'Allow generation of dynamic QR codes (trackable)',
+    is_enabled: true,
+  },
+  {
+    key: 'analytics_enabled',
+    name: 'Analytics Dashboard',
+    description: 'Show scan analytics and statistics',
+    is_enabled: true,
+  },
 ]
 
 async function seedFeatureFlags() {

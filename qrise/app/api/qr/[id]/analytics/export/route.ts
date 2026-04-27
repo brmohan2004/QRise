@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const isEnabled = await isFeatureEnabled("analytics_export_enabled");
+    const isEnabled = await isFeatureEnabled("analytics_export");
     if (!isEnabled) {
       return NextResponse.json({ error: "Feature disabled" }, { status: 403 });
     }
