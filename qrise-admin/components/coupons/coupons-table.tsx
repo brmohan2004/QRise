@@ -16,6 +16,8 @@ import { Edit2, Trash2, Copy } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { useState } from 'react'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 
 interface Coupon {
   id: string
@@ -36,6 +38,7 @@ interface CouponsTableProps {
 }
 
 export function CouponsTable({ data, onStatusToggle, onDelete }: CouponsTableProps) {
+  const [deleteId, setDeleteId] = useState<string | null>(null)
   const copyToClipboard = (code: string) => {
     navigator.clipboard.writeText(code)
     toast.success(`Code ${code} copied!`)
@@ -126,7 +129,7 @@ export function CouponsTable({ data, onStatusToggle, onDelete }: CouponsTablePro
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-gray-500 hover:text-red-500"
-                        onClick={() => onDelete(coupon.id)}
+                        onClick={() => setDeleteId(coupon.id)}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
@@ -138,6 +141,20 @@ export function CouponsTable({ data, onStatusToggle, onDelete }: CouponsTablePro
           )}
         </TableBody>
       </Table>
+      <ConfirmDialog 
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={() => {
+          if (deleteId) {
+            onDelete(deleteId)
+            setDeleteId(null)
+          }
+        }}
+        title="Delete Coupon?"
+        description="Are you sure you want to delete this coupon? This action cannot be undone."
+        confirmText="Delete Now"
+        variant="danger"
+      />
     </div>
   )
 }

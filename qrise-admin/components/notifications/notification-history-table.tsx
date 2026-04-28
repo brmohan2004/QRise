@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button'
 import { Mail, Bell, Trash2, ExternalLink } from 'lucide-react'
 import { format } from 'date-fns'
 import Link from 'next/link'
+import { useState } from 'react'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 
 interface Notification {
   id: string
@@ -32,6 +34,8 @@ interface NotificationHistoryTableProps {
 }
 
 export function NotificationHistoryTable({ data, onDelete }: NotificationHistoryTableProps) {
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   return (
     <div className="bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a] overflow-hidden">
       <Table>
@@ -98,11 +102,7 @@ export function NotificationHistoryTable({ data, onDelete }: NotificationHistory
                       variant="ghost" 
                       size="icon" 
                       className="h-8 w-8 text-gray-500 hover:text-red-500"
-                      onClick={() => {
-                        if (confirm('Are you sure you want to delete this notification and all its user history?')) {
-                          onDelete(notification.id)
-                        }
-                      }}
+                      onClick={() => setDeleteId(notification.id)}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
@@ -113,6 +113,26 @@ export function NotificationHistoryTable({ data, onDelete }: NotificationHistory
           )}
         </TableBody>
       </Table>
+      <ConfirmDialog 
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={async () => {
+          if (deleteId) {
+            setIsDeleting(true)
+            try {
+              await onDelete(deleteId)
+            } finally {
+              setDeleteId(null)
+              setIsDeleting(false)
+            }
+          }
+        }}
+        isLoading={isDeleting}
+        title="Delete Notification?"
+        description="Are you sure you want to delete this notification and all its user history? This action cannot be undone."
+        confirmText="Delete Now"
+        variant="danger"
+      />
     </div>
   )
 }

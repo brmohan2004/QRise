@@ -96,12 +96,7 @@ export async function DELETE(
 
   const { error } = await adminClient
     .from('qr_codes')
-    .update({ 
-      is_deleted: true,
-      status: 'deleted',
-      deleted_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
+    .delete()
     .eq('id', id)
 
   if (error) {

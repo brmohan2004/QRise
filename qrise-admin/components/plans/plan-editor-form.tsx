@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Save, Info } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 const planSchema = z.object({
   name: z.string().min(2),
@@ -152,9 +153,15 @@ export function PlanEditorForm({ initialData, id }: PlanEditorFormProps) {
       })
 
       if (res.ok) {
+        toast.success(id ? 'Plan updated successfully' : 'New plan created')
         router.push('/plans')
         router.refresh()
+      } else {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed to save plan')
       }
+    } catch (err: any) {
+      toast.error(err.message || 'Error saving plan')
     } finally {
       setIsLoading(false)
     }

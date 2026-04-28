@@ -25,6 +25,8 @@ import {
 } from '@/components/ui/table'
 import { toast } from 'sonner'
 import { Switch } from '@/components/ui/switch'
+import { useState } from 'react'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 
 interface Quiz {
   id: string
@@ -41,6 +43,8 @@ interface QuizTableProps {
 }
 
 export function QuizTable({ data, onUpdate }: QuizTableProps) {
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const handleUpdateStatus = async (id: string, updates: Record<string, unknown>) => {
     try {
       const res = await fetch(`/api/admin/features-quiz/${id}`, {
@@ -57,11 +61,11 @@ export function QuizTable({ data, onUpdate }: QuizTableProps) {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this feature quiz?')) return
-    
+  const handleDelete = async () => {
+    if (!deleteId) return
+    setIsDeleting(true)
     try {
-      const res = await fetch(`/api/admin/features-quiz/${id}`, {
+      const res = await fetch(`/api/admin/features-quiz/${deleteId}`, {
         method: 'DELETE',
       })
       if (!res.ok) throw new Error('Failed to delete')
@@ -69,6 +73,9 @@ export function QuizTable({ data, onUpdate }: QuizTableProps) {
       onUpdate()
     } catch {
       toast.error('Error deleting')
+    } finally {
+      setIsDeleting(false)
+      setDeleteId(null)
     }
   }
 
@@ -149,7 +156,7 @@ export function QuizTable({ data, onUpdate }: QuizTableProps) {
                       )}
                       <DropdownMenuItem 
                         className="focus:bg-[#111] focus:text-red-500 cursor-pointer text-red-500"
-                        onClick={() => handleDelete(quiz.id)}
+                        onClick={() => setDeleteId(quiz.id)}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete
@@ -162,6 +169,16 @@ export function QuizTable({ data, onUpdate }: QuizTableProps) {
           )}
         </TableBody>
       </Table>
+      <ConfirmDialog 
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        isLoading={isDeleting}
+        title="Delete Quiz?"
+        description="Are you sure you want to delete this feature quiz? This action cannot be undone."
+        confirmText="Delete Now"
+        variant="danger"
+      />
     </div>
   )
 }

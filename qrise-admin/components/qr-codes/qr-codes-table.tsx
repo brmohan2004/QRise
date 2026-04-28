@@ -17,6 +17,8 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Layers } from 'lucide-react'
+import { ConfirmDialog } from '@/components/admin/confirm-dialog'
+import { toast } from 'sonner'
 
 interface QRColumn {
   id: string
@@ -38,6 +40,7 @@ interface QRCodesTableProps {
 
 export function QRCodesTable({ data }: QRCodesTableProps) {
   const queryClient = useQueryClient()
+  const [deleteItem, setDeleteItem] = React.useState<{ id: string, is_batch?: boolean, type: string } | null>(null)
 
   const toggleStatus = useMutation({
     mutationFn: async ({ id, is_active, is_batch }: { id: string, is_active: boolean, is_batch?: boolean }) => {
@@ -47,11 +50,18 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: !is_active })
       })
-      if (!res.ok) throw new Error('Failed to update status')
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to update status')
+      }
       return res.json()
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      toast.success(`${variables.is_batch ? 'Batch' : 'QR code'} ${!variables.is_active ? 'activated' : 'suspended'} successfully`)
       queryClient.invalidateQueries({ queryKey: ['admin', 'qr_codes'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update status')
     }
   })
 
@@ -61,11 +71,18 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
       const res = await fetch(endpoint, {
         method: 'DELETE'
       })
-      if (!res.ok) throw new Error('Failed to delete')
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to delete')
+      }
       return res.json()
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      toast.success(`${variables.is_batch ? 'Batch' : 'QR code'} removed from database`)
       queryClient.invalidateQueries({ queryKey: ['admin', 'qr_codes'] })
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to delete item')
     }
   })
 
@@ -73,7 +90,7 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
     {
       accessorKey: 'name',
       header: 'QR Name',
-      cell: ({ row }) => (
+      cell: ({ row }: { row: any }) => (
         <div className="flex items-center gap-2">
           <div className="p-1.5 bg-[#1a1a1a] rounded-md">
             {row.original.is_batch ? (
@@ -99,12 +116,12 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
     {
       accessorKey: 'users.email',
       header: 'Owner',
-      cell: ({ row }) => <span className="text-sm text-gray-400">{row.original.users?.email}</span>
+      cell: ({ row }: { row: any }) => <span className="text-sm text-gray-400">{row.original.users?.email}</span>
     },
     {
       accessorKey: 'type',
       header: 'Type',
-      cell: ({ row }) => (
+      cell: ({ row }: { row: any }) => (
         <Badge variant="outline" className="text-[10px] uppercase border-[#333] text-gray-400">
           {row.getValue('type')}
         </Badge>
@@ -113,12 +130,12 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
     {
       accessorKey: 'scan_count',
       header: 'Scans',
-      cell: ({ row }) => <span className="text-sm font-mono text-gray-400">{((row.getValue('scan_count') as number) ?? 0).toLocaleString()}</span>
+      cell: ({ row }: { row: any }) => <span className="text-sm font-mono text-gray-400">{((row.getValue('scan_count') as number) ?? 0).toLocaleString()}</span>
     },
     {
       accessorKey: 'created_at',
       header: 'Created',
-      cell: ({ row }) => (
+      cell: ({ row }: { row: any }) => (
         <span className="text-xs text-gray-500">
           {format(new Date(row.getValue('created_at')), 'MMM d, yyyy')}
         </span>
@@ -127,7 +144,7 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
     {
       accessorKey: 'is_active',
       header: 'Status',
-      cell: ({ row }) => {
+      cell: ({ row }: { row: any }) => {
         const status = (row.original.status || (row.original.is_active ? 'active' : 'suspended')) as string
         return (
           <Badge 
@@ -146,7 +163,7 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
     },
     {
       id: 'actions',
-      cell: ({ row }) => {
+      cell: ({ row }: { row: any }) => {
         const qr = row.original
         const isToggling = toggleStatus.isPending && toggleStatus.variables?.id === qr.id
         const isDeleting = deleteQR.isPending && deleteQR.variables?.id === qr.id
@@ -180,11 +197,7 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
               </DropdownMenuItem>
               <DropdownMenuItem 
                 className="cursor-pointer focus:bg-red-900/20 focus:text-red-400 flex items-center gap-2 text-red-400"
-                onClick={() => {
-                  if (confirm(`Are you sure you want to delete this ${qr.is_batch ? 'batch' : 'QR code'}? This action cannot be undone.`)) {
-                    deleteQR.mutate({ id: qr.id, is_batch: qr.is_batch })
-                  }
-                }}
+                onClick={() => setDeleteItem({ id: qr.id, is_batch: qr.is_batch, type: qr.is_batch ? 'batch' : 'QR code' })}
                 disabled={isToggling || isDeleting}
               >
                 <Trash2 className="h-4 w-4" />
@@ -198,12 +211,29 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
   ]
 
   return (
-    <DataTable 
-      columns={columns} 
-      data={data} 
-      searchKey="name" 
-      placeholder="Search by QR name..." 
-    />
+    <>
+      <DataTable 
+        columns={columns} 
+        data={data} 
+        searchKey="name" 
+        placeholder="Search by QR name..." 
+      />
+      <ConfirmDialog 
+        isOpen={!!deleteItem}
+        onClose={() => setDeleteItem(null)}
+        onConfirm={() => {
+          if (deleteItem) {
+            deleteQR.mutate({ id: deleteItem.id, is_batch: deleteItem.is_batch })
+            setDeleteItem(null)
+          }
+        }}
+        isLoading={deleteQR.isPending}
+        title={`Delete ${deleteItem?.type === 'batch' ? 'Batch' : 'QR Code'}?`}
+        description={`Are you sure you want to delete this ${deleteItem?.type === 'batch' ? 'batch' : 'QR code'}? This action cannot be undone.`}
+        confirmText="Delete Now"
+        variant="danger"
+      />
+    </>
   )
 }
 

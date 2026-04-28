@@ -39,8 +39,6 @@ export default function CouponsPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this coupon?')) return
-
     try {
       const res = await fetch(`/api/admin/coupons/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Failed to delete')

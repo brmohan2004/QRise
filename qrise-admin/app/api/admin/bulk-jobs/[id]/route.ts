@@ -15,27 +15,30 @@ export async function DELETE(
   const { id } = await params
   const adminClient = createAdminClient()
 
-  // 1. Mark all QR codes in this batch as deleted/suspended
-  // Per requirement, we don't hard delete from the app, we suspend.
-  // But in Admin, "Delete" might mean soft-delete.
+  // 1. Delete all QR codes in this batch
   const { error: qrError } = await adminClient
     .from('qr_codes')
-    .update({ 
-      is_deleted: true, 
-      status: 'deleted',
-      deleted_at: new Date().toISOString(),
-      updated_at: new Date().toISOString() 
-    })
+    .delete()
     .eq('bulk_job_id', id)
 
   if (qrError) {
     return NextResponse.json({ error: qrError.message }, { status: 500 })
   }
 
-  // 2. Audit
+  // 2. Delete the bulk job record itself
+  const { error: jobError } = await adminClient
+    .from('bulk_jobs')
+    .delete()
+    .eq('id', id)
+
+  if (jobError) {
+    return NextResponse.json({ error: jobError.message }, { status: 500 })
+  }
+
+  // 3. Audit
   await writeAuditLog({
     adminUserId: admin.adminId,
-    action: 'bulk_job.delete_qrs',
+    action: 'bulk_job.delete',
     targetType: 'bulk_job',
     targetId: id,
     details: { deleted: true },
