@@ -31,7 +31,7 @@ export function ScanTrendChart({ data, range, onRangeChange, isLoading }: ScanTr
 
   if (isLoading || !isMounted) {
     return (
-      <Card className="h-[400px]">
+      <Card className="h-[300px] sm:h-[400px]">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
           <Skeleton className="h-6 w-32" />
           <div className="flex gap-1">
@@ -41,7 +41,7 @@ export function ScanTrendChart({ data, range, onRangeChange, isLoading }: ScanTr
           </div>
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-[280px] w-full" />
+          <Skeleton className="h-[180px] sm:h-[280px] w-full" />
         </CardContent>
       </Card>
     );
@@ -69,8 +69,8 @@ export function ScanTrendChart({ data, range, onRangeChange, isLoading }: ScanTr
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height={300} minWidth={0} minHeight={300} debounce={100}>
+        <div className="h-[220px] sm:h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%" debounce={100}>
             <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorScans" x1="0" y1="0" x2="0" y2="1">

@@ -9,6 +9,7 @@ import { DocsSidebar, MobileSidebarContent } from "@/components/docs/docs-sideba
 import { SearchModal } from "@/components/docs/search-modal"
 import { OnThisPage } from "@/components/docs/on-this-page"
 import { DocsPageSkeleton } from "@/components/docs/docs-page-skeleton"
+import "./docs-modern.css"
 
 interface Heading {
   id: string
@@ -75,7 +76,7 @@ export default function DocsLayoutClient({
         </div>
 
         {/* Main content */}
-        <main className="flex-1 max-w-3xl mx-auto px-4 py-8 w-full overflow-x-hidden">
+        <main className="flex-1 max-w-3xl mx-auto px-4 py-8 w-full overflow-x-hidden modern-docs">
           <Suspense fallback={<DocsPageSkeleton />}>
             {children}
           </Suspense>

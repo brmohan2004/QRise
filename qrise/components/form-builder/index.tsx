@@ -183,7 +183,7 @@ export function FormBuilder({ initialData, onClose }: FormBuilderProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-slate-50">
+    <div className="fixed inset-0 z-50 flex flex-col bg-gray-50/50">
       <FormBuilderHeader 
         onClose={onClose}
         formName={formName}
@@ -202,34 +202,48 @@ export function FormBuilder({ initialData, onClose }: FormBuilderProps) {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <FieldPalette 
-            leftWidth={leftWidth}
-            startResizingLeft={startResizingLeft}
-            isResizingLeft={isResizingLeft}
-          />
+          {/* Left Palette (Desktop Only) */}
+          <div className="hidden lg:block h-full border-r border-gray-100 bg-white" style={{ width: leftWidth }}>
+            <FieldPalette 
+              leftWidth={leftWidth}
+              startResizingLeft={startResizingLeft}
+              isResizingLeft={isResizingLeft}
+            />
+          </div>
 
-          {/* Mobile FAB */}
+          {/* Mobile Palette FAB */}
           <div className="lg:hidden fixed bottom-6 right-6 z-40">
             <Sheet open={isPaletteOpen} onOpenChange={setIsPaletteOpen}>
               <Button
                 size="icon"
-                className="h-14 w-14 rounded-full bg-[#0F6E56] hover:bg-[#0d5c48] shadow-lg"
+                className="h-14 w-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 shadow-xl shadow-emerald-600/20 active:scale-95 transition-all border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1"
                 onClick={() => setIsPaletteOpen(true)}
               >
-                <Plus className="h-6 w-6" />
+                <Plus className="h-6 w-6 text-white" />
               </Button>
-              <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl">
-                <div className="px-4 py-6">
-                  <h3 className="text-base font-bold text-slate-800 mb-1">Add Field</h3>
-                  <div className="grid grid-cols-3 gap-3 mt-6">
+              <SheetContent side="bottom" className="h-[80vh] rounded-t-[2rem] p-0 border-none bg-white">
+                <div className="p-8">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="p-2.5 bg-emerald-50 rounded-xl border border-emerald-100">
+                      <Plus className="h-5 w-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-black text-gray-900 uppercase tracking-tight">Add Element</h3>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-0.5">Drag or tap to add</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
                     {paletteItems.map((item) => (
                       <button
                         key={item.type}
                         onClick={() => addField(item.type)}
-                        className="flex flex-col items-center gap-2 p-4 rounded-xl border bg-white hover:border-[#0F6E56] transition-all"
+                        className="flex items-center gap-4 p-4 rounded-2xl border border-gray-100 bg-white hover:border-emerald-500/30 hover:bg-emerald-50/10 transition-all text-left group shadow-sm active:scale-[0.98]"
                       >
-                        <item.icon className="h-5 w-5 text-[#0F6E56]" />
-                        <span className="text-xs font-medium text-slate-700">{item.label}</span>
+                        <div className="p-2.5 bg-gray-50 rounded-xl group-hover:bg-emerald-50 transition-colors border border-gray-50 group-hover:border-emerald-100">
+                          <item.icon className="h-5 w-5 text-gray-400 group-hover:text-emerald-600" />
+                        </div>
+                        <span className="text-[10px] font-black text-gray-600 group-hover:text-emerald-900 uppercase tracking-widest">{item.label}</span>
                       </button>
                     ))}
                   </div>
@@ -238,13 +252,15 @@ export function FormBuilder({ initialData, onClose }: FormBuilderProps) {
             </Sheet>
           </div>
 
-          <div className="flex-1 min-w-0 overflow-y-auto overflow-x-auto p-4 lg:p-12">
+          <div className="flex-1 min-w-0 overflow-y-auto p-6 lg:p-16 bg-gray-50/50">
             <BuilderCanvas
               fields={fields}
               selectedId={selectedFieldId}
               onSelect={(id) => {
                 setSelectedFieldId(id);
-                if (typeof window !== "undefined" && window.innerWidth < 1024) setIsSettingsOpen(true);
+                if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                  setIsSettingsOpen(true);
+                }
               }}
               onDelete={(id) => {
                 setFields(prev => prev.filter(f => f.id !== id));
@@ -255,26 +271,26 @@ export function FormBuilder({ initialData, onClose }: FormBuilderProps) {
 
           <DragOverlay>
             {activeId ? (
-              <div className="bg-white border-2 border-[#0F6E56] rounded-xl p-4 shadow-xl w-[300px] opacity-90 font-bold text-[#0F6E56]">
-                Moving field...
+              <div className="bg-white border-2 border-emerald-500 rounded-2xl p-5 shadow-2xl w-[300px] opacity-95 scale-105 transition-transform font-black text-emerald-600 uppercase tracking-widest text-[10px]">
+                Placing element...
               </div>
             ) : null}
           </DragOverlay>
         </DndContext>
 
-        {/* Right Settings Panel */}
+        {/* Right Settings Panel (Desktop) */}
         <div 
-          className="hidden lg:block border-l bg-white shrink-0 overflow-y-auto relative"
+          className="hidden lg:block border-l border-gray-100 bg-white shrink-0 overflow-y-auto relative"
           style={{ width: `${rightWidth}px` }}
         >
           <div
             onMouseDown={startResizingRight}
             className={cn(
-              "absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize z-50 transition-all duration-200 hover:bg-[#0F6E56]/20",
-              isResizingRight && "bg-[#0F6E56]/40 border-[#0F6E56]/50 w-2"
+              "absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize z-50 transition-all duration-200 hover:bg-emerald-600/20",
+              isResizingRight && "bg-emerald-600/40 border-emerald-600/50 w-2"
             )}
           >
-            <div className="absolute inset-y-0 left-0 w-[1px] bg-slate-200" />
+            <div className="absolute inset-y-0 left-0 w-[1px] bg-gray-100" />
           </div>
           <FieldSettingsPanel
             field={selectedField}
@@ -282,6 +298,29 @@ export function FormBuilder({ initialData, onClose }: FormBuilderProps) {
             onClose={() => setSelectedFieldId(null)}
           />
         </div>
+
+        {/* Mobile Settings Panel (Sheet) */}
+        <Sheet 
+          open={isSettingsOpen && !!selectedField} 
+          onOpenChange={(open) => {
+            setIsSettingsOpen(open);
+            if (!open) setSelectedFieldId(null);
+          }}
+        >
+          <SheetContent side="bottom" className="h-[85vh] rounded-t-[2rem] p-0 border-none bg-white">
+            <div className="h-full overflow-y-auto">
+              <FieldSettingsPanel
+                field={selectedField}
+                showClose={false}
+                onUpdate={(updates) => selectedFieldId && setFields(prev => prev.map(f => f.id === selectedFieldId ? { ...f, ...updates } : f))}
+                onClose={() => {
+                  setIsSettingsOpen(false);
+                  setSelectedFieldId(null);
+                }}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       <FormPreview isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} fields={fields} name={formName} />

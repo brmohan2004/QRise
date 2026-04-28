@@ -6,6 +6,8 @@ export interface QRDesign {
   eyeColor?: string;
   eyeStyle?: 'square' | 'dot' | 'extra-rounded';
   frameColor?: string;
+  frameText?: string;
+  frameTextColor?: string;
   logoUrl?: string;
   logoPublicId?: string;
   frameStyle?: 'none' | 'simple' | 'rounded' | 'badge_below' | 'badge_above' | 'bubble';

@@ -10,18 +10,20 @@ import {
   Code2, 
   Settings, 
   Plus,
-  QrCode as LogoIcon,
   PanelLeftClose,
   PanelLeftOpen,
   Zap,
   ArrowUpRight
 } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "./user-menu";
 import { useSidebarStore } from "@/stores/sidebar.store";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
+
+import { useQuery } from "@tanstack/react-query";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -44,7 +46,23 @@ export function SidebarNav({
   const resetWizard = useWizardStore((state) => state.reset);
   const { isCollapsed, toggle } = useSidebarStore();
 
+  const { data: userData } = useQuery({
+    queryKey: ["current-user"],
+    queryFn: async () => {
+      const res = await fetch("/api/user");
+      const json = await res.json();
+      return json.data;
+    }
+  });
+
   const collapsed = isCollapsed && !isMobile;
+
+  const user = {
+    name: userData?.fullName || "Mohan",
+    email: userData?.email || "mohan@example.com",
+    plan: userData?.plan?.name || "Pro",
+    avatar_url: userData?.avatarUrl
+  };
 
   return (
     <TooltipProvider delay={0}>
@@ -69,12 +87,16 @@ export function SidebarNav({
               >
                 <Link 
                   href="/dashboard" 
-                  className="flex items-center gap-2 font-bold text-xl text-primary"
+                  className="flex items-center gap-3 font-bold text-xl text-primary"
                   onClick={onNavClick}
                 >
-                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0">
-                    <LogoIcon className="w-5 h-5 text-primary-foreground" />
-                  </div>
+                  <Image 
+                    src="/logo.png" 
+                    alt="QRise" 
+                    width={32} 
+                    height={32} 
+                    className="w-8 h-8 object-contain"
+                  />
                   <span>QRise</span>
                 </Link>
               </motion.div>
@@ -85,9 +107,15 @@ export function SidebarNav({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0 }}
-                className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0"
+                className="shrink-0"
               >
-                <LogoIcon className="w-5 h-5 text-primary-foreground" />
+                <Image 
+                  src="/logo.png" 
+                  alt="QRise" 
+                  width={32} 
+                  height={32} 
+                  className="w-8 h-8 object-contain"
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -221,7 +249,7 @@ export function SidebarNav({
             </motion.div>
           )}
           <UserMenu 
-            user={{ name: "Mohan", email: "mohan@example.com", plan: "Pro" }} 
+            user={user} 
             isCollapsed={collapsed}
           />
         </div>

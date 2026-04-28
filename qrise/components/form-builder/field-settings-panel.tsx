@@ -33,6 +33,7 @@ interface FieldSettingsPanelProps {
   field: FormField | undefined;
   onUpdate: (updates: Partial<FormField>) => void;
   onClose: () => void;
+  showClose?: boolean;
 }
 
 const fieldTypeIcons: Record<string, React.ElementType> = {
@@ -72,7 +73,12 @@ function FieldTypeIcon({ type, className }: { type: string; className?: string }
   return <Icon className={className} />;
 }
 
-export function FieldSettingsPanel({ field, onUpdate, onClose }: FieldSettingsPanelProps) {
+export function FieldSettingsPanel({ 
+  field, 
+  onUpdate, 
+  onClose,
+  showClose = true
+}: FieldSettingsPanelProps) {
   if (!field) return null;
 
   const handleOptionChange = (index: number, value: string) => {
@@ -95,25 +101,27 @@ export function FieldSettingsPanel({ field, onUpdate, onClose }: FieldSettingsPa
     <aside className="w-full bg-white flex flex-col shrink-0 animate-in slide-in-from-right duration-300 overflow-hidden h-full">
       {/* Header with gradient accent bar */}
       <div className="relative overflow-hidden shrink-0">
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#0F6E56] via-[#14a085] to-[#0F6E56]" />
-        <div className="h-20 border-b flex items-center justify-between px-5 shrink-0 bg-white">
+        <div className="absolute inset-x-0 top-0 h-1 bg-emerald-600" />
+        <div className="h-20 border-b border-gray-100 flex items-center justify-between px-5 shrink-0 bg-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0F6E56] to-[#0d5a48] flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center shadow-sm">
               <FieldTypeIcon type={field.type} className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 leading-tight">{fieldName}</h3>
-              <p className="text-xs text-slate-400 font-medium">Field Settings</p>
+              <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight leading-tight">{fieldName}</h3>
+              <p className="text-[10px] font-black text-emerald-600/50 uppercase tracking-widest mt-0.5">Field Settings</p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="h-9 w-9 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          {showClose && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-9 w-9 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all rounded-xl border border-transparent hover:border-emerald-100"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 

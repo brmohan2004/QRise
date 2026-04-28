@@ -44,15 +44,15 @@ export function BillingDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent showCloseButton={false} className="sm:max-w-5xl md:w-[95vw] md:h-[85vh] h-screen w-screen p-0 overflow-hidden rounded-none md:rounded-[40px] border-none shadow-2xl flex flex-col">
+      <DialogContent showCloseButton={false} className="sm:max-w-5xl md:w-[95vw] md:h-[85vh] h-[90vh] w-[95vw] p-0 overflow-hidden rounded-[32px] md:rounded-[48px] border-none shadow-2xl flex flex-col">
         <div className="flex items-center justify-between px-8 py-6 bg-white border-b shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-              <CreditCard className="w-5 h-5 text-indigo-600" />
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-emerald-50 flex items-center justify-center">
+              <CreditCard className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" />
             </div>
             <div>
-              <h2 className="text-xl font-black tracking-tight text-slate-900 italic uppercase">Subscription</h2>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Manage your plan and invoices</p>
+              <h2 className="text-lg md:text-2xl font-bold tracking-tight text-slate-900 leading-none">Subscription</h2>
+              <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1 md:mt-1.5">Manage your plan and invoices</p>
             </div>
           </div>
           <button 
@@ -68,23 +68,23 @@ export function BillingDialog() {
             <div className="py-20 text-center"><Loader2 className="h-8 w-8 animate-spin mx-auto text-indigo-600" /></div>
           ) : (
             <div className="space-y-16">
-              <div className="flex items-center gap-4">
-                <div className="w-1.5 h-6 bg-indigo-600 rounded-full" />
-                <h2 className="text-xl font-black text-slate-900 tracking-tight italic">Plan & Billing</h2>
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="w-1.5 h-5 md:h-6 bg-emerald-600 rounded-full" />
+                <h2 className="text-lg md:text-xl font-bold text-slate-900 tracking-tight">Plan & Billing</h2>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Current Plan Card */}
-                <div className="lg:col-span-2 p-12 bg-indigo-600 rounded-[48px] text-white shadow-2xl shadow-indigo-200 flex flex-col justify-between relative overflow-hidden group">
-                  <Zap className="absolute -right-12 -top-12 w-80 h-80 text-white/5 rotate-12 group-hover:rotate-0 transition-transform duration-1000" />
+                <div className="lg:col-span-2 p-8 md:p-12 bg-slate-900 rounded-[32px] md:rounded-[56px] text-white shadow-2xl shadow-slate-200 flex flex-col justify-between relative overflow-hidden group">
+                  <div className="absolute -right-20 -top-20 w-96 h-96 bg-emerald-500/10 blur-[100px] rounded-full group-hover:bg-emerald-500/20 transition-all duration-1000" />
                   
-                  <div className="relative z-10 space-y-10">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-200">Current active tier</span>
-                        <h3 className="text-5xl font-black capitalize tracking-tight italic">{planName}</h3>
+                  <div className="relative z-10 space-y-8 md:space-y-10">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="space-y-2 md:space-y-3">
+                        <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.4em] text-emerald-400">Current active tier</span>
+                        <h3 className="text-4xl md:text-6xl font-bold tracking-tight">{planName}</h3>
                       </div>
-                      <div className="px-6 py-3 bg-white/10 rounded-full border border-white/20 text-[11px] font-black uppercase tracking-widest backdrop-blur-md">
+                      <div className="px-4 py-2 md:px-6 md:py-3 bg-white/5 rounded-full border border-white/10 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] backdrop-blur-md shrink-0">
                         {userData?.planExpiresAt ? `Renews on ${renewalDate}` : 'Free Tier Active'}
                       </div>
                     </div>
@@ -99,11 +99,11 @@ export function BillingDialog() {
                     </div>
                   </div>
 
-                  <div className="relative z-10 pt-16 flex flex-wrap gap-4">
-                    <Button className="bg-white text-indigo-600 hover:bg-slate-50 font-black h-14 px-10 rounded-2xl shadow-xl shadow-indigo-900/20 text-xs uppercase tracking-widest">
+                  <div className="relative z-10 pt-10 md:pt-16 flex flex-wrap gap-3 md:gap-4">
+                    <Button className="flex-1 md:flex-none bg-emerald-500 hover:bg-emerald-400 text-white font-bold h-14 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl shadow-xl shadow-emerald-900/20 text-[10px] md:text-[11px] uppercase tracking-[0.2em] transition-all hover:scale-[1.02]">
                       Manage Subscription
                     </Button>
-                    <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-black h-14 px-10 rounded-2xl backdrop-blur-sm text-xs uppercase tracking-widest">
+                    <Button variant="outline" className="flex-1 md:flex-none border-white/10 text-white hover:bg-white/5 font-bold h-14 md:h-16 px-8 md:px-10 rounded-xl md:rounded-2xl backdrop-blur-sm text-[10px] md:text-[11px] uppercase tracking-[0.2em]">
                       View Invoices
                     </Button>
                   </div>
@@ -128,7 +128,7 @@ export function BillingDialog() {
                     </div>
                   </div>
                   
-                  <Button variant="ghost" className="w-full text-indigo-600 font-black justify-between hover:bg-indigo-50 rounded-2xl h-14 px-6 text-xs uppercase tracking-widest">
+                  <Button variant="ghost" className="w-full text-emerald-600 font-bold justify-between hover:bg-emerald-50 rounded-xl md:rounded-2xl h-14 md:h-16 px-6 text-[9px] md:text-[10px] uppercase tracking-[0.2em]">
                     Update Methods
                     <ArrowUpRight className="h-4 w-4" />
                   </Button>
@@ -137,12 +137,12 @@ export function BillingDialog() {
 
               {/* History Section */}
               <section className="space-y-10 pt-16 border-t border-slate-200/60">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-1.5 h-6 bg-slate-200 rounded-full" />
-                    <h2 className="text-xl font-black text-slate-900 tracking-tight italic uppercase tracking-tight">Financial ledger</h2>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 md:gap-4">
+                    <div className="w-1.5 h-5 md:h-6 bg-slate-200 rounded-full" />
+                    <h2 className="text-lg md:text-xl font-bold text-slate-900 tracking-tight">Financial ledger</h2>
                   </div>
-                  <Button variant="outline" className="gap-2 text-slate-500 font-black rounded-xl border-2 uppercase text-[10px] tracking-widest h-10 px-5 hover:bg-slate-50">
+                  <Button variant="outline" className="gap-2 text-slate-500 font-bold rounded-xl md:rounded-2xl border border-slate-200 uppercase text-[9px] md:text-[10px] tracking-[0.2em] h-10 md:h-12 px-5 md:px-6 hover:bg-slate-50 shadow-sm">
                     <History className="h-4 w-4" />
                     Export Receipts
                   </Button>

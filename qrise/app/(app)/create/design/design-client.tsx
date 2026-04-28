@@ -108,9 +108,17 @@ export function DesignClient({ isEnabled }: { isEnabled: boolean }) {
 
   return (
     <WizardShell>
-      <div className="mb-6">
-        <Link href={`/create/${qrType || "url"}`} className="text-sm text-[#0F6E56] hover:underline">
-          ← Back to config
+      <div className="mb-8">
+        <Link 
+          href={`/create/${qrType || "url"}`} 
+          className="group inline-flex items-center gap-2 text-[10px] uppercase font-black tracking-widest text-gray-400 hover:text-emerald-600 transition-all"
+        >
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 group-hover:bg-emerald-50 transition-colors">
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" />
+            </svg>
+          </div>
+          Back to configuration
         </Link>
       </div>
       
@@ -123,10 +131,19 @@ export function DesignClient({ isEnabled }: { isEnabled: boolean }) {
           <button
             onClick={handleFinish}
             disabled={isSubmitting || warning}
-            className="px-6 py-2.5 bg-[#0F6E56] text-white rounded-lg font-medium hover:bg-[#0d5c48] disabled:opacity-50 flex items-center gap-2"
+            className="group relative h-12 px-8 flex items-center justify-center bg-gray-900 text-white rounded-xl font-bold overflow-hidden transition-all hover:bg-black active:scale-[0.98] disabled:opacity-50"
           >
-            {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-            Finish & create QR
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-600 opacity-0 group-hover:opacity-10 transition-opacity" />
+            {isSubmitting ? (
+              <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+            ) : (
+              <span className="flex items-center gap-2">
+                Complete & Create QR
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                </svg>
+              </span>
+            )}
           </button>
         </div>
       </div>

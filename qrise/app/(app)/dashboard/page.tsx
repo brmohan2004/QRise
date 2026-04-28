@@ -130,11 +130,11 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-8">
         <div className="lg:col-span-7">
           <div className="flex flex-col h-full rounded-2xl border border-muted/60 bg-background overflow-hidden shadow-sm">
-            <div className="px-6 py-5 border-b flex items-center justify-between bg-muted/20">
+            <div className="px-4 sm:px-6 py-4 sm:py-5 border-b flex items-center justify-between bg-muted/20">
               <h3 className="font-bold text-base">Recent Scans</h3>
               <span className="text-xs font-bold text-muted-foreground bg-background px-2 py-1 rounded-md border">Latest 5</span>
             </div>
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <ActivityFeed 
                 events={statsData?.recentActivity || []} 
                 isLoading={isStatsLoading} 

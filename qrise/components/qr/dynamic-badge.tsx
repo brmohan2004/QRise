@@ -15,17 +15,17 @@ export function DynamicBadge({ isDynamic = true, className }: DynamicBadgeProps)
         <TooltipTrigger asChild>
           <span
             className={cn(
-              "inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium",
+              "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all shadow-sm",
               isDynamic
-                ? "bg-green-100 text-green-700"
-                : "bg-gray-100 text-gray-600",
+                ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                : "bg-gray-50 text-gray-500 border-gray-100",
               className
             )}
           >
             <span
               className={cn(
-                "h-2 w-2 rounded-full",
-                isDynamic ? "bg-green-500 animate-pulse" : "bg-gray-400"
+                "h-1.5 w-1.5 rounded-full",
+                isDynamic ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-gray-400"
               )}
             />
             {isDynamic ? "Dynamic" : "Static"}

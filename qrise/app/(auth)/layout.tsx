@@ -1,5 +1,5 @@
-import { QrCode } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function AuthLayout({
   children,
@@ -11,11 +11,15 @@ export default function AuthLayout({
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0F6E56]">
-              <QrCode className="h-7 w-7 text-white" />
-            </div>
+            <Image 
+              src="/logo.png" 
+              alt="QRise Logo" 
+              width={48} 
+              height={48} 
+              className="h-12 w-12 object-contain"
+            />
           </Link>
-          <h1 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">
+          <h1 className="mt-6 text-3xl font-bold tracking-tight text-gray-900 uppercase">
             QRise
           </h1>
         </div>

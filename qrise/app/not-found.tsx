@@ -1,16 +1,23 @@
-import { QrCode, Home, Mail, Ghost } from "lucide-react";
+import { Home, Mail, Ghost } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="max-w-md w-full p-8 text-center">
-        <div className="flex justify-center mb-8 relative">
-          <div className="h-24 w-24 bg-slate-900 rounded-3xl flex items-center justify-center shadow-2xl relative z-10">
-            <QrCode className="h-14 w-14 text-white" />
+        <div className="flex justify-center mb-10 relative">
+          <div className="relative z-10">
+            <Image 
+              src="/logo.png" 
+              alt="QRise Logo" 
+              width={96} 
+              height={96} 
+              className="h-24 w-24 object-contain drop-shadow-2xl"
+            />
           </div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-32 w-32 bg-slate-100 rounded-full blur-2xl opacity-50" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-32 w-32 bg-emerald-500/10 rounded-full blur-3xl opacity-50" />
         </div>
 
         <div className="mb-6">

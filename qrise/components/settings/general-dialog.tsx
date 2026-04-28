@@ -87,15 +87,15 @@ export function GeneralDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent showCloseButton={false} className="sm:max-w-4xl md:w-[90vw] md:h-[85vh] h-screen w-screen p-0 overflow-hidden rounded-none md:rounded-[40px] border-none shadow-2xl flex flex-col">
+      <DialogContent showCloseButton={false} className="sm:max-w-4xl md:w-[90vw] md:h-[85vh] h-[90vh] w-[95vw] p-0 overflow-hidden rounded-[32px] md:rounded-[48px] border-none shadow-2xl flex flex-col">
         <div className="flex items-center justify-between px-8 py-6 bg-white border-b shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-              <User className="w-5 h-5 text-indigo-600" />
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-emerald-50 flex items-center justify-center">
+              <User className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" />
             </div>
             <div>
-              <h2 className="text-xl font-black tracking-tight text-slate-900 italic uppercase tracking-tight">Profile & Workspace</h2>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global preferences & identity</p>
+              <h2 className="text-lg md:text-2xl font-bold tracking-tight text-slate-900 leading-none">Profile & Workspace</h2>
+              <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1 md:mt-1.5">Global preferences & identity</p>
             </div>
           </div>
           <button 
@@ -111,60 +111,60 @@ export function GeneralDialog() {
             <div className="py-20 text-center"><Loader2 className="h-8 w-8 animate-spin mx-auto text-indigo-600" /></div>
           ) : (
             <div className="space-y-16">
-              <section className="space-y-8">
-                <div className="flex items-center gap-4">
-                  <div className="w-1.5 h-6 bg-indigo-600 rounded-full" />
-                  <h2 className="text-xl font-black text-slate-900 tracking-tight italic">Public Profile</h2>
+              <section className="space-y-8 md:space-y-10">
+                <div className="flex items-center gap-3 md:gap-4">
+                  <div className="w-1.5 h-5 md:h-6 bg-emerald-600 rounded-full" />
+                  <h2 className="text-lg md:text-xl font-bold text-slate-900 tracking-tight">Public Profile</h2>
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-12 items-start">
-                  <div className="relative group">
-                    <Avatar className="w-32 h-32 border-4 border-white shadow-xl overflow-hidden rounded-[32px]">
+                  <div className="relative group shrink-0 mx-auto md:mx-0">
+                    <Avatar className="w-24 h-24 md:w-32 md:h-32 border-4 md:border-8 border-white shadow-2xl shadow-slate-200 overflow-hidden rounded-[32px] md:rounded-[40px]">
                       <AvatarImage src={user?.avatarUrl} />
-                      <AvatarFallback className="bg-indigo-50 text-indigo-600 text-3xl font-black">
+                      <AvatarFallback className="bg-emerald-50 text-emerald-600 text-2xl md:text-3xl font-bold">
                         {user?.fullName?.charAt(0) || "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-white p-2 text-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-[32px]">
-                      {isUploading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Upload className="h-6 w-6 mb-1" />}
-                      <span className="text-[10px] font-black uppercase tracking-widest">Change Photo</span>
+                    <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] text-white p-2 text-center opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer rounded-[32px] md:rounded-[40px]">
+                      {isUploading ? <Loader2 className="h-5 w-5 md:h-6 md:w-6 animate-spin" /> : <Upload className="h-5 w-5 md:h-6 md:w-6 mb-1 md:mb-1.5" />}
+                      <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest">Update Photo</span>
                       <input type="file" className="hidden" onChange={handleAvatarUpload} accept="image/*" />
                     </label>
                   </div>
 
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 w-full">
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</Label>
-                      <div className="relative">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
-                        <Input defaultValue={user?.fullName} className="pl-12 h-12 rounded-xl bg-white border-slate-100" />
+                    <div className="space-y-2 md:space-y-3">
+                      <Label className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 ml-1">Full Name</Label>
+                      <div className="relative group">
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+                        <Input defaultValue={user?.fullName} className="pl-12 h-12 md:h-14 rounded-xl md:rounded-2xl bg-white border-slate-100 focus:border-emerald-200 focus:ring-emerald-500/10 transition-all shadow-sm text-sm" />
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</Label>
+                    <div className="space-y-2 md:space-y-3">
+                      <Label className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 ml-1">Email Address</Label>
                       <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
-                        <Input value={user?.email} disabled className="pl-12 h-12 rounded-xl bg-slate-100 italic border-slate-200" />
+                        <Input value={user?.email} disabled className="pl-12 h-12 md:h-14 rounded-xl md:rounded-2xl bg-slate-50/50 text-slate-500 border-slate-100 shadow-none cursor-not-allowed text-sm" />
                       </div>
                     </div>
                   </div>
                 </div>
               </section>
 
-              <section className="space-y-8 pt-12 border-t border-slate-200/60">
+              <section className="space-y-10 pt-16 border-t border-slate-200/40">
                 <div className="flex items-center gap-4">
-                  <div className="w-1.5 h-6 bg-indigo-600 rounded-full" />
-                  <h2 className="text-xl font-black text-slate-900 tracking-tight italic">System Preferences</h2>
+                  <div className="w-1.5 h-6 bg-emerald-600 rounded-full" />
+                  <h2 className="text-xl font-bold text-slate-900 tracking-tight">System Preferences</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Workspace Timezone</Label>
+                  <div className="space-y-2 md:space-y-3">
+                    <Label className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 ml-1">Workspace Timezone</Label>
                     <Select defaultValue="UTC">
-                      <SelectTrigger className="h-12 rounded-xl bg-white border-slate-100">
+                      <SelectTrigger className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-white border-slate-100 focus:ring-emerald-500/10 transition-all shadow-sm text-sm">
                         <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-slate-300" />
+                          <Clock className="h-4 w-4 text-slate-400" />
                           <SelectValue placeholder="Select timezone" />
                         </div>
                       </SelectTrigger>
@@ -177,12 +177,12 @@ export function GeneralDialog() {
                     </Select>
                   </div>
 
-                  <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Default Language</Label>
+                  <div className="space-y-2 md:space-y-3">
+                    <Label className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 ml-1">Default Language</Label>
                     <Select defaultValue="en">
-                      <SelectTrigger className="h-12 rounded-xl bg-white border-slate-100">
+                      <SelectTrigger className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-white border-slate-100 focus:ring-emerald-500/10 transition-all shadow-sm text-sm">
                         <div className="flex items-center gap-2">
-                          <Globe className="h-4 w-4 text-slate-300" />
+                          <Globe className="h-4 w-4 text-slate-400" />
                           <SelectValue placeholder="Select language" />
                         </div>
                       </SelectTrigger>
@@ -197,18 +197,18 @@ export function GeneralDialog() {
                 </div>
               </section>
 
-              <section className="pt-12 border-t border-slate-200/60">
-                <div className="p-10 bg-red-50 border border-red-100 rounded-[40px] flex flex-col md:flex-row md:items-center justify-between gap-8">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-red-600 mb-1">
-                      <ShieldAlert className="h-5 w-5" />
-                      <h3 className="text-lg font-black uppercase tracking-tight italic">Terminal Action Zone</h3>
+              <section className="pt-10 md:pt-16 border-t border-slate-200/40">
+                <div className="p-6 md:p-10 bg-rose-50 border border-rose-100 rounded-[32px] md:rounded-[48px] flex flex-col lg:flex-row lg:items-center justify-between gap-6 md:gap-10">
+                  <div className="space-y-2 md:space-y-3">
+                    <div className="flex items-center gap-2 md:gap-3 text-rose-600 mb-1">
+                      <ShieldAlert className="h-5 w-5 md:h-6 md:w-6" />
+                      <h3 className="text-base md:text-lg font-bold tracking-tight">Terminal Action Zone</h3>
                     </div>
-                    <p className="text-sm text-red-900/60 font-bold max-w-md">
+                    <p className="text-xs md:text-sm text-rose-900/60 font-medium max-w-md leading-relaxed">
                       Deleting your account is permanent and cannot be undone. All QR codes, forms, and analytics will be purged from our systems.
                     </p>
                   </div>
-                  <Button variant="destructive" className="h-14 px-10 font-black rounded-2xl shadow-xl shadow-red-200 uppercase tracking-widest text-xs">
+                  <Button variant="destructive" className="h-12 md:h-16 px-8 md:px-12 font-bold rounded-xl md:rounded-2xl shadow-xl md:shadow-2xl shadow-rose-200 uppercase tracking-[0.2em] text-[9px] md:text-[10px] hover:scale-[1.02] transition-transform">
                     Destroy Workspace
                   </Button>
                 </div>

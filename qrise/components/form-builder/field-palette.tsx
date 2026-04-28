@@ -36,11 +36,18 @@ const paletteItems: PaletteItemData[] = [
   { type: "signature", label: "Signature", icon: Signature },
 ];
 
+import { useEffect, useState } from "react";
+
 function DesktopPaletteItem({ type, label, icon: Icon }: PaletteItemData) {
+  const [mounted, setMounted] = useState(false);
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: `palette-${type}`,
     data: { type },
   });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const getCategoryColor = (type: FieldType) => {
     if (["text", "email", "phone", "textarea"].includes(type)) return "from-blue-500/10 to-blue-600/5 text-blue-600 border-blue-100";
@@ -53,18 +60,18 @@ function DesktopPaletteItem({ type, label, icon: Icon }: PaletteItemData) {
   return (
     <div
       ref={setNodeRef}
-      {...listeners}
-      {...attributes}
+      {...(mounted ? listeners : {})}
+      {...(mounted ? attributes : {})}
       className={cn(
         "flex items-center gap-3 p-3 rounded-xl border bg-white cursor-grab transition-all duration-300",
-        "hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:scale-[1.02] hover:border-[#0F6E56]/30",
+        "hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:scale-[1.02] hover:border-emerald-500/30",
         "active:scale-95 active:shadow-inner"
       )}
     >
       <div className={cn("p-2.5 rounded-lg bg-gradient-to-br shadow-sm", colorClass)}>
         <Icon className="h-4 w-4" />
       </div>
-      <span className="text-sm font-semibold text-slate-700 tracking-tight">{label}</span>
+      <span className="text-[11px] font-black text-gray-700 tracking-tight uppercase">{label}</span>
     </div>
   );
 }

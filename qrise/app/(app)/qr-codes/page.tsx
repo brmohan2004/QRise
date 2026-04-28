@@ -142,87 +142,116 @@ export default function QrCodesPage() {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My QR Codes</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage and track your QR codes</p>
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 leading-tight">My QR Codes</h1>
+          <p className="text-xs text-gray-500 mt-1 leading-relaxed">Manage and track your QR performance.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <Button 
             variant="outline" 
             onClick={() => setIsSelectionMode(!isSelectionMode)}
             className={cn(
-              "rounded-lg font-medium transition-all",
-              isSelectionMode ? "bg-[#0F6E56]/10 text-[#0F6E56] border-[#0F6E56]/20" : "hover:bg-gray-50"
+              "hidden sm:flex rounded-xl font-black text-[9px] uppercase tracking-widest transition-all h-9 px-4 border-gray-100 shadow-sm",
+              isSelectionMode ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-white text-gray-500 hover:text-emerald-600 hover:bg-emerald-50"
             )}
           >
-            {isSelectionMode ? "Cancel Selection" : "Select"}
+            {isSelectionMode ? "Cancel" : "Select"}
           </Button>
           <Link 
             href="/create" 
-            className="bg-[#0F6E56] hover:bg-[#0d5c48] text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+            className="flex-1 sm:flex-none h-10 bg-gray-900 hover:bg-black text-white px-6 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4" />
             Create QR
           </Link>
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input 
-            placeholder="Search QR codes..." 
-            className="pl-9"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-        </div>
-        
-        <div className="flex gap-2 items-center ml-auto">
-          <select 
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="border border-gray-200 rounded-md py-2 px-3 text-sm focus:ring-[#0F6E56] focus:border-[#0F6E56]"
-          >
-            <option value="all">All Types</option>
-            <option value="url">URL</option>
-            <option value="smart">Smart Routing</option>
-          </select>
-
-          <select 
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border border-gray-200 rounded-md py-2 px-3 text-sm focus:ring-[#0F6E56] focus:border-[#0F6E56]"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="paused">Paused</option>
-          </select>
-
-          <select 
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="border border-gray-200 rounded-md py-2 px-3 text-sm focus:ring-[#0F6E56] focus:border-[#0F6E56]"
-          >
-            <option value="newest">Newest first</option>
-            <option value="scans">Most scanned</option>
-          </select>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col md:flex-row gap-2">
+          <div className="flex items-center gap-2 flex-1">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+              <Input 
+                placeholder="Search..." 
+                className="pl-8 h-8 bg-white border-gray-100 rounded-xl text-[11px] font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsSelectionMode(!isSelectionMode)}
+              className={cn(
+                "md:hidden rounded-xl font-black text-[9px] uppercase tracking-widest transition-all h-8 px-3 gap-1.5 shadow-sm border-gray-100",
+                isSelectionMode 
+                  ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
+                  : "bg-white text-gray-500 hover:text-emerald-600 hover:bg-emerald-50"
+              )}
+            >
+              {isSelectionMode ? <X className="w-3 h-3" /> : <CheckSquare className="w-3 h-3" />}
+              {isSelectionMode ? "Cancel" : "Select"}
+            </Button>
+          </div>
           
-          <div className="flex bg-gray-100 rounded-md p-1">
-            <button 
-              onClick={() => setView("grid")}
-              className={`p-1.5 rounded ${view === "grid" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </button>
-            <button 
-              onClick={() => setView("list")}
-              className={`p-1.5 rounded ${view === "list" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
-            >
-              <ListIcon className="h-4 w-4" />
-            </button>
+          <div className="flex flex-wrap sm:flex-nowrap gap-1.5 items-center">
+            <div className="flex-1 sm:flex-none">
+              <select 
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="w-full sm:w-auto h-8 bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none cursor-pointer shadow-sm"
+              >
+                <option value="all">Types</option>
+                <option value="url">URL</option>
+                <option value="smart">Smart</option>
+              </select>
+            </div>
+
+            <div className="flex-1 sm:flex-none">
+              <select 
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full sm:w-auto h-8 bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none cursor-pointer shadow-sm"
+              >
+                <option value="all">Status</option>
+                <option value="active">Active</option>
+                <option value="paused">Paused</option>
+              </select>
+            </div>
+
+            <div className="flex-1 sm:flex-none">
+              <select 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full sm:w-auto h-8 bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none cursor-pointer shadow-sm"
+              >
+                <option value="newest">Newest</option>
+                <option value="scans">Scans</option>
+              </select>
+            </div>
+            
+            <div className="flex bg-gray-50 border border-gray-100 rounded-xl p-0.5 shadow-sm ml-auto sm:ml-0">
+              <button 
+                onClick={() => setView("grid")}
+                className={cn(
+                  "p-1 rounded-lg transition-all",
+                  view === "grid" ? "bg-white shadow-sm text-emerald-600" : "text-gray-400 hover:text-gray-600"
+                )}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+              </button>
+              <button 
+                onClick={() => setView("list")}
+                className={cn(
+                  "p-1 rounded-lg transition-all",
+                  view === "list" ? "bg-white shadow-sm text-emerald-600" : "text-gray-400 hover:text-gray-600"
+                )}
+              >
+                <ListIcon className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

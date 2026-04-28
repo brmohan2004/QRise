@@ -26,17 +26,17 @@ export function StudioPanel() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Design Studio</h2>
-          <p className="text-sm text-gray-500 mt-1">Customize the look and feel of your QR code</p>
+          <h2 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 leading-tight">Design Studio</h2>
+          <p className="text-sm text-gray-500 mt-1 leading-relaxed">Customize the look and feel of your QR code</p>
         </div>
         <button
           onClick={handleReset}
-          className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-2 px-3 py-2 bg-gray-50 text-gray-500 rounded-xl text-[10px] uppercase font-black tracking-widest hover:bg-emerald-50 hover:text-emerald-600 transition-all border border-gray-100 hover:border-emerald-100 active:scale-95 shrink-0"
         >
-          <RotateCcw className="h-4 w-4" />
-          Reset to default
+          <RotateCcw className="h-3.5 w-3.5" />
+          Reset
         </button>
       </div>
 
@@ -46,17 +46,17 @@ export function StudioPanel() {
           <TabsTrigger value="logo">Logo</TabsTrigger>
           <TabsTrigger value="frame">Frame & Eyes</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="style" className="space-y-6 mt-6">
           <ColorPicker />
           <div className="h-px bg-gray-200 w-full" />
           <DotPatternSelector />
         </TabsContent>
-        
+
         <TabsContent value="logo" className="mt-6">
           <LogoUploader />
         </TabsContent>
-        
+
         <TabsContent value="frame" className="space-y-6 mt-6">
           <FrameSelector />
           <div className="h-px bg-gray-200 w-full" />

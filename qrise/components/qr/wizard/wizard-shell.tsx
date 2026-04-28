@@ -74,56 +74,56 @@ export function WizardShell({ children, showPreview = true }: WizardShellProps) 
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto py-8 px-4">
+    <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
       <div className="flex-1">
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           {/* Progress Bar */}
-          <div className="h-1.5 bg-gray-100 rounded-full mb-8 overflow-hidden">
+          <div className="h-1.5 bg-gray-100 rounded-full mb-6 sm:mb-8 overflow-hidden">
             <div
               className="h-full bg-[#0F6E56] transition-all duration-500 ease-out"
               style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
             />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between px-2 sm:px-0 relative">
+            {/* Background line for stepper */}
+            <div className="absolute top-[18px] left-0 right-0 h-[2px] bg-gray-100 -z-10 mx-6 sm:mx-10" />
+            
             {steps.map((s, index) => {
               const isCompleted = step > s.id;
               const isCurrent = step === s.id;
               
               return (
-                <div key={s.id} className="flex items-center">
-                  <div className="flex flex-col items-center gap-2">
-                    <div
-                      className={cn(
-                        "flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-all duration-300",
-                        isCompleted
-                          ? "bg-[#0F6E56] text-white"
-                          : isCurrent
-                          ? "bg-[#0F6E56] text-white ring-4 ring-[#0F6E56]/10"
-                          : "bg-gray-100 text-gray-400 border border-gray-200"
-                      )}
-                    >
-                      {isCompleted ? <Check className="h-5 w-5" /> : s.id}
-                    </div>
-                    <span
-                      className={cn(
-                        "text-xs font-semibold uppercase tracking-wider",
-                        isCurrent ? "text-[#0F6E56]" : "text-gray-400"
-                      )}
-                    >
-                      {s.name}
-                    </span>
+                <div key={s.id} className="flex flex-col items-center relative z-10">
+                  <div
+                    className={cn(
+                      "flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full text-xs sm:text-sm font-bold transition-all duration-500",
+                      isCompleted
+                        ? "bg-[#0F6E56] text-white"
+                        : isCurrent
+                        ? "bg-[#0F6E56] text-white ring-4 ring-[#0F6E56]/10 shadow-lg shadow-emerald-900/20"
+                        : "bg-white text-gray-400 border-2 border-gray-100"
+                    )}
+                  >
+                    {isCompleted ? <Check className="h-4 w-4 sm:h-5 sm:w-5" /> : s.id}
                   </div>
-                  {index < steps.length - 1 && (
-                    <div className="h-px w-12 sm:w-24 bg-gray-200 mx-2 -translate-y-3" />
-                  )}
+                  <span
+                    className={cn(
+                      "mt-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-colors duration-300",
+                      isCurrent ? "text-[#0F6E56]" : "text-gray-400",
+                      "hidden xs:block" // Still hide on very small, but maybe show on most mobiles
+                    )}
+                  >
+                    {s.name}
+                  </span>
                 </div>
               );
             })}
           </div>
         </div>
 
-        <div className={cn("bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm relative", isLoading && "opacity-60")}>
+        <div className={cn("bg-white rounded-2xl border border-gray-200 p-4 sm:p-8 shadow-sm relative overflow-hidden", isLoading && "opacity-60")}>
+          <div className="absolute top-0 left-0 w-1 h-full bg-[#0F6E56]" />
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center z-20 bg-white/20 backdrop-blur-[1px]">
               <Loader2 className="w-8 h-8 animate-spin text-[#0F6E56]" />

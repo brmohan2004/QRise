@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, Eye, Save, MessageSquare, Share2 } from "lucide-react";
+import { ChevronLeft, Eye, Save, MessageSquare, Share2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -27,60 +27,54 @@ export function FormBuilderHeader({
   savedFormId 
 }: FormBuilderHeaderProps) {
   return (
-    <header className="h-14 lg:h-16 border-b bg-white flex items-center justify-between px-4 lg:px-6 shrink-0 z-50 relative shadow-sm">
-      <div className="flex items-center gap-3 lg:gap-4">
-        <Button variant="ghost" size="icon" onClick={onClose} className="h-11 w-11 lg:h-10 lg:w-10 rounded-xl hover:bg-slate-100">
+    <header className="h-16 lg:h-18 border-b border-gray-100 bg-white flex items-center justify-between px-4 lg:px-6 shrink-0 z-50 relative shadow-sm">
+      <div className="flex items-center gap-2 lg:gap-4">
+        <Button variant="ghost" size="icon" onClick={onClose} className="h-9 w-9 lg:h-10 lg:w-10 rounded-xl hover:bg-emerald-50 hover:text-emerald-600 transition-all">
           <ChevronLeft className="h-4 w-4 lg:h-5 lg:w-5" />
         </Button>
-        <div className="h-5 lg:h-6 w-px bg-slate-200" />
+        <div className="h-6 w-px bg-gray-100 mx-0.5" />
         <Input
           value={formName}
           onChange={(e) => setFormName(e.target.value)}
-          className="border-none shadow-none text-base lg:text-lg font-bold p-0 focus-visible:ring-0 w-40 lg:w-64 bg-transparent h-11 lg:h-auto"
+          className="border-none shadow-none text-sm lg:text-lg font-black tracking-tight p-0 focus-visible:ring-0 w-24 xs:w-32 sm:w-40 lg:w-80 bg-transparent h-10 lg:h-auto text-gray-900"
+          placeholder="Form Name"
         />
       </div>
       
-      <div className="flex items-center gap-2 lg:gap-3">
-        {savedFormId && (
-          <>
-            <Button 
-              variant="ghost" 
-              asChild
-              className="hidden sm:flex gap-2 text-slate-500 hover:text-[#0F6E56] hover:bg-[#0F6E56]/5 px-3 lg:px-4 rounded-xl"
-            >
-              <Link href={`/forms/${savedFormId}/submissions`}>
-                <MessageSquare className="h-4 w-4" />
-                <span className="hidden lg:inline text-xs font-bold uppercase tracking-wider">Submissions</span>
-              </Link>
-            </Button>
-            <Button 
-              variant="ghost" 
-              onClick={onShare}
-              className="hidden sm:flex gap-2 text-slate-500 hover:text-[#0F6E56] hover:bg-[#0F6E56]/5 px-3 lg:px-4 rounded-xl"
-            >
-              <Share2 className="h-4 w-4" />
-              <span className="hidden lg:inline text-xs font-bold uppercase tracking-wider">Share</span>
-            </Button>
-          </>
-        )}
-        
+      <div className="flex items-center gap-1.5 lg:gap-3">
         <Button 
           variant="outline" 
+          size="icon"
           onClick={onPreview} 
-          className="h-11 lg:h-10 px-3 lg:px-4 gap-2 border-slate-200 hover:border-[#0F6E56]/30 hover:bg-[#0F6E56]/5 rounded-xl transition-all"
+          className="h-9 w-9 lg:h-10 lg:w-auto lg:px-4 gap-2 border-gray-100 hover:border-emerald-100 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all shadow-sm font-black text-[10px] uppercase tracking-widest"
         >
-          <Eye className="h-4 w-4 text-slate-500" />
-          <span className="hidden sm:inline text-xs font-bold uppercase tracking-wider text-slate-600">Preview</span>
+          <Eye className="h-4 w-4" />
+          <span className="hidden lg:inline">Preview</span>
+        </Button>
+
+        <Button 
+          variant="outline" 
+          size="icon"
+          onClick={onShare}
+          disabled={!savedFormId}
+          className="h-9 w-9 lg:h-10 lg:w-auto lg:px-4 gap-2 border-gray-100 hover:border-emerald-100 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all shadow-sm font-black text-[10px] uppercase tracking-widest disabled:opacity-30 disabled:grayscale"
+        >
+          <Share2 className="h-4 w-4" />
+          <span className="hidden lg:inline">Share</span>
         </Button>
         
         <Button 
           onClick={onSave} 
           disabled={isSaving} 
-          className="h-11 lg:h-10 px-4 lg:px-6 gap-2 bg-[#0F6E56] hover:bg-[#0d5c48] text-white shadow-lg shadow-[#0F6E56]/20 rounded-xl transition-all"
+          className="h-9 px-3 lg:h-10 lg:px-6 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest"
         >
-          <Save className="h-4 w-4" />
-          <span className="text-xs font-bold uppercase tracking-wider">
-            {isSaving ? "Saving..." : (savedFormId ? "Update Form" : "Save Form")}
+          {isSaving ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="h-4 w-4" />
+          )}
+          <span className="hidden xs:inline">
+            {isSaving ? "Saving..." : (savedFormId ? "Update" : "Save")}
           </span>
         </Button>
       </div>

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 interface StatCardProps {
   label: string;
-  value: number;
+  value: number | string;
   delta?: string;
   deltaDirection?: "up" | "down" | "neutral";
   icon: LucideIcon;
@@ -25,11 +25,16 @@ export function StatCard({
   isLoading,
   prefix = ""
 }: StatCardProps) {
-  const [displayValue, setDisplayValue] = useState(0);
+  const [displayValue, setDisplayValue] = useState<number | string>(typeof value === 'number' ? 0 : value);
 
   useEffect(() => {
     if (isLoading) return;
     
+    if (typeof value !== 'number') {
+      setDisplayValue(value);
+      return;
+    }
+
     let start = 0;
     const end = value;
     const duration = 1000;
@@ -52,48 +57,52 @@ export function StatCard({
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-4 rounded-full" />
+      <Card className="overflow-hidden border-gray-100 rounded-2xl">
+        <CardContent className="p-4 sm:p-5">
+          <div className="flex items-center justify-between mb-3">
+            <Skeleton className="h-3 w-20 rounded-full" />
+            <Skeleton className="h-8 w-8 rounded-xl" />
           </div>
-          <Skeleton className="mt-4 h-8 w-32" />
-          <Skeleton className="mt-2 h-4 w-16" />
+          <Skeleton className="h-8 w-24 rounded-lg" />
+          <Skeleton className="mt-3 h-4 w-16 rounded-full" />
         </CardContent>
       </Card>
     );
   }
 
+  const formattedValue = typeof displayValue === 'number' 
+    ? displayValue.toLocaleString() 
+    : displayValue;
+
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-md border-muted/60">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm font-medium text-muted-foreground">{label}</p>
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Icon className="h-4 w-4 text-primary" />
+    <Card className="overflow-hidden transition-all hover:shadow-md border-gray-100 rounded-2xl group">
+      <CardContent className="p-4 sm:p-5">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 line-clamp-1 group-hover:text-emerald-600 transition-colors">{label}</p>
+          <div className="p-2 bg-emerald-50 rounded-xl shrink-0 border border-emerald-100/50 group-hover:bg-emerald-100 transition-colors">
+            <Icon className="h-4 w-4 text-emerald-600" />
           </div>
         </div>
         
-        <div>
-          <h3 className="text-3xl font-bold tracking-tight">
-            {prefix}{displayValue.toLocaleString()}
+        <div className="space-y-2">
+          <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900">
+            {prefix}{formattedValue}
           </h3>
           
           {delta && (
-            <div className="flex items-center gap-1 mt-2">
+            <div className="flex items-center gap-2">
               <span className={cn(
-                "flex items-center text-xs font-bold px-1.5 py-0.5 rounded-full",
-                deltaDirection === "up" ? "bg-emerald-500/10 text-emerald-600" :
-                deltaDirection === "down" ? "bg-red-500/10 text-red-600" :
-                "bg-gray-500/10 text-gray-600"
+                "flex items-center w-fit text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border shadow-sm",
+                deltaDirection === "up" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                deltaDirection === "down" ? "bg-red-50 text-red-600 border-red-100" :
+                "bg-gray-50 text-gray-500 border-gray-100"
               )}>
-                {deltaDirection === "up" && <ArrowUpRight className="h-3 w-3 mr-0.5" />}
-                {deltaDirection === "down" && <ArrowDownRight className="h-3 w-3 mr-0.5" />}
-                {deltaDirection === "neutral" && <Minus className="h-3 w-3 mr-0.5" />}
+                {deltaDirection === "up" && <ArrowUpRight className="h-3 w-3 mr-1" />}
+                {deltaDirection === "down" && <ArrowDownRight className="h-3 w-3 mr-1" />}
+                {deltaDirection === "neutral" && <Minus className="h-3 w-3 mr-1" />}
                 {delta}
               </span>
-              <span className="text-xs text-muted-foreground">vs last period</span>
+              <span className="text-[9px] font-bold text-gray-300 uppercase tracking-widest whitespace-nowrap">vs last period</span>
             </div>
           )}
         </div>

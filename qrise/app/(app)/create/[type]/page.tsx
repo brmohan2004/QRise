@@ -53,20 +53,31 @@ export default async function CreateTypePage({ params }: PageProps) {
   const config = configComponents[type as QRType];
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4">
+    <div className="max-w-6xl mx-auto">
       <WizardShell showPreview={type !== "bulk"}>
-        <div className="mb-6">
-          <Link href="/create" className="text-sm text-[#0F6E56] hover:underline">
-            ← Back to type selection
+        <div className="mb-8">
+          <Link 
+            href="/create" 
+            className="group inline-flex items-center gap-2 text-[10px] uppercase font-black tracking-widest text-gray-400 hover:text-emerald-600 transition-all"
+          >
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 group-hover:bg-emerald-50 transition-colors">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" />
+              </svg>
+            </div>
+            Back to type selection
           </Link>
         </div>
         {config}
-        <div className="mt-6 flex justify-end">
+        <div className="mt-8 pt-8 border-t border-gray-100 flex justify-end">
           <Link
             href={`/create/design?type=${type}`}
-            className="px-4 py-2 bg-[#0F6E56] text-white rounded-lg font-medium hover:bg-[#0d5c48]"
+            className="flex items-center gap-2 px-6 py-3 bg-emerald-50 text-emerald-700 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-100 transition-all active:scale-95 border border-emerald-100"
           >
-            Next: Design Studio →
+            Next: Design Studio
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
         </div>
       </WizardShell>

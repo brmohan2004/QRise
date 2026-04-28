@@ -172,68 +172,103 @@ export function QrCard({
     <>
       {view === "list" ? (
         <div className={cn(
-          "flex items-center gap-4 bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition-all",
+          "flex flex-col sm:flex-row sm:items-center gap-4 bg-white border rounded-2xl p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden group",
           isSelected && "border-[#0F6E56] ring-1 ring-[#0F6E56]/10 bg-emerald-50/10",
           qr.isBulk && "border-l-4 border-l-[#0F6E56]"
         )}>
-          {(selectionMode || isSelected) && (
-            <div className="shrink-0 mr-2">
-              <Checkbox
-                checked={isSelected}
-                onCheckedChange={(checked) => onSelect?.(qr.id, !!checked)}
-                className="data-[state=checked]:bg-[#0F6E56] data-[state=checked]:border-[#0F6E56]"
-              />
-            </div>
-          )}
-          <div className="w-16 h-16 bg-gray-100 rounded shrink-0 flex items-center justify-center">
-            {qr.isBulk ? <LayoutGrid className="w-8 h-8 text-[#0F6E56]" /> : <div className="w-full h-full" />}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold truncate">
-                {qr.isBulk ? `[Batch] ${qr.name || 'Bulk Upload'}` : (qr.name || 'Untitled QR')}
-              </h3>
-              {qr.isBulk && (
-                <span className="bg-[#0F6E56]/10 text-[#0F6E56] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#0F6E56]/20">
-                  {qr.items?.length} QRs
-                </span>
-              )}
-              <DynamicBadge isDynamic={qr.isDynamic} />
-              <div className="ml-auto flex items-center gap-2 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
-                <Switch
-                  checked={qr.isActive}
-                  onCheckedChange={handleToggleStatus}
+          {/* Selection and Main Content */}
+          <div className="flex items-center gap-4 flex-1">
+            {(selectionMode || isSelected) && (
+              <div className="shrink-0">
+                <Checkbox
+                  checked={isSelected}
+                  onCheckedChange={(checked) => onSelect?.(qr.id, !!checked)}
+                  className="data-[state=checked]:bg-[#0F6E56] data-[state=checked]:border-[#0F6E56] shadow-sm"
                 />
-                <span className={cn(
-                  "text-[10px] font-bold uppercase tracking-wider",
-                  qr.isActive ? "text-emerald-600" : "text-gray-400"
-                )}>
-                  {qr.isActive ? "Active" : "Paused"}
+              </div>
+            )}
+            
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 rounded-xl shrink-0 flex items-center justify-center border border-gray-100 shadow-sm relative group-hover:border-emerald-100 transition-colors">
+              {qr.isBulk ? (
+                <div className="relative">
+                  <LayoutGrid className="w-7 h-7 text-[#0F6E56]" />
+                  <span className="absolute -top-2 -right-2 bg-white border border-[#0F6E56]/20 text-[#0F6E56] text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-sm">
+                    {qr.items?.length}
+                  </span>
+                </div>
+              ) : qrImageUrl ? (
+                <img src={qrImageUrl} alt={qr.name} className="w-10 h-10 object-contain" />
+              ) : (
+                <Globe className="w-6 h-6 text-gray-300" />
+              )}
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                <h3 className="font-bold text-gray-900 truncate max-w-[150px] sm:max-w-none">
+                  {qr.isBulk ? qr.name || 'Batch Upload' : qr.name || 'Untitled QR'}
+                </h3>
+                <DynamicBadge isDynamic={qr.isDynamic} />
+              </div>
+              <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-[9px] font-black uppercase tracking-[0.15em] text-gray-400">
+                <span className="flex items-center gap-1.5 whitespace-nowrap">
+                  <Globe className="w-3 h-3 text-emerald-600/60" />
+                  {qr.isBulk ? 'BULK' : (qr.type || 'URL')}
+                </span>
+                <span className="flex items-center gap-1.5 whitespace-nowrap">
+                  <BarChart2 className="w-3 h-3 text-emerald-600/60" />
+                  {qr.scanCount || 0} scans
                 </span>
               </div>
             </div>
-            <div className="flex gap-4 text-xs text-gray-500">
-              <span className="flex items-center gap-1"><Globe className="w-3.5 h-3.5" /> {qr.isBulk ? 'BULK' : (qr.type?.toUpperCase() || 'URL')}</span>
-              <span>{qr.scanCount || 0} total scans</span>
-            </div>
           </div>
-          <div className="flex gap-2">
-            {qr.isBulk ? (
-              <Button variant="outline" size="sm" onClick={() => setShowBulkList(true)} className="rounded-lg gap-2 text-[#0F6E56] border-[#0F6E56]/20 hover:bg-[#0F6E56]/5">
-                <LayoutGrid className="w-4 h-4" />
-                View Batch
-              </Button>
-            ) : (
-              <>
-                <button onClick={() => setShowQrPreview(true)} className="p-2 hover:text-[#0F6E56] rounded-lg">
-                  <Eye className="w-5 h-5" />
-                </button>
-                <Link href={`/qr-codes/${qr.id}/analytics`} className="p-2 hover:text-[#0F6E56] rounded-lg">
-                  <BarChart2 className="w-5 h-5" />
-                </Link>
-              </>
-            )}
-            <ActionMenu onCopy={handleCopy} onDelete={handleDelete} qrId={qr.id} type={qr.type} isBulk={qr.isBulk} />
+
+          {/* Actions and Status */}
+          <div className="flex items-center justify-between sm:justify-end gap-3 pt-3 sm:pt-0 border-t sm:border-0 border-gray-100 mt-1 sm:mt-0">
+            <div className="flex items-center gap-2 bg-gray-50 px-2.5 py-1.5 rounded-full border border-gray-100 shadow-sm">
+              <Switch
+                checked={qr.isActive}
+                onCheckedChange={handleToggleStatus}
+                className="scale-[0.6] data-[state=checked]:bg-emerald-500 origin-left"
+              />
+              <span className={cn(
+                "text-[9px] font-black uppercase tracking-widest min-w-[45px]",
+                qr.isActive ? "text-emerald-600" : "text-gray-400"
+              )}>
+                {qr.isActive ? "Active" : "Paused"}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1">
+              {qr.isBulk ? (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setShowBulkList(true)} 
+                  className="h-8 rounded-xl px-3 text-[9px] font-black uppercase tracking-widest text-emerald-600 border-emerald-100 bg-white hover:bg-emerald-50 transition-all shadow-sm"
+                >
+                  View Batch
+                </Button>
+              ) : (
+                <div className="flex items-center gap-0.5">
+                  <button 
+                    onClick={() => setShowQrPreview(true)} 
+                    className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                    title="Quick Preview"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <Link 
+                    href={`/qr-codes/${qr.id}/analytics`} 
+                    className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                    title="Analytics"
+                  >
+                    <BarChart2 className="w-4 h-4" />
+                  </Link>
+                </div>
+              )}
+              <ActionMenu onCopy={handleCopy} onDelete={handleDelete} qrId={qr.id} type={qr.type} isBulk={qr.isBulk} />
+            </div>
           </div>
         </div>
       ) : (

@@ -175,92 +175,102 @@ export default function FormsClient() {
 
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Form Studio</h1>
-          <p className="text-gray-500 text-sm mt-1">Create, manage, and analyze your lead capture forms.</p>
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 leading-tight">Form Studio</h1>
+          <p className="text-xs text-gray-500 mt-1 leading-relaxed">Create, manage, and analyze your lead capture forms.</p>
         </div>
 
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="outline" 
-            onClick={() => setIsSelectionMode(!isSelectionMode)}
-            className={cn(
-              "rounded-lg font-medium transition-all",
-              isSelectionMode ? "bg-[#0F6E56]/10 text-[#0F6E56] border-[#0F6E56]/20" : "hover:bg-gray-50"
-            )}
-          >
-            {isSelectionMode ? "Cancel Selection" : "Select"}
-          </Button>
-
-          <div className="hidden sm:flex items-center gap-3 p-2 bg-white rounded-xl border border-gray-200 shadow-sm">
-            <div className="flex flex-col text-right">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Auto-save</span>
-            </div>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="hidden sm:flex items-center gap-3 p-2 bg-white rounded-xl border border-gray-100 shadow-sm">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Auto-save</span>
             <Switch 
               checked={autoSaveEnabled} 
               onCheckedChange={setAutoSaveEnabled}
-              className="scale-75"
+              className="scale-75 data-[state=checked]:bg-emerald-600"
             />
           </div>
 
-          <Button onClick={handleCreateNew} className="bg-[#0F6E56] hover:bg-[#0d5c48] text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors">
-            <Plus className="h-5 w-5" />
+          <Button 
+            onClick={handleCreateNew} 
+            className="flex-1 sm:flex-none bg-gray-900 hover:bg-gray-800 text-white h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm gap-2"
+          >
+            <Plus className="h-4 w-4" />
             Create Form
           </Button>
         </div>
       </div>
 
-      <div className="flex gap-4 items-center mb-6">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input 
-            placeholder="Search forms..." 
-            className="pl-9"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      {/* Toolbar */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+            <Input 
+              placeholder="Search forms..." 
+              className="pl-8 h-8 rounded-xl border-gray-100 bg-white focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-[11px] font-medium"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setIsSelectionMode(!isSelectionMode)}
+            className={cn(
+              "h-8 px-3 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all gap-1.5 border-gray-100 shadow-sm",
+              isSelectionMode 
+                ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
+                : "bg-white text-gray-500 hover:text-emerald-600 hover:bg-emerald-50"
+            )}
+          >
+            {isSelectionMode ? <X className="w-3 h-3" /> : <CheckSquare className="w-3 h-3" />}
+            <span className="hidden sm:inline">{isSelectionMode ? "Cancel" : "Select"}</span>
+          </Button>
         </div>
 
-        <div className="flex gap-2 items-center ml-auto">
-          <select 
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border border-gray-200 rounded-md py-2 px-3 text-sm focus:ring-[#0F6E56] focus:border-[#0F6E56]"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="paused">Paused</option>
-          </select>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 flex-1 sm:flex-none">
+            <select 
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="h-8 flex-1 sm:flex-none bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all shadow-sm"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+            </select>
 
-          <select 
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="border border-gray-200 rounded-md py-2 px-3 text-sm focus:ring-[#0F6E56] focus:border-[#0F6E56]"
-          >
-            <option value="newest">Newest first</option>
-            <option value="submissions">Most submissions</option>
-          </select>
+            <select 
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="h-8 flex-1 sm:flex-none bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all shadow-sm"
+            >
+              <option value="newest">Newest first</option>
+              <option value="submissions">Most submissions</option>
+            </select>
+          </div>
 
-          <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-lg ml-2">
+          <div className="flex items-center gap-0.5 p-0.5 bg-gray-50 rounded-xl border border-gray-100 shadow-sm ml-auto">
             <button
               onClick={() => setViewMode("grid")}
               className={cn(
-                "p-1.5 rounded-md transition-all",
-                viewMode === "grid" ? "bg-white text-[#0F6E56] shadow-sm" : "text-gray-400 hover:text-gray-600"
+                "p-1 rounded-lg transition-all",
+                viewMode === "grid" ? "bg-white text-emerald-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
               )}
             >
-              <LayoutGrid className="w-4 h-4" />
+              <LayoutGrid className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setViewMode("list")}
               className={cn(
-                "p-1.5 rounded-md transition-all",
-                viewMode === "list" ? "bg-white text-[#0F6E56] shadow-sm" : "text-gray-400 hover:text-gray-600"
+                "p-1 rounded-lg transition-all",
+                viewMode === "list" ? "bg-white text-emerald-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
               )}
             >
-              <ListIcon className="w-4 h-4" />
+              <ListIcon className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

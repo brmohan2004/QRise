@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { QrCode, RotateCcw, Home, AlertCircle } from "lucide-react";
+import { RotateCcw, Home, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function RootError({
   error,
@@ -20,9 +21,13 @@ export default function RootError({
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl shadow-slate-200/50 p-8 text-center border border-slate-100">
         <div className="flex justify-center mb-6">
-          <div className="h-16 w-16 bg-slate-900 rounded-2xl flex items-center justify-center rotate-3 shadow-lg">
-            <QrCode className="h-10 w-10 text-white" />
-          </div>
+          <Image 
+            src="/logo.png" 
+            alt="QRise Logo" 
+            width={64} 
+            height={64} 
+            className="h-16 w-16 object-contain rotate-3 drop-shadow-md"
+          />
         </div>
 
         <div className="flex items-center justify-center gap-2 mb-2 text-red-600">
