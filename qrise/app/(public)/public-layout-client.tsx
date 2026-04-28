@@ -26,9 +26,7 @@ export default function PublicLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
-  const filteredNavigation = navigation.filter(item => 
-    item.name !== "Pricing" || pricingEnabled
-  );
+  const filteredNavigation = navigation;
 
   return (
     <div className="min-h-screen bg-white">

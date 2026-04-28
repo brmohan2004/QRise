@@ -5,7 +5,7 @@ import {
   Area, 
   AreaChart, 
   ResponsiveContainer, 
-  Tooltip, 
+  Tooltip as RechartsTooltip, 
   XAxis, 
   YAxis, 
   CartesianGrid,
@@ -13,14 +13,16 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, AlertCircle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ScanTimelineProps {
   data: { date: string, scans: number, unique: number }[];
   isLoading?: boolean;
+  exportEnabled?: boolean;
 }
 
-export function ScanTimeline({ data, isLoading }: ScanTimelineProps) {
+export function ScanTimeline({ data, isLoading, exportEnabled = true }: ScanTimelineProps) {
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
     setIsMounted(true);
@@ -42,10 +44,32 @@ export function ScanTimeline({ data, isLoading }: ScanTimelineProps) {
     <Card className="shadow-none border-none bg-transparent">
       <CardHeader className="flex flex-row items-center justify-between px-0 pt-0 pb-6">
         <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Scan Timeline</CardTitle>
-        <Button variant="outline" size="sm" className="h-8 text-xs font-bold gap-2" onClick={handleExport}>
-          <Download className="h-3.5 w-3.5" />
-          Export CSV
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-8 text-xs font-bold gap-2" 
+                  onClick={handleExport}
+                  disabled={!exportEnabled}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Export CSV
+                </Button>
+              </div>
+            </TooltipTrigger>
+            {!exportEnabled && (
+              <TooltipContent className="bg-destructive text-destructive-foreground border-none">
+                <p className="flex items-center gap-2 text-xs font-bold">
+                  <AlertCircle className="h-3 w-3" />
+                  This Analytics Export has been disabled by admin
+                </p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
       </CardHeader>
       <CardContent className="px-0">
         <div className="h-[350px] w-full">
@@ -75,7 +99,7 @@ export function ScanTimeline({ data, isLoading }: ScanTimelineProps) {
                   tickLine={false} 
                   tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
                 />
-                <Tooltip 
+                <RechartsTooltip 
                   contentStyle={{ 
                     backgroundColor: "hsl(var(--background))", 
                     borderRadius: "12px", 

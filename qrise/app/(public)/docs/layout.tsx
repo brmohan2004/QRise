@@ -1,6 +1,7 @@
 import { isFeatureEnabled } from "@/lib/feature-flags";
 import { redirect } from "next/navigation";
 import DocsLayoutClient from "./docs-layout-client";
+import { DocsComingSoon } from "@/components/docs/docs-coming-soon";
 
 export default async function DocsLayout({
   children,
@@ -10,7 +11,7 @@ export default async function DocsLayout({
   const isEnabled = await isFeatureEnabled("api_docs_enabled");
 
   if (!isEnabled) {
-    redirect("/");
+    return <DocsComingSoon />;
   }
 
   return <DocsLayoutClient>{children}</DocsLayoutClient>;

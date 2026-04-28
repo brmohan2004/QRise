@@ -5,10 +5,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function CreatePage() {
   const flags = {
-    password: await isFeatureEnabled("password_qr"),
+    password: await isFeatureEnabled("password_qr_enabled"),
     multiAction: await isFeatureEnabled("multi_action_qr"),
-    bulk: await isFeatureEnabled("bulk_qr_generator"),
-    smartRouting: await isFeatureEnabled("smart_routing"),
+    bulk: await isFeatureEnabled("bulk_qr_enabled"),
+    smartRouting: await isFeatureEnabled("smart_routing_enabled"),
     designStudio: await isFeatureEnabled("design_studio"),
     static_qr: await isFeatureEnabled("static_qr"),
     dynamic_qr: await isFeatureEnabled("dynamic_qr"),

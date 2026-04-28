@@ -14,6 +14,8 @@ import { TimeHeatmap } from "@/components/analytics/time-heatmap";
 import { RawEventsTable } from "@/components/analytics/raw-events-table";
 import { StatCard } from "@/components/app/stat-card";
 import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { AlertCircle, ShieldAlert } from "lucide-react";
 
 interface AnalyticsClientProps {
   id: string;
@@ -104,6 +106,48 @@ export function AnalyticsClient({ id, exportEnabled }: AnalyticsClientProps) {
     }
   };
 
+  if (!exportEnabled) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <Link 
+          href="/qr-codes" 
+          className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> Back to Library
+        </Link>
+        
+        <div className="flex items-center justify-center min-h-[60vh] bg-gray-50/50 rounded-3xl border-2 border-dashed border-gray-200">
+          <div className="max-w-md w-full mx-auto px-4 text-center">
+            <div className="inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-destructive/10 mb-8">
+              <ShieldAlert className="h-10 w-10 text-destructive" />
+            </div>
+            
+            <h1 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">
+              Analytics Disabled
+            </h1>
+            
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              This Analytics feature has been disabled by the administrator. 
+              Please contact support if you believe this is an error.
+            </p>
+            
+            <div className="p-6 bg-white rounded-2xl border border-gray-100 mb-8 text-left shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                  <AlertCircle className="h-6 w-6 text-destructive" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-gray-900">Admin Restriction</p>
+                  <p className="text-sm text-gray-500">Access to scan data has been suspended.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header Section */}
@@ -158,18 +202,32 @@ export function AnalyticsClient({ id, exportEnabled }: AnalyticsClientProps) {
                 ))}
               </div>
               
-              {exportEnabled && (
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="font-bold gap-2"
-                  onClick={handleExport}
-                  disabled={isExporting}
-                >
-                  {isExporting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
-                  Export
-                </Button>
-              )}
+               <TooltipProvider>
+                 <Tooltip>
+                   <TooltipTrigger asChild>
+                     <div className="flex items-center">
+                       <Button 
+                         size="sm" 
+                         variant="outline" 
+                         className="font-bold gap-2"
+                         onClick={handleExport}
+                         disabled={isExporting || !exportEnabled}
+                       >
+                         {isExporting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+                         Export
+                       </Button>
+                     </div>
+                   </TooltipTrigger>
+                   {!exportEnabled && (
+                     <TooltipContent className="bg-destructive text-destructive-foreground border-none">
+                       <p className="flex items-center gap-2 text-xs font-bold">
+                         <AlertCircle className="h-3 w-3" />
+                         This Analytics Export has been disabled by admin
+                       </p>
+                     </TooltipContent>
+                   )}
+                 </Tooltip>
+               </TooltipProvider>
 
               <Button size="sm" variant="outline" className="font-bold gap-2" asChild>
                 <Link href={`/create/design?id=${id}`}>
@@ -208,7 +266,7 @@ export function AnalyticsClient({ id, exportEnabled }: AnalyticsClientProps) {
           
           <div className="p-6 sm:p-8 min-h-[500px]">
              <TabsContent value="overview" className="mt-0 focus-visible:outline-none">
-               <ScanTimeline data={overview?.trend || []} isLoading={isOverviewLoading} />
+               <ScanTimeline data={overview?.trend || []} isLoading={isOverviewLoading} exportEnabled={exportEnabled} />
              </TabsContent>
              
              <TabsContent value="location" className="mt-0 focus-visible:outline-none">

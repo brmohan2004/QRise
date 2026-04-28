@@ -11,12 +11,12 @@ interface PageProps {
 export default async function AnalyticsPage({ params: paramsPromise }: PageProps) {
   const params = await paramsPromise;
   
-  const analyticsEnabled = await isFeatureEnabled("analytics_enabled");
+  const analyticsEnabled = await isFeatureEnabled("analytics_dashboard_enabled");
   if (!analyticsEnabled) {
     redirect(`/qr-codes/${params.id}`);
   }
 
-  const exportEnabled = await isFeatureEnabled("analytics_export");
+  const exportEnabled = await isFeatureEnabled("analytics_export_enabled");
   
   return (
     <AnalyticsClient id={params.id} exportEnabled={exportEnabled} />

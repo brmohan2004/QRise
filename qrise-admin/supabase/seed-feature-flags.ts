@@ -65,7 +65,7 @@ const DEFAULT_FLAGS = [
     enabled_for_plans: ['pro', 'business', 'enterprise'],
   },
   {
-    key: 'analytics_export',
+    key: 'analytics_export_enabled',
     name: 'Analytics Export',
     description: 'Download scan data as CSV',
     is_enabled: true,
@@ -84,7 +84,7 @@ const DEFAULT_FLAGS = [
     is_enabled: true,
   },
   {
-    key: 'analytics_enabled',
+    key: 'analytics_dashboard_enabled',
     name: 'Analytics Dashboard',
     description: 'Show scan analytics and statistics',
     is_enabled: true,
