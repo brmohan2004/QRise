@@ -14,9 +14,23 @@ export default function BroadcastsPage() {
     queryKey: ['admin', 'broadcasts'],
     queryFn: async () => {
       const res = await fetch('/api/admin/broadcasts')
-      return res.json()
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to fetch broadcasts')
+      }
+      return data
     }
   })
+
+  if (broadcasts && 'error' in (broadcasts as any)) {
+    return (
+      <div className="p-8 text-center border border-red-500/20 bg-red-500/5 rounded-2xl">
+        <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-4" />
+        <h2 className="text-xl font-bold text-white mb-2">Error Loading Broadcasts</h2>
+        <p className="text-gray-400">{(broadcasts as any).error}</p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-8">
@@ -49,8 +63,8 @@ export default function BroadcastsPage() {
               <Link href="/broadcasts/new">Create First Broadcast</Link>
             </Button>
           </div>
-        ) : (
-          broadcasts?.map((broadcast: { id: string; subject: string; status: string; recipient_count?: number; sent_at?: string }) => (
+        ) : Array.isArray(broadcasts) ? (
+          broadcasts.map((broadcast: { id: string; subject: string; status: string; recipient_count?: number; sent_at?: string }) => (
             <Card key={broadcast.id} className="bg-[#0a0a0a] border-[#1a1a1a] hover:border-[#333] transition-colors group">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
@@ -91,7 +105,7 @@ export default function BroadcastsPage() {
               </CardContent>
             </Card>
           ))
-        )}
+        ) : null}
       </div>
 
       <div className="p-6 bg-blue-500/5 border border-blue-500/10 rounded-2xl flex gap-4">

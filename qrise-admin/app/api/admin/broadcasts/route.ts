@@ -4,22 +4,28 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, RESEND_FROM_EMAIL } from '@/lib/resend'
 
 export async function GET(request: NextRequest) {
-  const admin = await verifyAdmin(request)
-  if ('error' in admin) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status })
+  try {
+    const admin = await verifyAdmin(request)
+    if ('error' in admin) {
+      return NextResponse.json({ error: admin.error }, { status: admin.status })
+    }
+
+    const adminClient = createAdminClient()
+    const { data, error } = await adminClient
+      .from('broadcasts')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('[API/admin/broadcasts] Supabase error:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json(data)
+  } catch (err) {
+    console.error('[API/admin/broadcasts] Unexpected error:', err)
+    return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 })
   }
-
-  const adminClient = createAdminClient()
-  const { data, error } = await adminClient
-    .from('broadcasts')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-
-  return NextResponse.json(data)
 }
 
 export async function POST(request: NextRequest) {
