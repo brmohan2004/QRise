@@ -8,6 +8,7 @@ import { apiKeys, webhooks, webhookDeliveries, type ApiKey, type NewApiKey, type
 import { bulkJobs, type BulkJob, type NewBulkJob } from './bulk-jobs';
 import { featureFlags, type FeatureFlag, type NewFeatureFlag } from './feature-flags';
 import { notifications, userNotifications } from './notifications';
+import { platformFeedback, platformFeedbackRelations, type PlatformFeedback, type NewPlatformFeedback } from './platform-feedback';
 import { relations } from 'drizzle-orm';
 
 // Users relations
@@ -15,6 +16,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   qrCodes: many(qrCodes),
   apiKeys: many(apiKeys),
   bulkJobs: many(bulkJobs),
+  feedback: many(platformFeedback),
 }));
 
 // Plans relations
@@ -138,6 +140,8 @@ export {
   featureFlags,
   notifications,
   userNotifications,
+  platformFeedback,
+  platformFeedbackRelations,
   type User,
   type NewUser,
   type Plan,
@@ -166,4 +170,6 @@ export {
   type WebhookDelivery,
   type BulkJob,
   type NewBulkJob,
+  type PlatformFeedback,
+  type NewPlatformFeedback,
 };

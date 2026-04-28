@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { QrCode, Menu, X, LayoutGrid, CreditCard, FileText, LogIn, UserPlus } from "lucide-react";
+import { QrCode, Menu, X, LayoutGrid, CreditCard, FileText, LogIn, UserPlus, Flag } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { FeedbackModal } from "@/components/app/feedback-modal";
+import { Button } from "@/components/ui/button";
 
 const navigation = [
   { name: "Features", href: "/features", icon: LayoutGrid },
@@ -22,6 +24,7 @@ export default function PublicLayout({
 }) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const filteredNavigation = navigation.filter(item => 
     item.name !== "Pricing" || pricingEnabled
@@ -58,6 +61,13 @@ export default function PublicLayout({
 
             {/* Desktop CTA */}
             <div className="hidden md:flex items-center gap-4">
+              <button 
+                onClick={() => setFeedbackOpen(true)}
+                className="p-2 text-gray-400 hover:text-gray-900 transition-colors"
+                title="Send Feedback"
+              >
+                <Flag className="h-5 w-5" />
+              </button>
               <Link
                 href="/login"
                 className="text-sm font-medium text-gray-900 hover:text-[#0F6E56] transition-colors"
@@ -73,7 +83,13 @@ export default function PublicLayout({
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden">
+            <div className="md:hidden flex items-center gap-2">
+              <button 
+                onClick={() => setFeedbackOpen(true)}
+                className="p-2 text-gray-400 hover:text-gray-900 transition-colors"
+              >
+                <Flag className="h-5 w-5" />
+              </button>
               <button 
                 onClick={() => setMobileMenuOpen(true)}
                 className="p-2 text-gray-600 hover:text-gray-900"
@@ -134,6 +150,18 @@ export default function PublicLayout({
                             </Link>
                           );
                         })}
+                        <button
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            setFeedbackOpen(true);
+                          }}
+                          className="w-full group flex items-center gap-3.5 px-4 py-3 rounded-xl text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
+                        >
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 group-hover:bg-gray-200 transition-colors">
+                            <Flag className="h-4.5 w-4.5 text-gray-500" />
+                          </div>
+                          Send Feedback
+                        </button>
                       </nav>
                     </div>
  
@@ -174,6 +202,8 @@ export default function PublicLayout({
 
       {/* Main content */}
       <main>{children}</main>
+
+      <FeedbackModal open={feedbackOpen} onOpenChange={setFeedbackOpen} />
     </div>
   );
 }

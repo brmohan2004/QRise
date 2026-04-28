@@ -20,6 +20,7 @@ export async function POST(
     .from('users')
     .update({
       is_suspended: false,
+      suspension_reason: null,
       suspended_reason: null,
       suspended_at: null
     })

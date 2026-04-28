@@ -23,6 +23,7 @@ interface ConfirmDialogProps {
   cancelText?: string
   isLoading?: boolean
   variant?: 'danger' | 'warning' | 'info'
+  children?: React.ReactNode
 }
 
 export function ConfirmDialog({
@@ -34,7 +35,8 @@ export function ConfirmDialog({
   confirmText = 'Confirm',
   cancelText = 'Cancel',
   isLoading = false,
-  variant = 'danger'
+  variant = 'danger',
+  children
 }: ConfirmDialogProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -53,6 +55,11 @@ export function ConfirmDialog({
           <AlertDialogDescription className="text-gray-400">
             {description}
           </AlertDialogDescription>
+          {children && (
+            <div className="mt-4">
+              {children}
+            </div>
+          )}
         </AlertDialogHeader>
         <AlertDialogFooter className="pt-4">
           <AlertDialogCancel asChild>

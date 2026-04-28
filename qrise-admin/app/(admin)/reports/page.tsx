@@ -8,7 +8,8 @@ import { ReportsTable } from '@/components/reports/reports-table'
 import { 
   AlertTriangle, 
   Search,
-  RefreshCcw 
+  RefreshCcw,
+  MessageSquare
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -17,16 +18,18 @@ import { Skeleton } from '@/components/ui/skeleton'
 export default function ReportsPage() {
   const queryClient = useQueryClient()
   const [statusFilter, setStatusFilter] = useState('pending')
+  const [reportType, setReportType] = useState('abuse') // 'abuse' or 'feedback'
   const [search, setSearch] = useState('')
   const [debouncedSearch] = useDebounce(search, 500)
 
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ['admin', 'reports', statusFilter, debouncedSearch],
+    queryKey: ['admin', reportType, statusFilter, debouncedSearch],
     queryFn: async () => {
-      const res = await fetch(`/api/admin/reports?status=${statusFilter}&q=${debouncedSearch}`)
+      const endpoint = reportType === 'abuse' ? '/api/admin/reports' : '/api/admin/feedback'
+      const res = await fetch(`${endpoint}?status=${statusFilter}&q=${debouncedSearch || ''}`)
       if (!res.ok) {
         const error = await res.json()
-        throw new Error(error.error || 'Failed to fetch reports')
+        throw new Error(error.error || 'Failed to fetch data')
       }
       return res.json()
     }
@@ -52,12 +55,16 @@ export default function ReportsPage() {
       </div>
 
       <div className="flex items-center justify-between mb-6">
-        <Tabs defaultValue="abuse" className="w-full">
+        <Tabs defaultValue="abuse" className="w-full" onValueChange={setReportType}>
           <div className="flex items-center justify-between w-full">
             <TabsList className="bg-[#0a0a0a] border border-[#1a1a1a] p-1 rounded-2xl">
               <TabsTrigger value="abuse" className="rounded-xl data-[state=active]:bg-red-500/10 data-[state=active]:text-red-500">
                 <AlertTriangle className="h-4 w-4 mr-2" />
                 Abuse Reports
+              </TabsTrigger>
+              <TabsTrigger value="feedback" className="rounded-xl data-[state=active]:bg-blue-500/10 data-[state=active]:text-blue-500">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Platform Feedback
               </TabsTrigger>
             </TabsList>
           </div>
@@ -94,9 +101,9 @@ export default function ReportsPage() {
         </div>
       ) : (
         <ReportsTable 
-          type="abuse" 
+          type={reportType as any} 
           data={data?.data || []} 
-          onUpdate={() => queryClient.invalidateQueries({ queryKey: ['admin', 'reports'] })} 
+          onUpdate={() => queryClient.invalidateQueries({ queryKey: ['admin', reportType] })} 
         />
       )}
     </div>

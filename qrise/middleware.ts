@@ -49,6 +49,7 @@ export async function middleware(request: NextRequest) {
     '/about',
     '/f/',        // Public forms
     '/s/',        // Short link redirects
+    '/abuse',     // Account suspension page
     '/api/auth',
     '/api/newsletter',
     '/api/f/',
@@ -91,9 +92,8 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    if (profile?.is_suspended) {
-      await supabase.auth.signOut();
-      return NextResponse.redirect(new URL('/login?error=suspended', request.url));
+    if (profile?.is_suspended && pathname !== '/abuse') {
+      return NextResponse.redirect(new URL('/abuse', request.url));
     }
   }
 

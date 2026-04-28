@@ -9,6 +9,7 @@ export const users = pgTable('users', {
   plan: varchar('plan', { length: 20 }).notNull().default('free'),
   planExpiresAt: timestamp('plan_expires_at'),
   isSuspended: boolean('is_suspended').default(false),
+  suspensionReason: text('suspension_reason'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

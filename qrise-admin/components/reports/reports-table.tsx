@@ -8,7 +8,8 @@ import {
   XCircle,
   ShieldAlert,
   Trash2,
-  Loader2
+  Loader2,
+  MessageSquare
 } from 'lucide-react'
 import {
   AlertDialog,
@@ -51,10 +52,15 @@ interface ReportData {
   severity?: string
   created_at: string
   status: string
+  // Feedback specific
+  type?: string
+  subject?: string
+  content?: string
+  user_email?: string
 }
 
 interface ReportsTableProps {
-  type: 'abuse'
+  type: 'abuse' | 'feedback'
   data: ReportData[]
   onUpdate: () => void
 }
@@ -73,10 +79,11 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
 
   const handleStatusUpdate = async (id: string, status: string) => {
     try {
-      const res = await fetch(`/api/admin/reports/${id}`, {
+      const endpoint = type === 'abuse' ? `/api/admin/reports/${id}` : `/api/admin/feedback`
+      const res = await fetch(endpoint, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ id, status }),
       })
 
       if (!res.ok) {
@@ -94,7 +101,8 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
   const handleDelete = async (id: string) => {
     setIsDeleting(true)
     try {
-      const res = await fetch(`/api/admin/reports/${id}`, {
+      const endpoint = type === 'abuse' ? `/api/admin/reports/${id}` : `/api/admin/feedback?id=${id}`
+      const res = await fetch(endpoint, {
         method: 'DELETE',
       })
 
@@ -129,9 +137,9 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
       <Table>
         <TableHeader className="bg-[#111]/50">
           <TableRow className="border-[#1a1a1a] hover:bg-transparent">
-            <TableHead className="text-gray-400 font-bold">QR Code</TableHead>
-            <TableHead className="text-gray-400 font-bold">Reason</TableHead>
-            <TableHead className="text-gray-400 font-bold">Reporter</TableHead>
+            <TableHead className="text-gray-400 font-bold">{type === 'abuse' ? 'QR Code' : 'Type'}</TableHead>
+            <TableHead className="text-gray-400 font-bold">{type === 'abuse' ? 'Reason' : 'Subject'}</TableHead>
+            <TableHead className="text-gray-400 font-bold">{type === 'abuse' ? 'Reporter' : 'User'}</TableHead>
             <TableHead className="text-gray-400 font-bold">Date</TableHead>
             <TableHead className="text-gray-400 font-bold">Status</TableHead>
             <TableHead className="text-right text-gray-400 font-bold">Actions</TableHead>
@@ -148,19 +156,26 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
             data.map((report) => (
               <TableRow key={report.id} className="border-[#1a1a1a] hover:bg-[#111]/30 transition-colors">
                 <TableCell>
-                  <div className="flex flex-col">
-                    <span className="text-white font-bold">{report.qr_codes?.name || 'Deleted QR'}</span>
-                    <span className="text-[10px] font-mono text-gray-500 uppercase tracking-tighter">/{report.qr_codes?.short_code}</span>
-                  </div>
+                  {type === 'abuse' ? (
+                    <div className="flex flex-col">
+                      <span className="text-white font-bold">{report.qr_codes?.name || 'Deleted QR'}</span>
+                      <span className="text-[10px] font-mono text-gray-500 uppercase tracking-tighter">/{report.qr_codes?.short_code}</span>
+                    </div>
+                  ) : (
+                    <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 capitalize">
+                      {report.type}
+                    </Badge>
+                  )}
                 </TableCell>
                 <TableCell>
                    <div className="flex items-center gap-2">
-                     <ShieldAlert className="h-3.5 w-3.5 text-red-500" />
-                     <span className="text-gray-300 text-sm">{report.reason}</span>
+                     {type === 'abuse' && <ShieldAlert className="h-3.5 w-3.5 text-red-500" />}
+                     {type === 'feedback' && <MessageSquare className="h-3.5 w-3.5 text-blue-500" />}
+                     <span className="text-gray-300 text-sm">{type === 'abuse' ? report.reason : report.subject}</span>
                    </div>
                 </TableCell>
                 <TableCell className="text-gray-400 text-xs">
-                  {report.users?.email || 'Anonymous'}
+                  {report.users?.email || report.user_email || 'Anonymous'}
                 </TableCell>
                 <TableCell className="text-gray-500 text-xs font-medium">
                   {format(new Date(report.created_at), 'MMM d, yyyy')}

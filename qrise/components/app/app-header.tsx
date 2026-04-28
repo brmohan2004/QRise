@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Bell, Menu, Plus } from "lucide-react";
+import { Bell, Menu, Plus, Flag } from "lucide-react";
+import { FeedbackModal } from "./feedback-modal";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -17,6 +18,7 @@ import { NotificationDropdown } from "./notification-dropdown";
 export function AppHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   // Basic title logic
   const getPageTitle = (path: string) => {
@@ -59,8 +61,19 @@ export function AppHeader() {
             Create QR
           </Link>
         </Button>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => setFeedbackOpen(true)}
+          className="h-9 w-9 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-slate-600 dark:text-slate-400"
+          title="Send Feedback"
+        >
+          <Flag className="h-5 w-5" />
+        </Button>
         <NotificationDropdown />
       </div>
+
+      <FeedbackModal open={feedbackOpen} onOpenChange={setFeedbackOpen} />
     </header>
   );
 }

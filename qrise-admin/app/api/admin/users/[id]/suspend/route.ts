@@ -30,6 +30,7 @@ export async function POST(
     .from('users')
     .update({
       is_suspended: true,
+      suspension_reason: reason,
       suspended_reason: reason,
       suspended_at: new Date().toISOString()
     })

@@ -16,6 +16,8 @@ import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 
 interface UserActionsMenuProps {
   userId: string
@@ -27,6 +29,7 @@ export function UserActionsMenu({ userId, isSuspended }: UserActionsMenuProps) {
   const queryClient = useQueryClient()
   const [isLoading, setIsLoading] = useState(false)
   const [activeDialog, setActiveDialog] = useState<'suspend' | 'delete' | 'impersonate' | null>(null)
+  const [suspensionReason, setSuspensionReason] = useState('')
 
   const handleImpersonate = async () => {
     setIsLoading(true)
@@ -54,7 +57,9 @@ export function UserActionsMenu({ userId, isSuspended }: UserActionsMenuProps) {
       const res = await fetch(`/api/admin/users/${userId}/${action}`, { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: 'Suspended by Admin' })
+        body: JSON.stringify({ 
+          reason: isSuspended ? '' : (suspensionReason || 'Suspended by Admin') 
+        })
       })
       if (!res.ok) throw new Error(`Failed to ${action} user`)
       
@@ -156,7 +161,10 @@ export function UserActionsMenu({ userId, isSuspended }: UserActionsMenuProps) {
 
       <ConfirmDialog 
         isOpen={activeDialog === 'suspend'}
-        onClose={() => setActiveDialog(null)}
+        onClose={() => {
+          setActiveDialog(null)
+          setSuspensionReason('')
+        }}
         onConfirm={handleToggleSuspension}
         title={isSuspended ? "Lift Suspension?" : "Suspend Account?"}
         description={isSuspended 
@@ -166,7 +174,21 @@ export function UserActionsMenu({ userId, isSuspended }: UserActionsMenuProps) {
         confirmText={isSuspended ? "Unsuspend" : "Confirm Suspension"}
         variant="warning"
         isLoading={isLoading}
-      />
+      >
+        {!isSuspended && (
+          <div className="space-y-2 text-left">
+            <Label htmlFor="reason" className="text-xs text-gray-400">Suspension Reason (Shown to user)</Label>
+            <Input 
+              id="reason"
+              placeholder="e.g., Repeated violations of terms, suspicious activity..."
+              value={suspensionReason}
+              onChange={(e) => setSuspensionReason(e.target.value)}
+              className="bg-[#111] border-[#222] text-white focus:ring-amber-500/20 h-11"
+              autoFocus
+            />
+          </div>
+        )}
+      </ConfirmDialog>
 
       <ConfirmDialog 
         isOpen={activeDialog === 'delete'}
