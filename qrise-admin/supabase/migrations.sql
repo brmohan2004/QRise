@@ -215,6 +215,7 @@ CREATE TABLE IF NOT EXISTS features_quiz (
   feature_name VARCHAR(200) NOT NULL,
   hint_text TEXT NOT NULL,
   answer_hash VARCHAR(64) NOT NULL,
+  image_url VARCHAR(500),
   gift_code VARCHAR(50),
   correct_guesses INT DEFAULT 0,
   is_visible BOOL DEFAULT false,

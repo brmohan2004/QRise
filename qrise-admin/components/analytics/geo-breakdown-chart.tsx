@@ -42,7 +42,7 @@ export function GeoBreakdownChart() {
       <CardContent>
         <div className="h-[300px] w-full" style={{ minWidth: 0 }}>
           {hasData ? (
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <BarChart data={chartData} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#222" horizontal={false} />
               <XAxis type="number" stroke="#444" fontSize={12} tickLine={false} axisLine={false} />

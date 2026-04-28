@@ -16,6 +16,10 @@ export default function FeaturesQuizPage() {
     queryKey: ['admin', 'features_quiz'],
     queryFn: async () => {
       const res = await fetch('/api/admin/features-quiz')
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to fetch features quiz')
+      }
       return res.json()
     }
   })
@@ -69,7 +73,7 @@ export default function FeaturesQuizPage() {
          <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-6 rounded-3xl space-y-4 text-center flex flex-col items-center justify-center border-dashed border-blue-500/20">
             <p className="text-[10px] uppercase font-black text-blue-500 tracking-widest">Active Challenges</p>
             <span className="text-4xl font-black text-white mt-1">
-               {quizEntries?.filter((q: { is_revealed: boolean }) => !q.is_revealed).length || 0}
+               {Array.isArray(quizEntries) ? quizEntries.filter((q: { is_revealed: boolean }) => !q.is_revealed).length : 0}
             </span>
          </div>
       </div>
