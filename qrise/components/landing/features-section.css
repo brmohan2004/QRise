@@ -1,0 +1,147 @@
+/* Features Section Styles */
+
+/* ==========================================================================
+   MOBILE & SHARED STYLES (Base)
+   ========================================================================== */
+
+.features-section {
+  padding: 4rem 0;
+  background-color: #ffffff;
+}
+
+.features-container {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.features-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.features-title {
+  font-size: 1.5rem; /* Reduced for mobile */
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.75rem;
+}
+
+.features-subtitle {
+  font-size: 0.875rem; /* Reduced for mobile */
+  color: #6b7280;
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.feature-card {
+  padding: 1.25rem; /* Reduced for mobile */
+  border-radius: 1.25rem;
+  background-color: #f9fafb;
+  border: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  border-color: #0F6E5630;
+}
+
+.feature-icon-wrapper {
+  width: 2.5rem; /* Smaller for mobile */
+  height: 2.5rem;
+  background-color: #0F6E5610;
+  border-radius: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0F6E56;
+  margin-bottom: 1rem;
+}
+
+.feature-title {
+  font-size: 1.125rem; /* Smaller for mobile */
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.feature-description {
+  font-size: 0.8125rem; /* Smaller for mobile */
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   DESKTOP & TABLET STYLES (Adjustments)
+   ========================================================================== */
+
+@media (min-width: 640px) {
+  .features-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .feature-card {
+    padding: 1.75rem;
+    border-radius: 1.5rem;
+  }
+
+  .feature-icon-wrapper {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .feature-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .feature-description {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+}
+
+@media (min-width: 768px) {
+  .features-title {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .features-section {
+    padding: 6rem 0;
+  }
+
+  .features-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem;
+  }
+
+  .feature-description {
+    font-size: 1rem;
+  }
+}

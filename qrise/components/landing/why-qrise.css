@@ -1,0 +1,131 @@
+/* Why QRise Section Styles */
+
+/* ==========================================================================
+   MOBILE & SHARED STYLES (Base)
+   ========================================================================== */
+
+.why-section {
+  padding: 4rem 0;
+  background-color: #f9fafb;
+}
+
+.why-container {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.why-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.why-title {
+  font-size: 1.5rem; /* Reduced for mobile */
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.75rem;
+}
+
+.why-subtitle {
+  font-size: 0.875rem; /* Reduced for mobile */
+  color: #6b7280;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.comparison-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+}
+
+.comparison-table th {
+  padding-bottom: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.comparison-table td {
+  padding: 1rem 0;
+  font-size: 0.875rem;
+}
+
+.feature-col {
+  text-align: left;
+  font-weight: 500;
+  color: #111827;
+}
+
+.center-col {
+  text-align: center;
+}
+
+.qrise-col {
+  text-align: center;
+  background-color: rgba(15, 110, 86, 0.05);
+}
+
+.qrise-header {
+  color: #0F6E56 !important;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.comparison-table tbody {
+  border-top: 1px solid #e5e7eb;
+}
+
+.comparison-table tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.icon-check {
+  color: #10b981;
+  margin: 0 auto;
+}
+
+.icon-x {
+  color: #d1d5db;
+  margin: 0 auto;
+}
+
+.icon-qrise {
+  color: #0F6E56;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   DESKTOP & TABLET STYLES (Adjustments)
+   ========================================================================== */
+
+@media (min-width: 640px) {
+  .why-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .why-section {
+    padding: 6rem 0;
+  }
+
+  .why-title {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .why-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}

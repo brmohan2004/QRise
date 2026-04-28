@@ -1,0 +1,162 @@
+/* Reviews Carousel Section Styles */
+
+/* ==========================================================================
+   MOBILE & SHARED STYLES (Base)
+   ========================================================================== */
+
+.reviews-section {
+  padding: 4rem 0;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.reviews-container {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.reviews-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.reviews-title {
+  font-size: 1.5rem; /* Reduced for mobile */
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.025em;
+}
+
+.carousel-wrapper {
+  position: relative;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease-out;
+}
+
+.review-slide {
+  width: 100%;
+  flex-shrink: 0;
+  padding: 0 1rem;
+}
+
+.review-card {
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #f9fafb;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+}
+
+.rating-row {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.star-icon {
+  fill: #fbbf24;
+  color: #fbbf24;
+}
+
+.review-text {
+  font-size: 1.125rem;
+  color: #374151;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.author-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.author-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background-color: #0F6E56;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.author-name {
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.9375rem;
+}
+
+.author-info {
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.dot-btn {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: #d1d5db;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 0.5rem;
+}
+
+.dot-btn.active {
+  width: 2rem;
+  background-color: #0F6E56;
+}
+
+/* ==========================================================================
+   DESKTOP & TABLET STYLES (Adjustments)
+   ========================================================================== */
+
+@media (min-width: 640px) {
+  .reviews-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  
+  .review-card {
+    padding: 2.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .reviews-section {
+    padding: 6rem 0;
+  }
+
+  .reviews-title {
+    font-size: 2.25rem;
+  }
+
+  .review-text {
+    font-size: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .reviews-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}

@@ -1,0 +1,151 @@
+/* Trusted By Section Styles */
+
+/* ==========================================================================
+   MOBILE & SHARED STYLES (Base)
+   ========================================================================== */
+
+.trusted-by-section {
+  padding-bottom: 2.5rem;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.trusted-by-container {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.trusted-by-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.trusted-by-line {
+  height: 1px;
+  width: 3rem;
+  background-color: #e5e7eb;
+}
+
+.trusted-by-title {
+  text-align: center;
+  font-size: 0.75rem; /* Reduced for mobile */
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  text-transform: uppercase;
+}
+
+.trusted-by-marquee-wrapper {
+  position: relative;
+}
+
+.marquee-overlay-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4rem;
+  background: linear-gradient(to right, #ffffff, transparent);
+  z-index: 10;
+}
+
+.marquee-overlay-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4rem;
+  background: linear-gradient(to left, #ffffff, transparent);
+  z-index: 10;
+}
+
+.marquee-container {
+  display: flex;
+  overflow: hidden;
+}
+
+.marquee-content {
+  display: flex;
+  gap: 3rem; /* Reduced gap for mobile */
+  align-items: center;
+  white-space: nowrap;
+  padding: 1rem 0;
+  animation: marquee 30s linear infinite;
+}
+
+.marquee-content:hover {
+  animation-play-state: paused;
+}
+
+.company-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: default;
+}
+
+.company-name {
+  font-size: 1.25rem; /* Reduced for mobile */
+  font-weight: 700;
+  color: #d1d5db;
+  transition: color 0.3s;
+  user-select: none;
+}
+
+.company-item:hover .company-name {
+  color: #0F6E56;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.33%); }
+}
+
+/* ==========================================================================
+   DESKTOP & TABLET STYLES (Adjustments)
+   ========================================================================== */
+
+@media (min-width: 640px) {
+  .trusted-by-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  
+  .trusted-by-title {
+    font-size: 0.875rem;
+  }
+
+  .marquee-content {
+    gap: 4rem;
+  }
+
+  .company-name {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .trusted-by-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .marquee-content {
+    gap: 6rem;
+  }
+
+  .company-name {
+    font-size: 1.875rem;
+  }
+  
+  .marquee-overlay-left,
+  .marquee-overlay-right {
+    width: 8rem;
+  }
+}
