@@ -47,7 +47,11 @@ export function DemoDashboard() {
             {/* Sidebar Mockup */}
             <div className="dashboard-sidebar">
               <div className="sidebar-logo">
-                <div className="logo-box">Q</div>
+                <img 
+                  src="/logo.png" 
+                  alt="QRise Logo" 
+                  className="h-8 w-8 object-contain"
+                />
                 <span className="logo-text">QRise Pro</span>
               </div>
 
