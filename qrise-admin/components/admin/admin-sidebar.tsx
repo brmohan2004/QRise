@@ -67,7 +67,6 @@ const navigation = [
   {
     title: 'Communication',
     items: [
-      { name: 'Broadcasts', href: '/broadcasts', icon: Send },
       { name: 'Notifications', href: '/notifications', icon: Bell },
     ]
   },

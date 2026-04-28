@@ -17,7 +17,13 @@ export async function GET(request: NextRequest) {
   let query = adminClient.from('users').select('*', { count: 'exact', head: true })
 
   if (targetType === 'user' && targetId) {
-    query = query.or(`id.eq.${targetId},email.eq.${targetId}`)
+    // Check if targetId is a valid UUID to avoid Postgres error when comparing string to UUID
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetId)
+    if (isUuid) {
+      query = query.or(`id.eq.${targetId},email.eq.${targetId}`)
+    } else {
+      query = query.eq('email', targetId)
+    }
   } else if (targetType === 'plan' && targetPlan) {
     query = query.eq('plan', targetPlan.toLowerCase())
   }

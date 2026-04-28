@@ -39,15 +39,14 @@ export async function DELETE(
   const { id } = await params
   const adminClient = createAdminClient()
 
-  // Only allow deleting drafts
   const { data: notification } = await adminClient
     .from('notifications')
     .select('status')
     .eq('id', id)
     .single()
 
-  if (notification?.status !== 'draft') {
-    return NextResponse.json({ error: 'Only draft notifications can be deleted' }, { status: 400 })
+  if (!notification) {
+    return NextResponse.json({ error: 'Notification not found' }, { status: 404 })
   }
 
   const { error } = await adminClient

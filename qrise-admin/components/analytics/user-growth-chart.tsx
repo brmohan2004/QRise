@@ -1,11 +1,15 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function UserGrowthChart() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'analytics', 'user_growth'],
     queryFn: async () => {
@@ -40,9 +44,9 @@ export function UserGrowthChart() {
         <CardTitle className="text-lg font-semibold">User Acquisition Trends</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full flex items-center justify-center" style={{ minWidth: 0 }}>
-          {hasData ? (
-            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+        <div className="h-[300px] w-full min-h-[300px] relative">
+          {mounted && hasData ? (
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">

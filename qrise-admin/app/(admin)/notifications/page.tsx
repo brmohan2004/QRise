@@ -24,7 +24,7 @@ export default function NotificationsPage() {
       const res = await fetch(`/api/admin/notifications/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Failed to delete')
       
-      toast.success('Notification draft deleted')
+      toast.success('Notification deleted successfully')
       queryClient.invalidateQueries({ queryKey: ['admin', 'notifications'] })
     } catch {
       toast.error('Error deleting notification')

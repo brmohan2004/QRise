@@ -7,6 +7,7 @@ import { forms, formSubmissions, type Form, type NewForm, type FormSubmission, t
 import { apiKeys, webhooks, webhookDeliveries, type ApiKey, type NewApiKey, type Webhook, type NewWebhook, type WebhookDelivery } from './api-keys';
 import { bulkJobs, type BulkJob, type NewBulkJob } from './bulk-jobs';
 import { featureFlags, type FeatureFlag, type NewFeatureFlag } from './feature-flags';
+import { notifications, userNotifications } from './notifications';
 import { relations } from 'drizzle-orm';
 
 // Users relations
@@ -135,6 +136,8 @@ export {
   webhookDeliveries,
   bulkJobs,
   featureFlags,
+  notifications,
+  userNotifications,
   type User,
   type NewUser,
   type Plan,

@@ -3,6 +3,7 @@ import { verifyAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, RESEND_FROM_EMAIL } from '@/lib/resend'
 import { writeAuditLog } from '@/lib/audit'
+import { getNotificationEmailTemplate } from '@/lib/email-templates'
 
 export async function GET(request: NextRequest) {
   const admin = await verifyAdmin(request)
@@ -36,106 +37,145 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json()
-  const { type, subject, body: content, targetType, targetId, targetPlan, segment, sendImmediately } = body
+  const { 
+    type, 
+    category = 'alert', 
+    subject, 
+    body: content, 
+    targetType, 
+    targetId, 
+    targetPlan, 
+    segment, 
+    sendImmediately 
+  } = body
   
   const adminClient = createAdminClient()
 
-  // 1. Resolve recipients
+  // 1. Resolve recipients (Unified logic)
   let recipients: { email: string; id: string; full_name?: string }[] = []
 
   if (targetType === 'user' && targetId) {
-    const { data: user } = await adminClient.from('users').select('id, email, full_name').or(`id.eq.${targetId},email.eq.${targetId}`).single()
-    if (user) recipients = [user]
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetId)
+    const { data: user, error: userFetchError } = await adminClient
+      .from('users')
+      .select('id, email, full_name')
+      .or(isUuid ? `id.eq.${targetId},email.eq.${targetId}` : `email.eq.${targetId}`)
+      .single()
+    
+    if (userFetchError || !user) {
+      console.error('[API/admin/notifications] User not found:', targetId, userFetchError)
+      return NextResponse.json({ error: 'Recipient user not found' }, { status: 404 })
+    }
+    recipients = [user]
   } else if (targetType === 'plan' && targetPlan) {
     const { data: users } = await adminClient.from('users').select('id, email, full_name').eq('plan', targetPlan.toLowerCase())
+    if (users) recipients = users || []
+  } else if (targetType === 'segment' && segment) {
+    let query = adminClient.from('users').select('id, email, full_name')
+    if (segment.type === 'plan' && segment.plans?.length > 0) {
+      query = query.in('plan', segment.plans)
+    }
+    if (segment.type === 'country' && segment.countries?.length > 0) {
+      query = query.in('country', segment.countries)
+    }
+    const { data: users } = await query
     if (users) recipients = users
   } else if (targetType === 'all') {
     const { data: users } = await adminClient.from('users').select('id, email, full_name')
-    if (users) recipients = users
+    if (users) recipients = users || []
   }
 
   const recipientEmails = recipients.map(r => r.email).filter(Boolean)
 
+  console.log('[API/admin/notifications] Resolved recipients:', recipients.length)
+
   // 2. Create notification record
+  const adminId = admin.adminId === 'admin_env_user' 
+    ? '00000000-0000-0000-0000-000000000000' // Fallback UUID for environment admins
+    : admin.adminId
+
   const { data: notification, error: createError } = await adminClient
     .from('notifications')
     .insert([{
-      admin_id: admin.adminId,
+      admin_id: adminId,
       type,
+      category,
       subject,
       body: content,
       target_type: targetType,
-      target_id: targetType === 'user' ? recipients[0]?.id : null,
+      target_id: (targetType === 'user' && recipients[0]) ? recipients[0].id : null,
       target_plan: targetPlan,
       segment,
-      recipient_count: recipientEmails.length,
+      recipient_count: recipients.length,
       status: sendImmediately ? 'sending' : 'draft'
     }])
     .select()
     .single()
 
   if (createError) {
+    console.error('[API/admin/notifications] Supabase Insert Error:', createError)
     return NextResponse.json({ error: createError.message }, { status: 500 })
   }
 
-  // 3. Send if requested
+  // 3. In-App Persistence (The Bell) - We await this to ensure UI updates
+  if (recipients.length > 0) {
+    const userNotificationEntries = recipients.map(r => ({
+      user_id: r.id,
+      notification_id: notification.id,
+    }))
+    
+    console.log(`[API/admin/notifications] Persisting ${userNotificationEntries.length} in-app notifications...`)
+    
+    const batchSize = 1000
+    for (let i = 0; i < userNotificationEntries.length; i += batchSize) {
+      const { error: insertError } = await adminClient
+        .from('user_notifications')
+        .insert(userNotificationEntries.slice(i, i + batchSize))
+      
+      if (insertError) {
+        console.error('[API/admin/notifications] In-app persistence error:', insertError)
+      }
+    }
+  }
+
+  // 4. Background Email Delivery (Async)
   if (sendImmediately && recipientEmails.length > 0) {
-    // Process sending in background
-    const processSending = async () => {
+    const processEmailSending = async () => {
       try {
-        if (type === 'email') {
-          // Standard Email
-          await resend.emails.send({
+        console.log(`[API/admin/notifications] Starting background email delivery to ${recipientEmails.length} users...`)
+        
+        const emailHtml = getNotificationEmailTemplate({
+          subject: subject || 'New Update',
+          content: content,
+          type: type as 'email' | 'push',
+          appUrl: process.env.MAIN_APP_URL
+        })
+
+        const emailBatchSize = 50
+        for (let i = 0; i < recipientEmails.length; i += emailBatchSize) {
+          const batch = recipientEmails.slice(i, i + emailBatchSize)
+          const { data, error: resendError } = await resend.emails.send({
             from: RESEND_FROM_EMAIL,
-            to: recipientEmails,
-            subject: subject || 'New Update from QRise',
-            html: `
-              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #111;">
-                <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">${subject}</h1>
-                <div style="font-size: 16px; line-height: 1.6; color: #444;">
-                  ${content}
-                </div>
-                <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;" />
-                <p style="font-size: 12px; color: #999;">
-                  You received this because you are a registered user of QRise. 
-                  <a href="${process.env.MAIN_APP_URL}/settings" style="color: #000;">Manage preferences</a>
-                </p>
-              </div>
-            `,
+            to: batch,
+            subject: (type === 'push' ? '🔔 ' : '') + (subject || 'New Notification'),
+            html: emailHtml,
           })
-        } else if (type === 'push') {
-          // Push-Style Email (Minimal, centered, notification-like)
-          await resend.emails.send({
-            from: RESEND_FROM_EMAIL,
-            to: recipientEmails,
-            subject: '🔔 ' + (subject || 'New Notification'),
-            html: `
-              <div style="background-color: #f9f9f9; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-                <div style="max-width: 400px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee;">
-                  <div style="padding: 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 10px;">
-                    <img src="${process.env.MAIN_APP_URL}/favicon.ico" width="20" height="20" style="border-radius: 4px;" />
-                    <span style="font-size: 12px; font-weight: bold; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">QRise</span>
-                  </div>
-                  <div style="padding: 30px 25px;">
-                    <h2 style="margin: 0 0 10px 0; font-size: 18px; font-weight: 800; color: #000;">${subject || 'Notification'}</h2>
-                    <p style="margin: 0; font-size: 15px; color: #444; line-height: 1.4;">${content}</p>
-                    <a href="${process.env.MAIN_APP_URL}/dashboard" style="display: inline-block; margin-top: 25px; background: #000; color: #fff; text-decoration: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; font-size: 14px;">Open QRise</a>
-                  </div>
-                </div>
-                <p style="text-align: center; font-size: 11px; color: #aaa; margin-top: 30px;">
-                  This is a push-style notification. To disable these, visit your account settings.
-                </p>
-              </div>
-            `,
-          })
+          
+          if (resendError) {
+            console.error('[API/admin/notifications] Resend batch error:', resendError)
+          } else {
+            console.log('[API/admin/notifications] Email batch sent:', (data as any)?.id)
+          }
         }
 
         await adminClient
           .from('notifications')
           .update({ status: 'sent', sent_at: new Date().toISOString() })
           .eq('id', notification.id)
+          
+        console.log('[API/admin/notifications] Full delivery process complete.')
       } catch (err) {
-        console.error('Notification send error:', err)
+        console.error('[API/admin/notifications] Critical background error:', err)
         await adminClient
           .from('notifications')
           .update({ status: 'failed' })
@@ -143,8 +183,7 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // We don't await this to return response quickly
-    processSending()
+    processEmailSending()
   }
 
   // 4. Audit Log
@@ -153,9 +192,10 @@ export async function POST(request: NextRequest) {
     action: 'notification.sent',
     targetType: 'notification',
     targetId: notification.id,
-    details: { type, targetType, recipientCount: recipientEmails.length },
+    details: { type, category, targetType, recipientCount: recipients.length },
     ipAddress: admin.ipAddress
   })
 
   return NextResponse.json(notification)
 }
+

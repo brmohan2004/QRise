@@ -1,11 +1,15 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function GeoBreakdownChart() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'analytics', 'geo'],
     queryFn: async () => {
@@ -40,9 +44,9 @@ export function GeoBreakdownChart() {
         <CardTitle className="text-lg font-semibold">Geographic Breakdown</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full" style={{ minWidth: 0 }}>
-          {hasData ? (
-            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+        <div className="h-[300px] w-full min-h-[300px] relative">
+          {mounted && hasData ? (
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#222" horizontal={false} />
               <XAxis type="number" stroke="#444" fontSize={12} tickLine={false} axisLine={false} />

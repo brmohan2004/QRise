@@ -94,16 +94,18 @@ export function NotificationHistoryTable({ data, onDelete }: NotificationHistory
                           <ExternalLink className="h-3.5 w-3.5" />
                        </Link>
                     </Button>
-                    {notification.status === 'draft' && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-gray-500 hover:text-red-500"
-                        onClick={() => onDelete(notification.id)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    )}
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-gray-500 hover:text-red-500"
+                      onClick={() => {
+                        if (confirm('Are you sure you want to delete this notification and all its user history?')) {
+                          onDelete(notification.id)
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
