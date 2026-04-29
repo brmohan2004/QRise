@@ -1,5 +1,6 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Layers, Activity, AlertCircle, CheckCircle2, RotateCw } from 'lucide-react'
@@ -16,14 +17,31 @@ interface JobQueueMonitorProps {
 }
 
 export function JobQueueMonitor({ jobs }: JobQueueMonitorProps) {
+  const queryClient = useQueryClient()
   const [isFlushing, setIsFlushing] = useState(false)
 
   const handleFlush = async () => {
     setIsFlushing(true)
     try {
-      // Logic to flush stuck jobs (e.g., mark processing jobs as failed if they are old)
-      // This would typically call a POST /api/admin/system/flush
-      toast.success('Stuck jobs flushed successfully')
+      const res = await fetch('/api/admin/system/jobs/flush', {
+        method: 'POST'
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to flush jobs')
+      }
+
+      const data = await res.json()
+      if (data.count > 0) {
+        toast.success(data.message)
+      } else {
+        toast.info('No stuck jobs detected')
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ['admin', 'system_health'] })
+    } catch (error: any) {
+      toast.error(error.message)
     } finally {
       setIsFlushing(false)
     }

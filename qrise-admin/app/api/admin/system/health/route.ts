@@ -29,45 +29,93 @@ export async function GET(request: NextRequest) {
       console.error('Redis ping failed:', e)
     }
 
-    // 3. Row Counts
-    const getCount = async (table: string) => {
-      const { count } = await adminClient.from(table).select('*', { count: 'exact', head: true })
-      return count || 0
-    }
-
-    const rowCounts = {
-      users: await getCount('users'),
-      qr_codes: await getCount('qr_codes'),
-      scan_events: await getCount('scan_events'),
-      bulk_jobs: await getCount('bulk_jobs'),
-      form_submissions: await getCount('form_submissions'),
-    }
-
-    // 4. Bulk Job Stats
-    const bulkJobCounts = { queued: 0, processing: 0, done: 0, failed: 0 }
-    const { data: jobs } = await adminClient.from('bulk_jobs').select('status')
-    jobs?.forEach(j => {
-      if (j.status in bulkJobCounts) bulkJobCounts[j.status as keyof typeof bulkJobCounts]++
-    })
-
-    let dbSize = 'Unknown'
+    // 3. Ping Resend (Verification)
+    let resendStatus = 'down'
     try {
-      const { data } = await adminClient.rpc('get_db_size')
-      if (data) dbSize = data
+      const res = await fetch('https://api.resend.com/emails', {
+        headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}` },
+        signal: AbortSignal.timeout(3000)
+      })
+      if (res.status < 500) resendStatus = 'up'
     } catch (e) {
-      console.error('DB size RPC failed:', e)
+      console.error('Resend check failed:', e)
+    }
+
+    // 4. Ping Worker / Main App
+    let workerStatus = 'down'
+    try {
+      const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL || process.env.NEXT_PUBLIC_MAIN_APP_URL || 'https://q-rise-rho.vercel.app'
+      const res = await fetch(workerUrl, { signal: AbortSignal.timeout(3000) })
+      // If maintenance mode is ON, the worker returns 503. This is still "up".
+      if (res.ok || res.status === 503) workerStatus = 'up'
+    } catch (e) {
+      console.error('Worker check failed:', e)
+    }
+
+    // 5. Row Counts (All 24 Tables)
+    const tables = [
+      'users', 'qr_codes', 'scan_events', 'bulk_jobs', 'form_submissions',
+      'abuse_reports', 'bug_reports', 'notifications', 'admin_audit_log',
+      'broadcasts', 'coupons', 'coupon_redemptions', 'competitions',
+      'competition_registrations', 'features_quiz', 'plans', 'feedback',
+      'newsletter_subs', 'api_keys', 'webhook_deliveries', 'short_urls',
+      'user_daily_stats', 'qr_redirect_history', 'platform_feedback'
+    ]
+
+    const rowCounts: Record<string, number> = {}
+    
+    // Fetch counts in parallel batches to avoid overloading
+    const batchSize = 8
+    for (let i = 0; i < tables.length; i += batchSize) {
+      const batch = tables.slice(i, i + batchSize)
+      const results = await Promise.all(batch.map(async (table) => {
+        try {
+          const { count } = await adminClient.from(table).select('*', { count: 'exact', head: true })
+          return { table, count: count || 0 }
+        } catch {
+          return { table, count: 0 }
+        }
+      }))
+      results.forEach(r => { rowCounts[r.table] = r.count })
+    }
+
+    // 6. Optimized Bulk Job Stats
+    const bulkJobCounts: Record<string, number> = { queued: 0, processing: 0, done: 0, failed: 0 }
+    try {
+      const statuses = ['queued', 'processing', 'done', 'failed']
+      const counts = await Promise.all(statuses.map(async (s) => {
+        const { count } = await adminClient.from('bulk_jobs').select('*', { count: 'exact', head: true }).eq('status', s)
+        return { status: s, count: count || 0 }
+      }))
+      counts.forEach(c => { bulkJobCounts[c.status] = c.count })
+    } catch (e) {
+      console.error('Job count optimization failed:', e)
+    }
+
+    // 7. DB Size & Connections
+    let dbSize = 'Unknown'
+    let activeConnections = 8 
+    
+    try {
+      const { data: size } = await adminClient.rpc('get_db_size')
+      if (size) dbSize = size
+      
+      const { data: conns } = await adminClient.rpc('get_active_connections')
+      if (conns) activeConnections = conns
+    } catch (e) {
+      console.error('DB Metrics RPC failed:', e)
     }
 
     return NextResponse.json({
       services: {
         supabase: dbStatus,
         redis: redisStatus,
-        resend: 'up',
-        worker: 'up',
+        resend: resendStatus,
+        worker: workerStatus,
       },
       db: {
-        size: dbSize || '4.2 MB',
-        active_connections: 8,
+        size: dbSize,
+        active_connections: activeConnections,
         row_counts: rowCounts,
       },
       jobs: bulkJobCounts,

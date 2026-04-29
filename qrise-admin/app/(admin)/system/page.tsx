@@ -8,26 +8,36 @@ import { MaintenanceToggle } from '@/components/system/maintenance-toggle'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { 
-
   RefreshCcw, 
   Activity, 
-  AlertTriangle 
+  AlertTriangle,
+  CheckCircle2
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function SystemHealthPage() {
   const queryClient = useQueryClient()
+  const [mounted, setMounted] = useState(false)
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date())
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ['admin', 'system_health'],
     queryFn: async () => {
+      const start = Date.now()
       const res = await fetch('/api/admin/system/health')
+      const end = Date.now()
       setLastRefreshed(new Date())
-      return res.json()
+      const json = await res.json()
+      return { ...json, latency: end - start }
     },
     refetchInterval: 30000 // Auto-refresh every 30s
   })
+
+  const anyServiceDown = data?.services && Object.values(data.services).some(status => status === 'down')
 
   return (
     <div className="space-y-8">
@@ -39,7 +49,9 @@ export default function SystemHealthPage() {
         <div className="flex items-center gap-3">
           <div className="text-right mr-2">
              <p className="text-[10px] font-bold text-gray-500 uppercase">Last Updated</p>
-             <p className="text-xs text-gray-400">{lastRefreshed.toLocaleTimeString()}</p>
+             <p className="text-xs text-gray-400">
+               {mounted ? lastRefreshed.toLocaleTimeString() : '--:--:--'}
+             </p>
           </div>
           <Button 
             variant="outline" 
@@ -74,7 +86,13 @@ export default function SystemHealthPage() {
                        <h3 className="text-white font-bold text-lg">System Pulse</h3>
                     </div>
                     <p className="text-gray-500 text-sm leading-relaxed">
-                       All systems are operating within normal parameters. The global latency average is currently <span className="text-green-500 font-bold">142ms</span>.
+                       {anyServiceDown 
+                         ? "Partial service interruption detected. Some components are responding slower than expected."
+                         : "All systems are operating within normal parameters. The global latency average is currently "
+                       }
+                       <span className={`${data.latency > 500 ? 'text-yellow-500' : 'text-green-500'} font-bold`}>
+                         {data.latency}ms
+                       </span>.
                     </p>
                  </div>
                  <MaintenanceToggle />
@@ -86,13 +104,23 @@ export default function SystemHealthPage() {
               <JobQueueMonitor jobs={data.jobs} />
            </div>
 
-           <div className="bg-red-500/5 border border-red-500/20 p-4 rounded-2xl flex items-center gap-4">
-              <div className="h-10 w-10 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0">
-                 <AlertTriangle className="h-5 w-5 text-red-500" />
+           <div className={`p-4 rounded-2xl flex items-center gap-4 border ${anyServiceDown ? 'bg-red-500/5 border-red-500/20' : 'bg-green-500/5 border-green-500/20'}`}>
+              <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${anyServiceDown ? 'bg-red-500/10' : 'bg-green-500/10'}`}>
+                 {anyServiceDown 
+                   ? <AlertTriangle className="h-5 w-5 text-red-500" />
+                   : <CheckCircle2 className="h-5 w-5 text-green-500" />
+                 }
               </div>
               <div>
-                 <h4 className="text-red-500 font-bold text-sm uppercase tracking-tighter">Infrastructure Advisory</h4>
-                 <p className="text-gray-500 text-xs">Primary Supabase region (aws-us-east-1) is stable. No active incidents reported.</p>
+                 <h4 className={`${anyServiceDown ? 'text-red-500' : 'text-green-500'} font-bold text-sm uppercase tracking-tighter`}>
+                   {anyServiceDown ? 'Infrastructure Advisory' : 'Infrastructure Stable'}
+                 </h4>
+                 <p className="text-gray-500 text-xs">
+                   {anyServiceDown 
+                     ? "Service degradation detected in primary regions. Our engineers are investigating."
+                     : "Primary Supabase region (aws-us-east-1) and CF Edge are stable. No active incidents reported."
+                   }
+                 </p>
               </div>
            </div>
         </div>

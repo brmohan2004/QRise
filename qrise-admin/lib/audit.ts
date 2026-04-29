@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 interface AuditEntry {
   adminUserId: string
   action: string
-  targetType?: 'user' | 'qr_code' | 'plan' | 'feature_flag' | 'broadcast' | 'coupon' | 'competition' | 'notification' | 'abuse_report' | 'bug_report' | 'bulk_job' | 'features_quiz' | 'system'
+  targetType?: 'user' | 'qr_code' | 'plan' | 'feature_flag' | 'broadcast' | 'coupon' | 'competition' | 'notification' | 'abuse_report' | 'bug_report' | 'bulk_job' | 'features_quiz' | 'system' | 'table'
   targetId?: string
   details?: Record<string, unknown>
   ipAddress?: string
