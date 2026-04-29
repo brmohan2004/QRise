@@ -10,22 +10,31 @@ export async function POST(request: NextRequest) {
   }
 
   const { table } = await request.json()
-  
+
   if (!table) {
     return NextResponse.json({ error: 'Table name is required' }, { status: 400 })
   }
 
   // List of allowed tables to clean (Safety check)
-  const allowedTables = ['qr_codes', 'scan_events', 'bulk_jobs', 'form_submissions', 'users']
+  const allowedTables = [
+    'users', 'plans', 'qr_codes', 'qr_redirect_history', 'routing_rules',
+    'qr_actions', 'scan_events', 'scan_daily_rollups', 'forms', 'form_submissions',
+    'api_keys', 'webhooks', 'webhook_deliveries', 'bulk_jobs',
+    'notifications', 'user_notifications', 'platform_feedback', 'billing_events',
+    'admin_audit_log', 'platform_config', 'maintenance_windows', 'announcements',
+    'competitions', 'competition_registrations', 'coupons', 'coupon_redemptions',
+    'features_quiz', 'abuse_reports', 'rate_limit_config', 'ip_blocks', 'rate_limit_violations', 'plans', 'users'
+  ]
+
   if (!allowedTables.includes(table)) {
     return NextResponse.json({ error: 'Invalid or restricted table' }, { status: 400 })
   }
 
   const adminClient = createAdminClient()
-  
+
   try {
     let query = adminClient.from(table).delete()
-    
+
     // Safety: If cleaning users, don't delete the current admin
     if (table === 'users') {
       query = query.neq('id', admin.adminId)

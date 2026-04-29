@@ -21,7 +21,10 @@ import {
   AlertTriangle,
   ChevronLeft,
   ChevronRight,
-  DollarSign
+  DollarSign,
+  Zap,
+  Server,
+  Activity
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -88,9 +91,9 @@ const navigation = [
     title: 'Config',
     items: [
       { name: 'Plans', href: '/plans', icon: Settings },
-      { name: 'Rate Limits', href: '/rate-limits', icon: ShieldCheck },
-      { name: 'Infra Ops', href: '/infra', icon: ShieldCheck },
-      { name: 'System Health', href: '/system', icon: ShieldCheck },
+      { name: 'Rate Limits', href: '/rate-limits', icon: Zap },
+      { name: 'Infra Ops', href: '/infra', icon: Server },
+      { name: 'System Health', href: '/system', icon: Activity },
     ]
   },
 ]
