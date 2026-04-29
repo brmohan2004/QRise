@@ -4,16 +4,108 @@ import { useState } from "react";
 import { Check, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/stores/user.store";
+import { Loader2 } from "lucide-react";
+
 import pricingData from "@/data/before-auth/pricing.json";
 import "./pricing.css";
 
-const plans = (pricingData as any).plans;
-const comparisonFeatures = (pricingData as any).comparisonFeatures;
-const faqs = (pricingData as any).faqs;
+const staticComparisonFeatures = (pricingData as any).comparisonFeatures;
+const staticFaqs = (pricingData as any).faqs;
 
-export function PricingContent() {
+interface Plan {
+  id: string;
+  name: string;
+  description?: string;
+  price_monthly: number;
+  price_annual?: number;
+  has_analytics: boolean;
+  has_api_access: boolean;
+  has_bulk_generator: boolean;
+  has_design_studio: boolean;
+  has_smart_routing: boolean;
+  has_password_qr: boolean;
+  has_multi_action_qr: boolean;
+  has_form_builder: boolean;
+  qr_limit: number;
+  monthly_scan_limit: number;
+}
+
+export function PricingContent({ initialPlans }: { initialPlans: any[] }) {
   const [isAnnual, setIsAnnual] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const router = useRouter();
+  const { user } = useUserStore();
+
+  const handlePlanClick = async (plan: any) => {
+    if (plan.price === 0) {
+      router.push("/register");
+      return;
+    }
+
+    if (!user) {
+      router.push(`/register?redirect=/pricing&plan=${plan.id}`);
+      return;
+    }
+
+    setLoadingPlan(plan.id);
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          planId: plan.id,
+          isAnnual,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("Checkout error:", data.error);
+        // TODO: Show toast error
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
+
+
+  const plans = initialPlans.map(plan => {
+    const features = [];
+    if (plan.qr_limit === -1) features.push("Unlimited QR Codes");
+    else features.push(`${plan.qr_limit} QR Codes`);
+
+    if (plan.monthly_scan_limit === -1) features.push("Unlimited Scans");
+    else features.push(`${plan.monthly_scan_limit} Scans /mo`);
+
+    if (plan.has_analytics) features.push("Detailed Analytics");
+    if (plan.has_design_studio) features.push("Advanced Design Studio");
+    if (plan.has_api_access) features.push("API Access");
+    if (plan.has_bulk_generator) features.push("Bulk Generation");
+    if (plan.has_smart_routing) features.push("Smart Routing");
+    if (plan.has_password_qr) features.push("Password Protection");
+    if (plan.has_multi_action_qr) features.push("Multi-Action Menu");
+    if (plan.has_form_builder) features.push("Custom Form Builder");
+
+    return {
+      ...plan,
+      price: plan.price_monthly,
+      annualPrice: plan.price_annual || Math.floor(plan.price_monthly * 0.8), // 20% discount if not specified
+      features,
+      cta: plan.price_monthly === 0 ? "Get Started" : "Choose Plan",
+      href: "/register",
+      popular: plan.name.toLowerCase() === 'pro' || plan.name.toLowerCase() === 'business'
+    };
+  });
+
 
   return (
     <div className="pricing-section">
@@ -83,15 +175,22 @@ export function PricingContent() {
                   </li>
                 ))}
               </ul>
-              <Link
-                href={plan.href}
+              <button
+                onClick={() => handlePlanClick(plan)}
+                disabled={loadingPlan !== null}
                 className={cn(
                   "plan-cta",
-                  plan.popular ? "cta-primary" : "cta-secondary"
+                  plan.popular ? "cta-primary" : "cta-secondary",
+                  loadingPlan === plan.id && "opacity-80 cursor-not-allowed"
                 )}
               >
-                {plan.cta}
-              </Link>
+                {loadingPlan === plan.id ? (
+                  <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                ) : (
+                  plan.cta
+                )}
+              </button>
+
             </div>
           ))}
         </div>
@@ -106,60 +205,41 @@ export function PricingContent() {
               <thead>
                 <tr>
                   <th>Features</th>
-                  <th className="text-center">Free</th>
-                  <th className="text-center">Pro</th>
-                  <th className="text-center">Business</th>
-                  <th className="text-center">Enterprise</th>
+                  {plans.map((plan: any) => (
+                    <th key={plan.id} className="text-center">{plan.name}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {comparisonFeatures.map((row: any) => (
-                  <tr key={row.feature}>
-                    <td>{row.feature}</td>
-                    <td className="text-center">
-                      {typeof row.free === "boolean" ? (
-                        row.free ? (
-                          <Check className="feature-icon" style={{ margin: "auto" }} />
+                {[
+                  { label: 'QR Code Limit', key: 'qr_limit', isLimit: true },
+                  { label: 'Monthly Scans', key: 'monthly_scan_limit', isLimit: true },
+                  { label: 'Analytics', key: 'has_analytics' },
+                  { label: 'API Access', key: 'has_api_access' },
+                  { label: 'Bulk Generator', key: 'has_bulk_generator' },
+                  { label: 'Design Studio', key: 'has_design_studio' },
+                  { label: 'Smart Routing', key: 'has_smart_routing' },
+                  { label: 'Password Protection', key: 'has_password_qr' },
+                  { label: 'Multi-Action Menu', key: 'has_multi_action_qr' },
+                  { label: 'Form Builder', key: 'has_form_builder' },
+                ].map((row) => (
+                  <tr key={row.label}>
+                    <td>{row.label}</td>
+                    {plans.map((plan: any) => (
+                      <td key={`${plan.id}-${row.key}`} className="text-center">
+                        {row.isLimit ? (
+                          <span className="feature-text">
+                            {plan[row.key] === -1 ? 'Unlimited' : plan[row.key]}
+                          </span>
                         ) : (
-                          <span className="dash-icon">—</span>
-                        )
-                      ) : (
-                        <span className="feature-text">{row.free}</span>
-                      )}
-                    </td>
-                    <td className="text-center">
-                      {typeof row.pro === "boolean" ? (
-                        row.pro ? (
-                          <Check className="feature-icon" style={{ margin: "auto" }} />
-                        ) : (
-                          <span className="dash-icon">—</span>
-                        )
-                      ) : (
-                        <span className="feature-text">{row.pro}</span>
-                      )}
-                    </td>
-                    <td className="text-center">
-                      {typeof row.business === "boolean" ? (
-                        row.business ? (
-                          <Check className="feature-icon" style={{ margin: "auto" }} />
-                        ) : (
-                          <span className="dash-icon">—</span>
-                        )
-                      ) : (
-                        <span className="feature-text">{row.business}</span>
-                      )}
-                    </td>
-                    <td className="text-center">
-                      {typeof row.enterprise === "boolean" ? (
-                        row.enterprise ? (
-                          <Check className="feature-icon" style={{ margin: "auto" }} />
-                        ) : (
-                          <span className="dash-icon">—</span>
-                        )
-                      ) : (
-                        <span className="feature-text">{row.enterprise}</span>
-                      )}
-                    </td>
+                          plan[row.key] ? (
+                            <Check className="feature-icon" style={{ margin: "auto" }} />
+                          ) : (
+                            <span className="dash-icon">—</span>
+                          )
+                        )}
+                      </td>
+                    ))}
                   </tr>
                 ))}
               </tbody>
@@ -173,7 +253,7 @@ export function PricingContent() {
             Frequently asked questions
           </h2>
           <div className="faq-list">
-            {faqs.map((faq: any, index: number) => (
+            {staticFaqs.map((faq: any, index: number) => (
               <div key={index} className="faq-item">
                 <button
                   onClick={() => setOpenFaq(openFaq === index ? null : index)}

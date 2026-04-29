@@ -14,7 +14,10 @@ export async function GET(request: NextRequest) {
   // For simplicity in this step, we'll fetch basic user data.
   // In a real app, this would be a single view or a more complex RPC.
   
-  const { data: users, error } = await adminClient
+  const { searchParams } = new URL(request.url);
+  const emailFilter = searchParams.get('email');
+
+  let query = adminClient
     .from('users')
     .select(`
       id,
@@ -24,8 +27,14 @@ export async function GET(request: NextRequest) {
       is_suspended,
       avatar_url,
       created_at
-    `)
-    .order('created_at', { ascending: false })
+    `);
+
+  if (emailFilter) {
+    query = query.eq('email', emailFilter);
+  }
+
+  const { data: users, error } = await query.order('created_at', { ascending: false });
+
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

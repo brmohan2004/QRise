@@ -1,7 +1,12 @@
+/* @tailwind base; */
+/* @tailwind components; */
+/* @tailwind utilities; */
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/** @custom-variant dark (&:is(.dark *)); */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -136,5 +141,18 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #222;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #333;
   }
 }

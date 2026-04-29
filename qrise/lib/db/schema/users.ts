@@ -10,6 +10,12 @@ export const users = pgTable('users', {
   planExpiresAt: timestamp('plan_expires_at'),
   isSuspended: boolean('is_suspended').default(false),
   suspensionReason: text('suspension_reason'),
+  stripeCustomerId: varchar('stripe_customer_id', { length: 100 }),
+  stripeSubscriptionId: varchar('stripe_subscription_id', { length: 100 }),
+  billingStatus: varchar('billing_status', { length: 30 }).default('active'),
+  trialEndsAt: timestamp('trial_ends_at'),
+  nextBillingDate: timestamp('next_billing_date'),
+  lifetimeValueCents: integer('lifetime_value_cents').default(0),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

@@ -16,7 +16,7 @@ export default async function AdminLayout({
 
   return (
     <QueryProvider>
-      <div className="flex h-screen bg-black overflow-hidden">
+      <div className="flex h-screen bg-black overflow-hidden dark">
         {/* Sidebar */}
         <AdminSidebar />
 

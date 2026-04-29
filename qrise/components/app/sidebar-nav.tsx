@@ -263,6 +263,23 @@ export function SidebarNav({
               </Link>
             </motion.div>
           )}
+          {userData?.plan?.name === 'free' && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link 
+                  href="/pricing" 
+                  className={cn(
+                    "flex items-center justify-center gap-2 w-full py-2.5 text-xs font-black text-white bg-primary hover:bg-primary/90 rounded-xl transition-all shadow-[0_4px_12px_rgba(59,130,246,0.3)] group",
+                    collapsed ? "px-0 h-10" : "px-4"
+                  )}
+                >
+                  <Zap className={cn("w-4 h-4 fill-current group-hover:scale-110 transition-transform")} />
+                  {!collapsed && "UPGRADE TO PRO"}
+                </Link>
+              </TooltipTrigger>
+              {collapsed && <TooltipContent side="right">Upgrade to Pro</TooltipContent>}
+            </Tooltip>
+          )}
           <UserMenu 
             user={user} 
             isCollapsed={collapsed}

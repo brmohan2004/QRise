@@ -4,7 +4,7 @@ import { bulkJobs, webhookDeliveries, scanEvents, scanDailyRollups } from "@/lib
 import { lt, sql, eq, and, isNotNull, inArray } from "drizzle-orm";
 import { utapi } from "@/lib/uploadthing-server";
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get("Authorization");
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

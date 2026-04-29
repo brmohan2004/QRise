@@ -5,16 +5,27 @@ import { PlatformTrendChart } from '@/components/analytics/platform-trend-chart'
 import { GeoBreakdownChart } from '@/components/analytics/geo-breakdown-chart'
 import { TopQRsTable } from '@/components/analytics/top-qrs-table'
 import { useQuery } from '@tanstack/react-query'
-import { Users, QrCode, MousePointer2, Trophy } from 'lucide-react'
+import { Users, QrCode, MousePointer2, Trophy, DollarSign } from 'lucide-react'
+import { RateLimitWidget } from '@/components/admin/rate-limit-widget'
 
 export default function DashboardPage() {
-  const { data: summary, isLoading } = useQuery({
+  const { data: summary, isLoading: isSummaryLoading } = useQuery({
     queryKey: ['admin', 'analytics', 'platform_summary'],
     queryFn: async () => {
       const res = await fetch('/api/admin/analytics?view=platform_summary')
       return res.json()
     }
   })
+
+  const { data: revenue, isLoading: isRevenueLoading } = useQuery({
+    queryKey: ['admin', 'revenue', 'overview'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/revenue/overview')
+      return res.json()
+    }
+  })
+
+  const isLoading = isSummaryLoading || isRevenueLoading
 
   return (
     <div className="space-y-8">
@@ -23,7 +34,7 @@ export default function DashboardPage() {
         <p className="text-gray-400">Real-time metrics and system health at a glance.</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <StatCard
           label="Total Users"
           value={summary?.totalUsers?.toLocaleString() || '0'}
@@ -43,11 +54,21 @@ export default function DashboardPage() {
           isLoading={isLoading}
         />
         <StatCard
+          label="Monthly Revenue"
+          value={revenue?.mrr ? `$${revenue.mrr.toLocaleString()}` : '$0'}
+          icon={DollarSign}
+          isLoading={isLoading}
+        />
+        <StatCard
           label="Active Competitions"
           value={summary?.activeCompetitions || '0'}
           icon={Trophy}
           isLoading={isLoading}
         />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+        <RateLimitWidget />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">

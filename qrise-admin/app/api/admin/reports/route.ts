@@ -3,14 +3,9 @@ import { verifyAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
-  // const admin = await verifyAdmin(request)
-  // if ('error' in admin) {
-  //   return NextResponse.json({ error: admin.error }, { status: admin.status })
-  // }
-  const admin = { user: { email: 'test@example.com' } } // Mock admin
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.error('Missing Supabase environment variables in admin panel')
-    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+  const admin = await verifyAdmin(request)
+  if ('error' in admin) {
+    return NextResponse.json({ error: admin.error }, { status: admin.status })
   }
 
   const { searchParams } = new URL(request.url)

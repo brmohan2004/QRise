@@ -20,7 +20,8 @@ import {
   LogOut,
   AlertTriangle,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  DollarSign
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -73,6 +74,7 @@ const navigation = [
   {
     title: 'Commerce',
     items: [
+      { name: 'Revenue', href: '/revenue', icon: DollarSign },
       { name: 'Coupons', href: '/coupons', icon: Ticket },
     ]
   },
@@ -86,6 +88,8 @@ const navigation = [
     title: 'Config',
     items: [
       { name: 'Plans', href: '/plans', icon: Settings },
+      { name: 'Rate Limits', href: '/rate-limits', icon: ShieldCheck },
+      { name: 'Infra Ops', href: '/infra', icon: ShieldCheck },
       { name: 'System Health', href: '/system', icon: ShieldCheck },
     ]
   },

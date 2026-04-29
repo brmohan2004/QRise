@@ -77,19 +77,6 @@
   line-height: 1.6;
 }
 
-.badge-upcoming {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 1rem;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #92400e;
-  background-color: #fef3c7;
-  border-radius: 9999px;
-  width: fit-content;
-}
-
 /* Upcoming Features Section */
 .upcoming-section {
   border-top: 1px solid #e5e7eb;
@@ -270,3 +257,4 @@
     padding: 2rem;
   }
 }
+

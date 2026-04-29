@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { verifyAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+  const admin = await verifyAdmin(request)
+  if ('error' in admin) {
+    return NextResponse.json({ error: admin.error }, { status: admin.status })
   }
 
   const { searchParams } = new URL(request.url)
@@ -41,6 +43,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const admin = await verifyAdmin(request)
+  if ('error' in admin) {
+    return NextResponse.json({ error: admin.error }, { status: admin.status })
+  }
+
   const { id, status } = await request.json()
   if (!id || !status) return NextResponse.json({ error: 'ID and status required' }, { status: 400 })
 
@@ -55,6 +62,11 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const admin = await verifyAdmin(request)
+  if ('error' in admin) {
+    return NextResponse.json({ error: admin.error }, { status: admin.status })
+  }
+
   const { searchParams } = new URL(request.url)
   const id = searchParams.get('id')
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 })

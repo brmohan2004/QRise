@@ -86,7 +86,7 @@ export function UserMenu({ user, isCollapsed }: UserMenuProps) {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className="cursor-pointer rounded-lg">
-          <Link href="?billing=true" className="flex items-center w-full">
+          <Link href="/settings/billing" className="flex items-center w-full">
             <CreditCard className="mr-3 h-4 w-4" />
             Billing
           </Link>

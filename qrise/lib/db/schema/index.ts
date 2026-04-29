@@ -1,3 +1,4 @@
+
 import { users, plans, type User, type NewUser, type Plan, type NewPlan } from './users';
 import { qrCodes, qrRedirectHistory, type QRCode, type NewQRCode, type QRRedirectHistory, type NewQRRedirectHistory } from './qr-codes';
 import { routingRules, type RoutingRule, type NewRoutingRule } from './routing-rules';
@@ -9,7 +10,14 @@ import { bulkJobs, type BulkJob, type NewBulkJob } from './bulk-jobs';
 import { featureFlags, type FeatureFlag, type NewFeatureFlag } from './feature-flags';
 import { notifications, userNotifications } from './notifications';
 import { platformFeedback, platformFeedbackRelations, type PlatformFeedback, type NewPlatformFeedback } from './platform-feedback';
+import { billingEvents, type BillingEvent, type NewBillingEvent } from './billing';
+import { adminAuditLog, platformConfig, maintenanceWindows, announcements } from './admin';
+import { competitions, competitionRegistrations } from './competitions';
+import { coupons, couponRedemptions } from './marketing';
+import { rateLimitConfig, ipBlocks, rateLimitViolations } from './security';
+import { featuresQuiz, abuseReports } from './features';
 import { relations } from 'drizzle-orm';
+
 
 // Users relations
 export const usersRelations = relations(users, ({ many }) => ({
@@ -17,6 +25,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   apiKeys: many(apiKeys),
   bulkJobs: many(bulkJobs),
   feedback: many(platformFeedback),
+  billingEvents: many(billingEvents),
 }));
 
 // Plans relations
@@ -121,6 +130,7 @@ export const bulkJobsRelations = relations(bulkJobs, ({ one }) => ({
   }),
 }));
 
+
 // Export all schemas
 export {
   users,
@@ -142,6 +152,22 @@ export {
   userNotifications,
   platformFeedback,
   platformFeedbackRelations,
+  billingEvents,
+  // Admin & Features
+  adminAuditLog,
+  platformConfig,
+  maintenanceWindows,
+  announcements,
+  competitions,
+  competitionRegistrations,
+  coupons,
+  couponRedemptions,
+  rateLimitConfig,
+  ipBlocks,
+  rateLimitViolations,
+  featuresQuiz,
+  abuseReports,
+  
   type User,
   type NewUser,
   type Plan,
@@ -172,4 +198,6 @@ export {
   type NewBulkJob,
   type PlatformFeedback,
   type NewPlatformFeedback,
+  type BillingEvent,
+  type NewBillingEvent,
 };

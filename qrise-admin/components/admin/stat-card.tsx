@@ -10,9 +10,10 @@ interface StatCardProps {
   trend?: 'up' | 'down' | 'neutral'
   icon?: React.ElementType
   isLoading?: boolean
+  className?: string
 }
 
-export function StatCard({ label, value, delta, trend, icon: Icon, isLoading }: StatCardProps) {
+export function StatCard({ label, value, delta, trend, icon: Icon, isLoading, className }: StatCardProps) {
   if (isLoading) {
     return (
       <Card className="bg-[#111] border-[#222]">
@@ -29,7 +30,7 @@ export function StatCard({ label, value, delta, trend, icon: Icon, isLoading }: 
   }
 
   return (
-    <Card className="bg-[#111] border-[#222] text-white">
+    <Card className={cn("bg-[#111] border-[#222] text-white", className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-gray-400">{label}</CardTitle>
         {Icon && <Icon className="h-4 w-4 text-gray-500" />}

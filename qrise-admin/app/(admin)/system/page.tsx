@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { HealthCard } from '@/components/system/health-card'
 import { DBStats } from '@/components/system/db-stats'
 import { JobQueueMonitor } from '@/components/system/job-queue-monitor'
-import { MaintenanceToggle } from '@/components/system/maintenance-toggle'
+
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { 
@@ -95,7 +95,7 @@ export default function SystemHealthPage() {
                        </span>.
                     </p>
                  </div>
-                 <MaintenanceToggle />
+
               </div>
            </div>
 

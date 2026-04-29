@@ -16,7 +16,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Loader2, Sparkles, Calendar as CalendarIcon } from 'lucide-react'
+import { Loader2, Sparkles, Calendar as CalendarIcon, Check } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { cn } from '@/lib/utils'
 
 const couponSchema = z.object({
   code: z.string().min(3).max(20).regex(/^[A-Z0-9_]+$/, 'Only uppercase letters, numbers, and underscores allowed'),
@@ -39,20 +41,36 @@ export function CouponForm({ initialData, id }: CouponFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
+  const { data: plans } = useQuery<Array<{ id: string, name: string, price_monthly: number }>>({
+    queryKey: ['admin', 'plans'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/plans')
+      if (!res.ok) throw new Error('Failed to fetch plans')
+      return res.json()
+    }
+  })
+
   const form = useForm<z.infer<typeof couponSchema>>({
     resolver: zodResolver(couponSchema),
-    defaultValues: initialData || {
-      code: '',
-      description: '',
-      discount_type: 'percent',
-      discount_value: 0,
-      applies_to_plans: null,
-      max_uses: null,
-      valid_from: new Date().toISOString().split('T')[0],
-      valid_until: null,
-      is_active: true,
+    defaultValues: {
+      code: initialData?.code || '',
+      description: initialData?.description || '',
+      discount_type: (initialData?.discount_type as 'percent' | 'fixed') || 'percent',
+      discount_value: initialData?.discount_value || 0,
+      applies_to_plans: initialData?.applies_to_plans as string[] | null || null,
+      max_uses: initialData?.max_uses || null,
+      valid_from: initialData?.valid_from ? new Date(initialData.valid_from as string).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      valid_until: initialData?.valid_until ? new Date(initialData.valid_until as string).toISOString().split('T')[0] : null,
+      is_active: initialData?.is_active ?? true,
     },
   })
+
+  const watchAppliesToPlans = form.watch('applies_to_plans')
+  const watchDiscountType = form.watch('discount_type')
+  const watchIsActive = form.watch('is_active')
+  const watchCode = form.watch('code')
+  const watchDescription = form.watch('description')
+  const watchDiscountValue = form.watch('discount_value')
 
   const generateCode = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -133,8 +151,7 @@ export function CouponForm({ initialData, id }: CouponFormProps) {
                 <div className="space-y-3">
                   <Label>Discount Type</Label>
                   <RadioGroup 
-                    // eslint-disable-next-line react-hooks/incompatible-library
-                    defaultValue={form.watch('discount_type')} 
+                    defaultValue={watchDiscountType} 
                     onValueChange={(val) => form.setValue('discount_type', val as 'percent' | 'fixed')}
                     className="flex gap-4"
                   >
@@ -185,7 +202,7 @@ export function CouponForm({ initialData, id }: CouponFormProps) {
                     <p className="text-[10px] text-gray-500">Toggle this coupon on or off.</p>
                   </div>
                   <Switch 
-                    checked={form.watch('is_active')} 
+                    checked={watchIsActive} 
                     onCheckedChange={(val: boolean) => form.setValue('is_active', val)} 
                   />
                 </div>
@@ -213,6 +230,67 @@ export function CouponForm({ initialData, id }: CouponFormProps) {
               </div>
             </CardContent>
           </Card>
+
+          <Card className="bg-[#0a0a0a] border-[#1a1a1a] text-white">
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Applicable Plans</h3>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-[10px] text-gray-400 h-6 px-2"
+                  onClick={() => form.setValue('applies_to_plans', null)}
+                >
+                  Apply to All
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {plans?.map((plan) => (
+                  <div 
+                    key={plan.id}
+                    className={cn(
+                      "flex items-center space-x-3 p-3 rounded-xl border transition-all cursor-pointer",
+                      watchAppliesToPlans?.includes(plan.name.toLowerCase())
+                        ? "bg-white/5 border-white/20 text-white"
+                        : "bg-black border-[#222] text-gray-500 hover:border-gray-700"
+                    )}
+                    onClick={() => {
+                      const current = form.getValues('applies_to_plans') || []
+                      const name = plan.name.toLowerCase()
+                      if (current.includes(name)) {
+                        const next = current.filter(n => n !== name)
+                        form.setValue('applies_to_plans', next.length === 0 ? null : next)
+                      } else {
+                        form.setValue('applies_to_plans', [...current, name])
+                      }
+                    }}
+                  >
+                    <div className={cn(
+                      "w-4 h-4 rounded border flex items-center justify-center",
+                      watchAppliesToPlans?.includes(plan.name.toLowerCase())
+                        ? "bg-white border-white text-black"
+                        : "border-gray-700"
+                    )}>
+                      {watchAppliesToPlans?.includes(plan.name.toLowerCase()) && <Check className="h-3 w-3" />}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold">{plan.name}</span>
+                      <span className="text-[10px] opacity-50">${plan.price_monthly}/mo</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {!watchAppliesToPlans && (
+                <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                  <p className="text-[10px] text-blue-400">
+                    <strong>Note:</strong> No specific plans selected. This coupon will apply to <strong>all subscription plans</strong>.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         <div className="space-y-6">
@@ -225,8 +303,8 @@ export function CouponForm({ initialData, id }: CouponFormProps) {
                        <CalendarIcon className="h-4 w-4 opacity-20" />
                     </div>
                     <div className="space-y-1">
-                       <h4 className="text-3xl font-black italic tracking-tighter">{form.watch('code') || 'YOURCODE'}</h4>
-                       <p className="text-xs font-bold text-gray-500">{form.watch('description') || 'Discount for your subscription'}</p>
+                       <h4 className="text-3xl font-black italic tracking-tighter">{watchCode || 'YOURCODE'}</h4>
+                       <p className="text-xs font-bold text-gray-500">{watchDescription || 'Discount for your subscription'}</p>
                     </div>
                     <div className="pt-4 border-t border-black/5 flex items-baseline gap-1">
                        <span className="text-4xl font-black">

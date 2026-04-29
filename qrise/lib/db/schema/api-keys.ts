@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, boolean, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, boolean, jsonb, integer } from 'drizzle-orm/pg-core';
 
 export const apiKeys = pgTable('api_keys', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -10,6 +10,7 @@ export const apiKeys = pgTable('api_keys', {
   createdAt: timestamp('created_at').defaultNow(),
   lastUsedAt: timestamp('last_used_at'),
   isActive: boolean('is_active').default(true),
+  adminCallLimitOverride: jsonb('admin_call_limit_override'), // { minute, hour, day }
 });
 
 export type ApiKey = typeof apiKeys.$inferSelect;

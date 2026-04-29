@@ -17,6 +17,10 @@ interface UserDetail {
   suspended_reason?: string
   suspended_at?: string
   created_at: string
+  stripe_customer_id?: string
+  billing_status?: string
+  next_billing_date?: string
+  lifetime_value_cents?: number
 }
 
 interface UserDetailCardProps {
@@ -86,6 +90,47 @@ export function UserDetailCard({ user }: UserDetailCardProps) {
             </p>
           </div>
         )}
+
+        <div className="border-t border-[#222] pt-6 mt-2">
+          <h3 className="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider">Billing Information</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Billing Status</span>
+              <div>
+                <Badge 
+                  variant="outline" 
+                  className={
+                    user.billing_status === 'active' ? 'bg-green-900/10 text-green-500 border-green-900/20' :
+                    user.billing_status === 'past_due' ? 'bg-amber-900/10 text-amber-500 border-amber-900/20' :
+                    'bg-gray-900/10 text-gray-500 border-gray-900/20'
+                  }
+                >
+                  {user.billing_status || 'Trial'}
+                </Badge>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Lifetime Value</span>
+              <div className="text-sm font-bold text-blue-400">
+                ${((user.lifetime_value_cents || 0) / 100).toFixed(2)}
+              </div>
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Next Billing</span>
+              <div className="text-sm text-gray-300">
+                {user.next_billing_date ? format(new Date(user.next_billing_date), 'MMM d, yyyy') : 'N/A'}
+              </div>
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Stripe Customer</span>
+              <div className="text-sm text-blue-400 hover:underline cursor-pointer">
+                <a href={`https://dashboard.stripe.com/customers/${user.stripe_customer_id}`} target="_blank" rel="noreferrer">
+                  {user.stripe_customer_id ? `${user.stripe_customer_id.substring(0, 12)}...` : 'N/A'}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

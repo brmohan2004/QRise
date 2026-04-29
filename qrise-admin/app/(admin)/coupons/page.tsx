@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { CouponsTable } from '@/components/coupons/coupons-table'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Plus, Ticket, Search, Filter } from 'lucide-react'
+import { Plus, Ticket, Search, Filter, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
@@ -14,10 +14,14 @@ export default function CouponsPage() {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   
-  const { data: coupons, isLoading } = useQuery({
+  const { data: coupons, isLoading, error } = useQuery({
     queryKey: ['admin', 'coupons'],
     queryFn: async () => {
       const res = await fetch('/api/admin/coupons')
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to fetch coupons')
+      }
       return res.json()
     }
   })
@@ -86,7 +90,20 @@ export default function CouponsPage() {
         </Button>
       </div>
 
-      {isLoading ? (
+      {error ? (
+        <div className="p-8 border border-red-500/20 bg-red-500/5 rounded-3xl text-center">
+          <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-4" />
+          <p className="text-red-500 font-bold">Error loading coupons</p>
+          <p className="text-red-400 text-sm mt-1">{(error as Error).message}</p>
+          <Button 
+            variant="outline" 
+            className="mt-4 border-red-500/20 text-red-500 hover:bg-red-500/10"
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['admin', 'coupons'] })}
+          >
+            Try Again
+          </Button>
+        </div>
+      ) : isLoading ? (
         <div className="space-y-4">
           <Skeleton className="h-10 w-full bg-[#111]" />
           <Skeleton className="h-[400px] w-full bg-[#111] rounded-2xl" />

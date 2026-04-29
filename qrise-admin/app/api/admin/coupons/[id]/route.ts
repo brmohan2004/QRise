@@ -39,6 +39,15 @@ export async function PATCH(
 
   const { id } = await params
   const body = await request.json()
+
+  // Basic validation if these are being updated
+  if (body.discount_type === 'percent' && (body.discount_value <= 0 || body.discount_value > 100)) {
+    return NextResponse.json({ error: 'Percentage discount must be between 0 and 100' }, { status: 400 })
+  }
+  if (body.discount_value !== undefined && body.discount_value <= 0) {
+    return NextResponse.json({ error: 'Discount value must be greater than 0' }, { status: 400 })
+  }
+
   const adminClient = createAdminClient()
 
   // Get current for audit
@@ -46,7 +55,11 @@ export async function PATCH(
 
   const { data: updated, error } = await adminClient
     .from('coupons')
-    .update({ ...body, updated_at: new Date().toISOString() })
+    .update({ 
+      ...body, 
+      code: body.code ? body.code.toUpperCase().trim() : undefined,
+      updated_at: new Date().toISOString() 
+    })
     .eq('id', id)
     .select()
     .single()

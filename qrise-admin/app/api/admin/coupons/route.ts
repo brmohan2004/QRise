@@ -35,13 +35,23 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json()
+  
+  // Basic validation
+  if (body.discount_type === 'percent' && (body.discount_value <= 0 || body.discount_value > 100)) {
+    return NextResponse.json({ error: 'Percentage discount must be between 0 and 100' }, { status: 400 })
+  }
+  if (body.discount_value <= 0) {
+    return NextResponse.json({ error: 'Discount value must be greater than 0' }, { status: 400 })
+  }
+
   const adminClient = createAdminClient()
 
   // Ensure code is uppercased
   const couponData = {
     ...body,
-    code: body.code.toUpperCase(),
-    created_by: admin.adminId
+    code: body.code.toUpperCase().trim(),
+    created_by: admin.adminId,
+    updated_at: new Date().toISOString()
   }
 
   const { data, error } = await adminClient
