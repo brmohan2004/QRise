@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { users, plans } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { ApiResponse } from "@/lib/api-response";
+import { sendWelcomeEmail } from "@/lib/resend";
 
 export async function GET() {
   try {
@@ -33,6 +33,9 @@ export async function GET() {
         plan: 'free',
       }).returning();
       userData = newUser;
+
+      // Send welcome email to the new user
+      await sendWelcomeEmail(userData.email, userData.fullName || 'User');
       
       // Fetch the free plan details separately if needed, or assume defaults
       const [freePlan] = await db.select().from(plans).where(eq(plans.name, 'free')).limit(1);

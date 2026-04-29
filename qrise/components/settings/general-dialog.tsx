@@ -18,12 +18,14 @@ import {
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { DestroyWorkspaceDialog } from "./destroy-workspace-dialog";
 
 export function GeneralDialog() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
+  const [isDestroyDialogOpen, setIsDestroyDialogOpen] = useState(false);
   
   const isOpen = searchParams.get("general") === "true";
 
@@ -83,6 +85,22 @@ export function GeneralDialog() {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("general");
     router.replace(`${pathname}${params.toString() ? `?${params.toString()}` : ""}`);
+  };
+
+  const handleDestroyWorkspace = async () => {
+    try {
+      const res = await fetch("/api/user/suspend", { method: "POST" });
+      if (res.ok) {
+        toast.success("Workspace destroyed. Signing out...");
+        const supabase = createClient();
+        await supabase.auth.signOut();
+        router.push("/login");
+      } else {
+        toast.error("Failed to destroy workspace");
+      }
+    } catch (error) {
+      toast.error("An error occurred");
+    }
   };
 
   return (
@@ -208,7 +226,11 @@ export function GeneralDialog() {
                       Deleting your account is permanent and cannot be undone. All QR codes, forms, and analytics will be purged from our systems.
                     </p>
                   </div>
-                  <Button variant="destructive" className="h-12 md:h-16 px-8 md:px-12 font-bold rounded-xl md:rounded-2xl shadow-xl md:shadow-2xl shadow-rose-200 uppercase tracking-[0.2em] text-[9px] md:text-[10px] hover:scale-[1.02] transition-transform">
+                  <Button 
+                    onClick={() => setIsDestroyDialogOpen(true)}
+                    variant="destructive" 
+                    className="h-12 md:h-16 px-8 md:px-12 font-bold rounded-xl md:rounded-2xl shadow-xl md:shadow-2xl shadow-rose-200 uppercase tracking-[0.2em] text-[9px] md:text-[10px] hover:scale-[1.02] transition-transform"
+                  >
                     Destroy Workspace
                   </Button>
                 </div>
@@ -217,6 +239,12 @@ export function GeneralDialog() {
           )}
         </div>
       </DialogContent>
+
+      <DestroyWorkspaceDialog 
+        isOpen={isDestroyDialogOpen}
+        onClose={() => setIsDestroyDialogOpen(false)}
+        onConfirm={handleDestroyWorkspace}
+      />
     </Dialog>
   );
 }

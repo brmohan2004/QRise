@@ -25,22 +25,31 @@ export function BackupDialog() {
     setExportProgress(10);
     
     try {
+      setExportProgress(30);
       const res = await fetch(`/api/export?type=${type}`);
+      setExportProgress(80);
+      
       if (!res.ok) throw new Error("Export failed");
       
-      let progress = 10;
-      const interval = setInterval(() => {
-        progress += 15;
-        setExportProgress(progress);
-        if (progress >= 100) {
-          clearInterval(interval);
-          setLoader(false);
-          toast.success("Export complete! Check your email for the download link.");
-        }
-      }, 800);
+      // Convert response to blob and trigger download
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = type === "qr-codes" ? "qrise-qr-export.zip" : "qrise-forms-export.zip";
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      setExportProgress(100);
+      setTimeout(() => {
+        setLoader(false);
+        toast.success("Export complete! Your download has started.");
+      }, 500);
 
     } catch (err) {
-      toast.error("Failed to start export job");
+      toast.error("Failed to process export request");
       setLoader(false);
     }
   };

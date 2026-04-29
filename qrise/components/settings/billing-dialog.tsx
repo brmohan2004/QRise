@@ -23,10 +23,10 @@ export function BillingDialog() {
   
   const isOpen = searchParams.get("billing") === "true";
 
-  const { data: userData, isLoading } = useQuery({
-    queryKey: ["current-user"],
+  const { data: billingData, isLoading } = useQuery({
+    queryKey: ["user-billing"],
     queryFn: async () => {
-      const res = await fetch("/api/user");
+      const res = await fetch("/api/user/billing");
       const json = await res.json();
       return json.data;
     },
@@ -39,8 +39,8 @@ export function BillingDialog() {
     router.replace(`${pathname}${params.toString() ? `?${params.toString()}` : ""}`);
   };
 
-  const planName = userData?.plan?.name || "Free";
-  const renewalDate = userData?.planExpiresAt ? format(new Date(userData.planExpiresAt), 'MMMM d, yyyy') : "N/A";
+  const planName = billingData?.plan?.name || "Free";
+  const renewalDate = billingData?.plan?.expiresAt ? format(new Date(billingData.plan.expiresAt), 'MMMM d, yyyy') : "N/A";
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
@@ -85,7 +85,7 @@ export function BillingDialog() {
                         <h3 className="text-4xl md:text-6xl font-bold tracking-tight">{planName}</h3>
                       </div>
                       <div className="px-4 py-2 md:px-6 md:py-3 bg-white/5 rounded-full border border-white/10 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] backdrop-blur-md shrink-0">
-                        {userData?.planExpiresAt ? `Renews on ${renewalDate}` : 'Free Tier Active'}
+                        {billingData?.plan?.expiresAt ? `Renews on ${renewalDate}` : 'Free Tier Active'}
                       </div>
                     </div>
 
@@ -118,13 +118,21 @@ export function BillingDialog() {
                     </div>
                     
                     <div className="space-y-4">
-                      <div className="flex items-center gap-4 p-5 rounded-[24px] bg-slate-50 border border-slate-100">
-                        <div className="w-12 h-8 bg-black rounded-lg flex items-center justify-center text-[10px] font-black text-white italic">VISA</div>
-                        <div className="flex-1">
-                          <p className="text-base font-black text-slate-900 tracking-tight">•••• 4242</p>
-                          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Exp 09 / 27</p>
+                      {billingData?.paymentMethod ? (
+                        <div className="flex items-center gap-4 p-5 rounded-[24px] bg-slate-50 border border-slate-100">
+                          <div className="w-12 h-8 bg-black rounded-lg flex items-center justify-center text-[10px] font-black text-white italic">
+                            {billingData.paymentMethod.brand.toUpperCase()}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-base font-black text-slate-900 tracking-tight">•••• {billingData.paymentMethod.last4}</p>
+                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">
+                              Exp {billingData.paymentMethod.expMonth.toString().padStart(2, '0')} / {billingData.paymentMethod.expYear.toString().slice(-2)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <p className="text-xs text-slate-400 font-medium italic text-center py-4">No payment method on file</p>
+                      )}
                     </div>
                   </div>
                   
@@ -159,23 +167,35 @@ export function BillingDialog() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {[1, 2, 3].map((_, i) => (
-                        <tr key={i} className="group hover:bg-slate-50/50 transition-colors">
+                      {billingData?.invoices?.map((invoice: any, i: number) => (
+                        <tr key={invoice.id} className="group hover:bg-slate-50/50 transition-colors">
                           <td className="px-10 py-6">
                             <div className="flex items-center gap-4">
                               <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
                                 <Package className="h-5 w-5" />
                               </div>
-                              <span className="font-black text-slate-900 italic">Monthly Pro — April 2026</span>
+                              <span className="font-black text-slate-900 italic">{invoice.description}</span>
                             </div>
                           </td>
-                          <td className="px-10 py-6 text-slate-500 font-bold tracking-tight">April 20, 2026</td>
-                          <td className="px-10 py-6 font-black text-slate-900">$29.00</td>
+                          <td className="px-10 py-6 text-slate-500 font-bold tracking-tight">
+                            {format(new Date(invoice.date), 'MMMM d, yyyy')}
+                          </td>
+                          <td className="px-10 py-6 font-black text-slate-900">${invoice.amount}</td>
                           <td className="px-10 py-6 text-right">
-                            <span className="inline-flex px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest border border-emerald-100">Settled</span>
+                            <span className={cn(
+                              "inline-flex px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                              invoice.status === 'settled' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-slate-50 text-slate-600 border-slate-100"
+                            )}>
+                              {invoice.status}
+                            </span>
                           </td>
                         </tr>
                       ))}
+                      {!billingData?.invoices?.length && (
+                        <tr>
+                          <td colSpan={4} className="px-10 py-12 text-center text-slate-400 font-medium italic">No invoices found</td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>

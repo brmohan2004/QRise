@@ -55,6 +55,15 @@ export function SidebarNav({
     }
   });
 
+  const { data: usageData } = useQuery({
+    queryKey: ["user-usage"],
+    queryFn: async () => {
+      const res = await fetch("/api/user/usage");
+      const json = await res.json();
+      return json.data;
+    }
+  });
+
   const collapsed = isCollapsed && !isMobile;
 
   const user = {
@@ -230,12 +239,18 @@ export function SidebarNav({
                   </div>
                   <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Plan Usage</span>
                 </div>
-                <span className="text-[11px] font-black text-primary">850 / 1000</span>
+                <span className="text-[11px] font-black text-primary">
+                  {usageData?.dynamicQrCount ?? 0} / {usageData?.planLimits?.dynamicQrLimit === -1 ? '∞' : (usageData?.planLimits?.dynamicQrLimit ?? 0)}
+                </span>
               </div>
               <div className="h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
                 <motion.div 
                   initial={{ width: 0 }}
-                  animate={{ width: "85%" }}
+                  animate={{ 
+                    width: usageData?.planLimits?.dynamicQrLimit === -1 
+                      ? "100%" 
+                      : `${Math.min(100, ((usageData?.dynamicQrCount ?? 0) / (usageData?.planLimits?.dynamicQrLimit ?? 1)) * 100)}%` 
+                  }}
                   className="h-full bg-primary rounded-full shadow-[0_0_10px_rgba(59,130,246,0.3)]" 
                 />
               </div>

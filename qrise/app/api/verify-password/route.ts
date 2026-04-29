@@ -4,6 +4,9 @@ import { qrCodes } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
+import { rateLimitByIP } from '@/lib/rate-limit';
+import { sendPasswordBruteForceAlert } from '@/lib/resend';
+import { users } from '@/lib/db/schema';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,6 +23,8 @@ export async function POST(request: NextRequest) {
     // Fetch QR by ID with password hash
     const qr = await db.select({
       id: qrCodes.id,
+      name: qrCodes.name,
+      userId: qrCodes.userId,
       targetUrl: qrCodes.targetUrl,
       passwordHash: qrCodes.passwordHash,
     })
@@ -38,6 +43,22 @@ export async function POST(request: NextRequest) {
     const isValid = await bcrypt.compare(password, qr[0].passwordHash);
 
     if (!isValid) {
+      // 1. Detect brute force attempt using Redis
+      const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
+      const rl = await rateLimitByIP(ip, `pw-brute:${qrId}`, 5, "15m");
+      
+      // 2. If limit reached, alert the owner
+      if (!rl.success) {
+        const owner = await db.select().from(users).where(eq(users.id, qr[0].userId)).limit(1);
+        if (owner[0]) {
+          await sendPasswordBruteForceAlert(owner[0].email, qr[0].name, 5, ip);
+        }
+        return NextResponse.json(
+          { error: "Too many failed attempts. Please try again later." },
+          { status: 429 }
+        );
+      }
+
       return NextResponse.json(
         { valid: false },
         { status: 401 }
