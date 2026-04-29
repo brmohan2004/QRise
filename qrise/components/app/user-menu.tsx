@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/client";
+import { useState } from "react";
+import { SignOutDialog } from "./sign-out-dialog";
 
 interface UserMenuProps {
   user: {
@@ -27,6 +29,8 @@ interface UserMenuProps {
 export function UserMenu({ user, isCollapsed }: UserMenuProps) {
   const router = useRouter();
   const supabase = createClient();
+
+  const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -95,13 +99,19 @@ export function UserMenu({ user, isCollapsed }: UserMenuProps) {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem 
-          onClick={handleSignOut} 
+          onClick={() => setIsSignOutDialogOpen(true)} 
           className="text-destructive focus:text-destructive cursor-pointer rounded-lg"
         >
           <LogOut className="mr-3 h-4 w-4" />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
+
+      <SignOutDialog 
+        isOpen={isSignOutDialogOpen}
+        onClose={() => setIsSignOutDialogOpen(false)}
+        onConfirm={handleSignOut}
+      />
     </DropdownMenu>
   );
 }
