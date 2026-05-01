@@ -8,6 +8,7 @@ import { useWizardStore } from "@/stores/qr-wizard.store";
 import { Eye, EyeOff, Loader2, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useUsageStats } from "@/lib/hooks/use-usage-stats";
 
 const PasswordSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -49,6 +50,8 @@ export function PasswordConfig() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { data: usage } = useUsageStats();
+  const isLimitReached = !!usage && usage.metrics.dynamicQrs.limit !== -1 && usage.metrics.dynamicQrs.current >= usage.metrics.dynamicQrs.limit && !editingQrId;
 
   const {
     register,
@@ -113,7 +116,10 @@ export function PasswordConfig() {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to save to storage");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to save to storage");
+      }
 
       const resData = await response.json();
       if (!isEditing && resData.data?.id) {
@@ -218,7 +224,7 @@ export function PasswordConfig() {
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || isLimitReached}
         className="w-full px-4 py-2 bg-[#0F6E56] text-white rounded-lg font-medium hover:bg-[#0d5c48] disabled:opacity-50"
       >
         {loading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Save Configuration"}

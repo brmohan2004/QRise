@@ -14,6 +14,7 @@ import {
   SheetDescription
 } from "@/components/ui/sheet";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUsageStats } from "@/lib/hooks/use-usage-stats";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { WEBHOOK_EVENTS } from "@/lib/webhooks/events";
@@ -99,6 +100,7 @@ export function CreateWebhookDialog({ open, onOpenChange }: { open: boolean; onO
   const [filterConfig, setFilterConfig] = useState<any>({});
   const [showSecret, setShowSecret] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const { data: usage } = useUsageStats();
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
@@ -305,10 +307,20 @@ export function CreateWebhookDialog({ open, onOpenChange }: { open: boolean; onO
           </CollapsibleContent>
         </Collapsible>
 
+        {usage && usage.metrics.webhooks.limit !== -1 && usage.metrics.webhooks.current >= usage.metrics.webhooks.limit && (
+          <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3">
+             <AlertCircle className="h-5 w-5 text-rose-500 shrink-0" />
+             <div className="flex flex-col">
+               <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest leading-none">Quota Reached</span>
+               <span className="text-[11px] font-bold text-rose-500 mt-1">You have reached the limit for webhooks on your current plan.</span>
+             </div>
+          </div>
+        )}
+
         <div className="pt-4 pb-2 sm:pb-0">
           <Button
             onClick={() => createMutation.mutate()}
-            disabled={!url || !url.startsWith("https://") || selectedEvents.length === 0 || createMutation.isPending}
+            disabled={!url || !url.startsWith("https://") || selectedEvents.length === 0 || createMutation.isPending || (!!usage && usage.metrics.webhooks.limit !== -1 && usage.metrics.webhooks.current >= usage.metrics.webhooks.limit)}
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest h-12 sm:h-14 rounded-2xl shadow-lg shadow-emerald-600/20 transition-all active:scale-95 disabled:opacity-50"
           >
             {createMutation.isPending ? "Creating..." : "Create Webhook"}
@@ -328,7 +340,7 @@ export function CreateWebhookDialog({ open, onOpenChange }: { open: boolean; onO
         </Sheet>
       ) : (
         <Dialog open={open} onOpenChange={onOpenChange}>
-          <DialogContent className="sm:max-w-3xl rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
+          <DialogContent className="sm:max-w-3xl sm:max-h-[90vh] sm:h-fit rounded-3xl p-0 overflow-hidden border-none shadow-2xl flex flex-col">
             <FormContent />
           </DialogContent>
         </Dialog>

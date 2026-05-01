@@ -7,6 +7,8 @@ import { ApiResponse } from "@/lib/api-response";
 import { createForm, bulkDeleteForms } from "@/lib/services/form.service";
 import { createQR } from "@/lib/services/qr.service";
 import { rateLimitByIP } from "@/lib/redis";
+import { getEffectiveLimits } from "@/lib/api/rate-limit-config";
+import { users } from "@/lib/db/schema";
 
 export async function GET(request: Request) {
   try {
@@ -54,6 +56,17 @@ export async function POST(request: Request) {
     const rl = await rateLimitByIP(ip, "form-create", 10, "1h");
     if (!rl.success) {
       return ApiResponse.error("Form creation limit reached (Max 10/hr).", 429);
+    }
+
+    // 1. Quota Check
+    const userRec = await db.select({ plan: users.plan }).from(users).where(eq(users.id, user.id)).limit(1);
+    const limits = await getEffectiveLimits(user.id, userRec[0]?.plan || 'free');
+    
+    const countResult = await db.select({ count: sql<number>`count(*)` }).from(forms).where(and(eq(forms.userId, user.id), eq(forms.isDeleted, false)));
+    const currentCount = Number(countResult[0]?.count || 0);
+
+    if (limits.formBuilderLimit !== -1 && currentCount >= limits.formBuilderLimit) {
+       return ApiResponse.forbidden(`Plan limit reached: You can only have ${limits.formBuilderLimit} active forms.`);
     }
 
     if (!name || !fields || !Array.isArray(fields)) {

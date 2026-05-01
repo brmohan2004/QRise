@@ -6,6 +6,7 @@ import { Plus, Trash2, GripVertical, Globe, Phone, Mail, MapPin, Download, Messa
 import { cn } from "@/lib/utils";
 import type { QRAction } from "@/types/qr.types";
 import { useToast } from "@/hooks/use-toast";
+import { useUsageStats } from "@/lib/hooks/use-usage-stats";
 
 const actionTypes = [
   { value: "url", label: "URL", icon: Globe },
@@ -25,6 +26,8 @@ export function MultiActionConfig() {
   const [localName, setLocalName] = useState(wizardName || "");
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { data: usage } = useUsageStats();
+  const isLimitReached = !!usage && usage.metrics.dynamicQrs.limit !== -1 && usage.metrics.dynamicQrs.current >= usage.metrics.dynamicQrs.limit && !editingQrId;
 
   // Sync store to state (for editing)
   useEffect(() => {
@@ -69,7 +72,10 @@ export function MultiActionConfig() {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to save to storage");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to save to storage");
+      }
 
       const data = await response.json();
       if (!isEditing && data.data?.id) {
@@ -158,7 +164,7 @@ export function MultiActionConfig() {
       <button
         type="button"
         onClick={handleSave}
-        disabled={actions.length === 0 || loading}
+        disabled={actions.length === 0 || loading || isLimitReached}
         className="w-full px-4 py-2 bg-[#0F6E56] text-white rounded-lg font-medium hover:bg-[#0d5c48] disabled:opacity-50 flex items-center justify-center"
       >
         {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Save Configuration"}

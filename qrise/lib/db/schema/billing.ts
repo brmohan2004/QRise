@@ -54,6 +54,9 @@ export const planRateLimits = pgTable('plan_rate_limits', {
   maxWebhooks: integer('max_webhooks').notNull().default(2),
   maxCustomTypes: integer('max_custom_types').notNull().default(0),
   maxResolverTimeoutMs: integer('max_resolver_timeout_ms').notNull().default(3000),
+  maxDynamicQrs: integer('max_dynamic_qrs').notNull().default(50),
+  formBuilderLimit: integer('form_builder_limit').notNull().default(0),
+  formSubmissionLimit: integer('form_submission_limit').notNull().default(0),
   updatedAt: timestamp('updated_at').defaultNow(),
   updatedByAdminId: uuid('updated_by_admin_id'),
 });

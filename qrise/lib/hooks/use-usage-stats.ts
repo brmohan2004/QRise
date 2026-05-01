@@ -21,6 +21,7 @@ export interface UsageStats {
     customTypes: UsageMetric;
     forms: UsageMetric;
     submissions: UsageMetric;
+    webhooks: UsageMetric;
   };
 }
 
@@ -95,6 +96,12 @@ export function useUsageStats() {
             limit: data.plan.limits.formSubmissions,
             pct: getPct(data.usage.formSubmissions, data.plan.limits.formSubmissions),
             remaining: getRemaining(data.usage.formSubmissions, data.plan.limits.formSubmissions),
+          },
+          webhooks: {
+            current: data.usage.webhooks,
+            limit: data.plan.limits.webhooks,
+            pct: getPct(data.usage.webhooks, data.plan.limits.webhooks),
+            remaining: getRemaining(data.usage.webhooks, data.plan.limits.webhooks),
           }
         }
       };

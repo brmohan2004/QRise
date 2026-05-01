@@ -92,6 +92,9 @@ export const plans = pgTable('plans', {
   // Export
   csvExportLimit: integer('csv_export_limit'),
   analyticsExportDays: integer('analytics_export_days').default(30),
+
+  // Custom Types
+  customTypeLimit: integer('custom_type_limit').default(0),
 });
 
 export type Plan = typeof plans.$inferSelect;

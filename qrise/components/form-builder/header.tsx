@@ -1,9 +1,11 @@
 "use client";
 
-import { ChevronLeft, Eye, Save, MessageSquare, Share2, Loader2 } from "lucide-react";
+import { ChevronLeft, Eye, Save, MessageSquare, Share2, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useUsageStats } from "@/lib/hooks/use-usage-stats";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface FormBuilderHeaderProps {
   onClose: () => void;
@@ -24,8 +26,11 @@ export function FormBuilderHeader({
   onSave, 
   onShare,
   isSaving,
-  savedFormId 
+  savedFormId,
 }: FormBuilderHeaderProps) {
+  const { data: usage } = useUsageStats();
+  const isLimitReached = !!usage && usage.metrics.forms.limit !== -1 && usage.metrics.forms.current >= usage.metrics.forms.limit && !savedFormId;
+
   return (
     <header className="h-16 lg:h-18 border-b border-gray-100 bg-white flex items-center justify-between px-4 lg:px-6 shrink-0 z-50 relative shadow-sm">
       <div className="flex items-center gap-2 lg:gap-4">
@@ -65,8 +70,13 @@ export function FormBuilderHeader({
         
         <Button 
           onClick={onSave} 
-          disabled={isSaving} 
-          className="h-9 px-3 lg:h-10 lg:px-6 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest"
+          disabled={isSaving || isLimitReached} 
+          className={cn(
+            "h-9 px-3 lg:h-10 lg:px-6 gap-2 text-white shadow-lg rounded-xl transition-all font-black text-[10px] uppercase tracking-widest",
+            isLimitReached 
+              ? "bg-rose-500 hover:bg-rose-600 shadow-rose-500/20" 
+              : "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20"
+          )}
         >
           {isSaving ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -74,7 +84,7 @@ export function FormBuilderHeader({
             <Save className="h-4 w-4" />
           )}
           <span className="hidden xs:inline">
-            {isSaving ? "Saving..." : (savedFormId ? "Update" : "Save")}
+            {isSaving ? "Saving..." : (isLimitReached ? "Limit Reached" : (savedFormId ? "Update" : "Save"))}
           </span>
         </Button>
       </div>

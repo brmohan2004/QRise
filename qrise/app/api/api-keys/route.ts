@@ -23,6 +23,10 @@ export async function GET() {
       createdAt: apiKeys.createdAt,
       lastUsedAt: apiKeys.lastUsedAt,
       isActive: apiKeys.isActive,
+      monthlyCallLimit: apiKeys.monthlyCallLimit,
+      callsThisMonth: apiKeys.callsThisMonth,
+      callsResetAt: apiKeys.callsResetAt,
+      environment: apiKeys.environment,
     })
     .from(apiKeys)
     .where(and(eq(apiKeys.userId, user.id), eq(apiKeys.isActive, true)))

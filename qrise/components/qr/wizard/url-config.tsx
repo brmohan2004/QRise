@@ -9,6 +9,8 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { useUsageStats } from "@/lib/hooks/use-usage-stats";
+import { AlertCircle } from "lucide-react";
 
 const URLSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -24,6 +26,8 @@ export function URLConfig() {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [showUTM, setShowUTM] = useState(false);
+  const { data: usage } = useUsageStats();
+  const isLimitReached = !!usage && usage.metrics.dynamicQrs.limit !== -1 && usage.metrics.dynamicQrs.current >= usage.metrics.dynamicQrs.limit && !editingQrId;
 
   const {
     register,
@@ -94,7 +98,10 @@ export function URLConfig() {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to save to storage");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to save to storage");
+      }
 
       const resData = await response.json();
       if (!isEditing && resData.data?.id) {
@@ -214,9 +221,20 @@ export function URLConfig() {
         )}
       </div>
 
+      {isLimitReached && (
+        <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
+          <AlertCircle className="h-5 w-5 text-rose-600 shrink-0" />
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest leading-none">Quota Reached</span>
+            <span className="text-xs font-bold text-rose-500 mt-1">You have reached the limit for dynamic QR codes.</span>
+          </div>
+          <Link href="/billing" className="ml-auto text-[10px] font-black text-rose-600 uppercase underline decoration-rose-200">Upgrade</Link>
+        </div>
+      )}
+
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || isLimitReached}
         className="group relative w-full h-12 flex items-center justify-center bg-gray-900 text-white rounded-xl font-bold overflow-hidden transition-all hover:bg-black active:scale-[0.98] disabled:opacity-50"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-600 opacity-0 group-hover:opacity-10 transition-opacity" />

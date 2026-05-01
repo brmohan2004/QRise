@@ -6,6 +6,9 @@ import { Check, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { QRPreview } from "../qr-preview";
+import { useUsageStats } from "@/lib/hooks/use-usage-stats";
+import { AlertCircle } from "lucide-react";
+import Link from "next/link";
 
 interface WizardShellProps {
   children: React.ReactNode;
@@ -24,6 +27,8 @@ export function WizardShell({ children, showPreview = true }: WizardShellProps) 
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
+  const { data: usage } = useUsageStats();
+  const isLimitReached = !!usage && usage.metrics.dynamicQrs.limit !== -1 && usage.metrics.dynamicQrs.current >= usage.metrics.dynamicQrs.limit && !editingQrId;
 
   useEffect(() => {
     async function fetchQR() {
@@ -127,6 +132,23 @@ export function WizardShell({ children, showPreview = true }: WizardShellProps) 
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center z-20 bg-white/20 backdrop-blur-[1px]">
               <Loader2 className="w-8 h-8 animate-spin text-[#0F6E56]" />
+            </div>
+          )}
+          {isLimitReached && (
+            <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+              <div className="h-10 w-10 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
+                <AlertCircle className="h-5 w-5 text-rose-600" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest leading-none">Quota Reached</span>
+                <span className="text-xs font-bold text-rose-500 mt-1">You have reached the limit for dynamic QR codes on your current plan.</span>
+              </div>
+              <Link 
+                href="/billing" 
+                className="ml-auto px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95"
+              >
+                Upgrade
+              </Link>
             </div>
           )}
           {children}

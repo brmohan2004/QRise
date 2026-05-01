@@ -82,12 +82,26 @@ export function UsageOverview() {
             <h3 className="text-lg font-bold text-slate-900 tracking-tight">Resource Allocation</h3>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1.5">Detailed breakdown of plan limits</p>
           </div>
+          
+          {Object.values(data.metrics).some(m => m.limit !== -1 && m.current >= m.limit) && (
+            <div className="flex items-center gap-3 px-6 py-3 bg-rose-50 border border-rose-100 rounded-2xl animate-pulse">
+              <AlertCircle className="w-5 h-5 text-rose-500" />
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest leading-none">Quota Reached</span>
+                <span className="text-xs font-bold text-rose-500 mt-1">Upgrade now to restore service.</span>
+              </div>
+              <Button size="sm" variant="ghost" className="h-8 rounded-lg text-[10px] font-bold uppercase tracking-widest text-rose-600 hover:bg-rose-100 ml-2 border border-rose-200" onClick={() => window.location.search = '?billing=true'}>
+                Upgrade
+              </Button>
+            </div>
+          )}
         </div>
         <div className="p-10 space-y-8">
           {[
             { label: "Form Submissions", metric: data.metrics.submissions, color: "bg-emerald-500" },
             { label: "Active Forms", metric: data.metrics.forms, color: "bg-blue-500" },
             { label: "Custom Types", metric: data.metrics.customTypes, color: "bg-indigo-500" },
+            { label: "Webhooks", metric: data.metrics.webhooks, color: "bg-rose-500" },
           ].map((item, idx) => (
             <div key={idx} className="group">
               <div className="flex justify-between items-end mb-3">

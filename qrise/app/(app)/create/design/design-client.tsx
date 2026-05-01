@@ -11,6 +11,8 @@ import { Loader2, Lock } from "lucide-react";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { useUsageStats } from "@/lib/hooks/use-usage-stats";
+import { AlertCircle } from "lucide-react";
 
 export function DesignClient({ isEnabled }: { isEnabled: boolean }) {
   const { name, qrType, config, design, isDynamic, editingQrId, reset, tempPassword } = useWizardStore();
@@ -19,6 +21,7 @@ export function DesignClient({ isEnabled }: { isEnabled: boolean }) {
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [warning, setWarning] = useState(false);
+  const { data: usage } = useUsageStats();
 
   const handleFinish = async () => {
     setIsSubmitting(true);
@@ -127,10 +130,28 @@ export function DesignClient({ isEnabled }: { isEnabled: boolean }) {
       <div className="mt-8 border-t border-gray-200 pt-8">
         <ScannabilityScore onWarning={setWarning} />
         
+        {usage && usage.metrics.dynamicQrs.limit !== -1 && usage.metrics.dynamicQrs.current >= usage.metrics.dynamicQrs.limit && !editingQrId && (
+          <div className="mt-8 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
+            <div className="h-10 w-10 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
+              <AlertCircle className="h-5 w-5 text-rose-600" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest leading-none">Quota Reached</span>
+              <span className="text-xs font-bold text-rose-500 mt-1">You have reached the limit for dynamic QR codes on your current plan.</span>
+            </div>
+            <Link 
+              href="/billing" 
+              className="ml-auto px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95"
+            >
+              Upgrade
+            </Link>
+          </div>
+        )}
+
         <div className="mt-8 flex justify-end">
           <button
             onClick={handleFinish}
-            disabled={isSubmitting || warning}
+            disabled={isSubmitting || warning || (!!usage && usage.metrics.dynamicQrs.limit !== -1 && usage.metrics.dynamicQrs.current >= usage.metrics.dynamicQrs.limit && !editingQrId)}
             className="group relative h-12 px-8 flex items-center justify-center bg-gray-900 text-white rounded-xl font-bold overflow-hidden transition-all hover:bg-black active:scale-[0.98] disabled:opacity-50"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-600 opacity-0 group-hover:opacity-10 transition-opacity" />

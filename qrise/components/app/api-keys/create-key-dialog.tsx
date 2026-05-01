@@ -294,7 +294,7 @@ export function CreateKeyDialog({ open, onOpenChange }: { open: boolean; onOpenC
         </Sheet>
       ) : (
         <Dialog open={open} onOpenChange={onOpenChange}>
-          <DialogContent className="sm:max-w-3xl rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
+          <DialogContent className="sm:max-w-3xl sm:max-h-[90vh] sm:h-fit rounded-3xl p-0 overflow-hidden border-none shadow-2xl flex flex-col">
             <FormContent />
           </DialogContent>
         </Dialog>

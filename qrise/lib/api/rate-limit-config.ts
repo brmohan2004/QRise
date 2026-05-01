@@ -33,6 +33,8 @@ export interface PlanRateLimits {
   maxCustomTypes: number;
   maxResolverTimeoutMs: number;
   maxDynamicQrs: number;
+  formBuilderLimit: number;
+  formSubmissionLimit: number;
 }
 
 export const DEFAULT_UNLIMITED_LIMITS: PlanRateLimits = {
@@ -48,6 +50,8 @@ export const DEFAULT_UNLIMITED_LIMITS: PlanRateLimits = {
   maxCustomTypes: 1000,
   maxResolverTimeoutMs: 60000,
   maxDynamicQrs: 10000,
+  formBuilderLimit: 1000,
+  formSubmissionLimit: 10000,
 };
 
 const PLAN_CACHE_TTL = 60; // seconds
@@ -96,7 +100,9 @@ export async function getPlanRateLimits(plan: string): Promise<PlanRateLimits> {
       maxWebhooks: row.maxWebhooks,
       maxCustomTypes: row.maxCustomTypes,
       maxResolverTimeoutMs: row.maxResolverTimeoutMs,
-      maxDynamicQrs: (row as Record<string, unknown>).maxDynamicQrs as number || 50,
+      maxDynamicQrs: (row as any).maxDynamicQrs || 50,
+      formBuilderLimit: (row as any).formBuilderLimit || 0,
+      formSubmissionLimit: (row as any).formSubmissionLimit || 0,
     };
 
     if (redis) {
@@ -220,4 +226,12 @@ export async function checkRateLimit(
       reset: 0,
     };
   }
+}
+
+export async function getEffectiveLimits(
+  userId: string,
+  plan: string
+): Promise<PlanRateLimits> {
+  const baseLimits = await getPlanRateLimits(plan);
+  return getUserRateLimits(userId, baseLimits);
 }

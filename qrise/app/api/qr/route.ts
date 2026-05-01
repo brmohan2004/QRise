@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { qrCodes } from "@/lib/db/schema";
+import { qrCodes, users } from "@/lib/db/schema";
 import { generateShortCode } from "@/lib/short-code";
 import { desc, eq, and, like, or, sql } from "drizzle-orm";
 import { getAuthenticatedUser, requirePlanFeature } from "@/lib/api-auth";
 import { ApiResponse } from "@/lib/api-response";
 import { createQR, createBulkQR, bulkDeleteQR } from "@/lib/services/qr.service";
 import { rateLimitByIP } from "@/lib/redis";
+import { getEffectiveLimits } from "@/lib/api/rate-limit-config";
+import { qrCodes as qrSchema } from "@/lib/db/schema";
+import { count } from "drizzle-orm";
 
 export async function GET(request: Request) {
   try {
@@ -83,9 +86,22 @@ export async function POST(request: Request) {
       return ApiResponse.error("QR creation limit reached (Max 20/hr).", 429);
     }
 
-    // 1. Plan limit check
-    const hasFeature = await requirePlanFeature(user.id, "qr_creation");
-    if (!hasFeature) return ApiResponse.forbidden("Plan limit reached or feature locked");
+    // 1. Plan limit check (Numeric & Features)
+    const userRec = await db.select({ plan: users.plan }).from(users).where(eq(users.id, user.id)).limit(1);
+    const limits = await getEffectiveLimits(user.id, userRec[0]?.plan || 'free');
+
+    // a. Check dynamic QR limit
+    if (isDynamic ?? true) {
+      const qrCountResult = await db
+        .select({ count: count() })
+        .from(qrSchema)
+        .where(and(eq(qrSchema.userId, user.id), eq(qrSchema.isDynamic, true), eq(qrSchema.isDeleted, false)));
+      
+      const currentCount = Number(qrCountResult[0]?.count || 0);
+      if (limits.maxDynamicQrs !== -1 && currentCount >= limits.maxDynamicQrs) {
+        return ApiResponse.forbidden(`Plan limit reached: You can only have ${limits.maxDynamicQrs} dynamic QR codes.`);
+      }
+    }
 
     const isBulk = type === "bulk" || config?.type === "bulk";
 

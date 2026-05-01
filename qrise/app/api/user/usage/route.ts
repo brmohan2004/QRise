@@ -4,6 +4,7 @@ import { users, plans, qrCodes, scanEvents, forms, formSubmissions, apiKeys, web
 import { eq, and, sql, gte, count } from "drizzle-orm";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { ApiResponse } from "@/lib/api-response";
+import { getPlanRateLimits, getUserRateLimits, type PlanRateLimits } from "@/lib/api/rate-limit-config";
 
 export async function GET() {
   try {
@@ -25,6 +26,10 @@ export async function GET() {
     const planData = result[0]?.plan;
 
     if (!userData) return ApiResponse.notFound("User not found");
+
+    // 1.5 Fetch User Overrides
+    const baseLimits = await getPlanRateLimits(userData.plan);
+    const finalLimits = await getUserRateLimits(user.id, baseLimits);
 
     // 2. Calculate current usage
     
@@ -116,16 +121,26 @@ export async function GET() {
           gte(apiUsageEvents.calledAt, firstDayOfMonth)
         )
       );
+    
+    // h. Webhooks
+    const webhooksResult = await db
+      .select({
+        count: sql<number>`count(*)`,
+      })
+      .from(webhooks)
+      .where(eq(webhooks.userId, user.id));
 
     return ApiResponse.ok({
       plan: {
-        name: planData?.name || userData.plan,
+        name: finalLimits.plan,
         limits: {
-          monthlyScans: planData?.monthlyScanLimit ?? 0,
-          dynamicQrs: planData?.dynamicQrLimit ?? 0,
-          apiCalls: planData?.apiCallLimit ?? 0,
-          formSubmissions: planData?.formSubmissionLimit ?? 0,
-          forms: planData?.formBuilderLimit ?? 0,
+          monthlyScans: finalLimits.imageRendersPerMonth,
+          dynamicQrs: finalLimits.maxDynamicQrs,
+          apiCalls: finalLimits.apiCallsPerMonth,
+          formSubmissions: finalLimits.formSubmissionLimit || (planData?.formSubmissionLimit ?? 0),
+          forms: finalLimits.formBuilderLimit || (planData?.formBuilderLimit ?? 0),
+          customTypes: finalLimits.maxCustomTypes,
+          webhooks: finalLimits.maxWebhooks,
         }
       },
       usage: {
@@ -135,6 +150,7 @@ export async function GET() {
         formSubmissions: Number(submissionsResult[0]?.count || 0),
         activeForms: Number(activeFormsResult[0]?.count || 0),
         customTypes: Number(customTypesResult[0]?.count || 0),
+        webhooks: Number(webhooksResult[0]?.count || 0),
       }
     });
   } catch (error) {

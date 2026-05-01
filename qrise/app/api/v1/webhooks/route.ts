@@ -6,7 +6,7 @@ import { withApiAuth } from '@/lib/api/auth-middleware';
 import { apiSuccess, apiError } from '@/lib/api/response';
 import { SCOPES } from '@/lib/api/scope-registry';
 import { randomBytes } from 'node:crypto';
-import { getPlanRateLimits } from '@/lib/api/rate-limit-config';
+import { getPlanRateLimits, getEffectiveLimits } from '@/lib/api/rate-limit-config';
 import { fireWebhookEvent } from '@/lib/webhooks/delivery';
 import { createHash } from 'node:crypto';
 
@@ -34,7 +34,7 @@ export const POST = withApiAuth(async (req, ctx) => {
 
   // Plan check: max webhooks
   const userRec = await ctx.db.select({ plan: users.plan }).from(users).where(eq(users.id, user.id)).limit(1);
-  const planLimits = await getPlanRateLimits(userRec[0]?.plan || 'free');
+  const planLimits = await getEffectiveLimits(user.id, userRec[0]?.plan || 'free');
   const countResult = await ctx.db
     .select({ count: sql<number>`COUNT(*)` })
     .from(webhooks)
