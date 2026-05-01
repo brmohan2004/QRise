@@ -1,5 +1,4 @@
 import { pgTable, text, timestamp, uuid, boolean, integer, numeric, varchar } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -9,6 +8,7 @@ export const users = pgTable('users', {
   plan: varchar('plan', { length: 20 }).notNull().default('free'),
   planExpiresAt: timestamp('plan_expires_at'),
   isSuspended: boolean('is_suspended').default(false),
+  isAdmin: boolean('is_admin').default(false),
   suspensionReason: text('suspension_reason'),
   stripeCustomerId: varchar('stripe_customer_id', { length: 100 }),
   stripeSubscriptionId: varchar('stripe_subscription_id', { length: 100 }),
@@ -16,6 +16,7 @@ export const users = pgTable('users', {
   trialEndsAt: timestamp('trial_ends_at'),
   nextBillingDate: timestamp('next_billing_date'),
   lifetimeValueCents: integer('lifetime_value_cents').default(0),
+  allowOverages: boolean('allow_overages').default(false),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

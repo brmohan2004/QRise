@@ -7,7 +7,7 @@ import { MaintenanceWindowForm } from '@/components/infra/maintenance-window-for
 import { AnnouncementComposer } from '@/components/infra/announcement-composer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, RefreshCw, Zap, Clock, Megaphone, Trash2, Play, Circle, Database, HardDrive, Calendar, AlertCircle, History } from 'lucide-react';
+import { Loader2, RefreshCw, Zap, Clock, Megaphone, Trash2, Play, Circle, Database, HardDrive, Calendar, AlertCircle, History, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -372,6 +372,7 @@ export default function InfraPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
 
         <TabsContent value="logs" className="mt-0 outline-none">
           <AuditLogTable />

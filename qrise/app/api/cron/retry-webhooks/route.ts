@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { webhookDeliveries } from "@/lib/db/schema";
 import { eq, and, lt } from "drizzle-orm";
+import { processQueue } from "@/lib/webhooks/executor";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,17 +11,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const now = new Date();
-    // Implementation placeholder: Retry failed webhooks
-    // Fetch failed deliveries and attempt redelivery
+    const result = await processQueue(50);
     
     return NextResponse.json({ 
       success: true, 
-      message: "Webhook retries triggered",
-      timestamp: now.toISOString() 
+      ...result,
+      timestamp: new Date().toISOString() 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Cron retry-webhooks failed:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ 
+      error: error instanceof Error ? error.message : "Unknown error" 
+    }, { status: 500 });
   }
 }

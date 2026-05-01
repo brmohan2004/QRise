@@ -1,6 +1,6 @@
 import { db } from '../index';
-import { qrCodes, type QRCode, type NewQRCode, type QRRedirectHistory } from '../schema';
-import { eq, desc, asc, like, and, sql, ilike } from 'drizzle-orm';
+import { qrCodes, type QRCode, type NewQRCode } from '../schema';
+import { eq, desc, and, ilike } from 'drizzle-orm';
 
 export interface QRFilters {
   type?: string;

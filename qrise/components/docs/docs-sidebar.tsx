@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useState, useEffect } from "react"
 import { Search, Lock } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
@@ -27,7 +28,7 @@ export function DocsSidebar({ onSearchClick }: DocsSidebarProps) {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-64 flex-col border-r border-gray-200 bg-gray-50/50 h-[calc(100vh-4rem)] sticky top-16">
+      <aside className="hidden lg:flex w-full flex-col bg-transparent">
         <div className="p-4 border-b border-gray-200">
           <Button
             variant="outline"
@@ -50,21 +51,22 @@ export function DocsSidebar({ onSearchClick }: DocsSidebarProps) {
               </h3>
               <ul className="space-y-1">
                 {section.items.map((item) => {
-                  const isActive = pathname === item.href
+                  const isActive = pathname === item.href || (pathname === "/docs" && item.href === "/docs/introduction")
+                  
                   return (
                     <li key={item.href}>
                       <Link
                         href={item.href}
-                        className={`flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors ${
+                        className={`flex items-center justify-between rounded-md px-3 py-2 text-sm transition-all duration-200 ${
                           isActive
-                            ? "bg-[#0F6E56]/10 text-[#0F6E56] font-medium border-l-2 border-[#0F6E56]"
+                            ? "bg-[#0F6E56]/10 text-[#0F6E56] font-semibold border-l-2 border-[#0F6E56]"
                             : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         }`}
                       >
                         <span>{item.label}</span>
                         {item.method && (
                           <span
-                            className={`text-xs px-1.5 py-0.5 rounded ${methodColors[item.method]}`}
+                            className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${methodColors[item.method]}`}
                           >
                             {item.method}
                           </span>
@@ -87,23 +89,24 @@ export function DocsSidebar({ onSearchClick }: DocsSidebarProps) {
           </Link>
         </div>
       </aside>
-
-      {/* Mobile sidebar would be handled by Sheet in the layout */}
     </>
   )
 }
 
 export function MobileSidebarContent({ onOpenChange }: { onOpenChange: (open: boolean) => void }) {
   const pathname = usePathname()
+  const [activeHash, setActiveHash] = useState("")
+
+  useEffect(() => {
+    setActiveHash(window.location.hash)
+  }, [])
 
   return (
     <SheetContent side="left" className="w-80 p-0 border-r border-gray-100/50">
-      {/* Decorative background element */}
       <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-gray-50/50 -z-10" />
       <div className="absolute top-0 right-0 -z-10 h-64 w-64 bg-[#0F6E56]/5 blur-[80px] rounded-full" />
       
       <div className="flex flex-col h-full px-6">
-        {/* Header with Logo */}
         <div className="flex items-center h-16 border-b border-gray-100/50">
           <Link 
             href="/" 
@@ -127,11 +130,14 @@ export function MobileSidebarContent({ onOpenChange }: { onOpenChange: (open: bo
               </h3>
                <ul className="space-y-1.5">
                  {section.items.map((item) => {
-                   const isActive = pathname === item.href
+                   const hash = item.href.split("#")[1] || ""
+                   const isActive = activeHash === `#${hash}` || (activeHash === "" && hash === "introduction")
+
                    return (
                      <li key={item.href}>
                        <Link
                          href={item.href}
+                         onClick={() => onOpenChange(false)}
                          className={cn(
                            "group flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 min-h-11",
                            isActive
@@ -174,3 +180,4 @@ export function MobileSidebarContent({ onOpenChange }: { onOpenChange: (open: bo
     </SheetContent>
   )
 }
+

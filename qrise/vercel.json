@@ -3,6 +3,14 @@
     {
       "path": "/api/cron/cleanup",
       "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/usage-reset",
+      "schedule": "1 0 1 * *"
+    },
+    {
+      "path": "/api/cron/webhook-processor",
+      "schedule": "* * * * *"
     }
   ],
   "rewrites": [

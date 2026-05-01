@@ -64,8 +64,8 @@ async function testCronEngine() {
         console.log(`❌ FAILED (${res.status})`);
         console.log(`   Error: ${text.substring(0, 100)}`);
       }
-    } catch (error: any) {
-      console.log(`❌ ERROR: ${error.message}`);
+    } catch (error: unknown) {
+      console.log(`❌ ERROR: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 

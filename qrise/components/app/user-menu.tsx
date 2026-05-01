@@ -45,7 +45,7 @@ export function UserMenu({ user, isCollapsed }: UserMenuProps) {
           isCollapsed ? "justify-center" : "gap-3"
         )}
       >
-        <Avatar className="h-10 w-10 border shadow-sm group-hover:scale-105 transition-transform shrink-0">
+        <Avatar className="h-9 w-9 border shadow-sm group-hover:scale-105 transition-transform shrink-0">
           <AvatarImage src={user.avatar_url} />
           <AvatarFallback className="bg-primary/5 text-primary font-bold">
             {user.name.charAt(0).toUpperCase()}

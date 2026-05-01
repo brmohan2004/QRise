@@ -53,14 +53,18 @@ export async function GET(request: NextRequest) {
     }
 
     // 5. Row Counts (All 24 Tables)
+    // 5. Dynamic Table Discovery (or hardcoded list of all 41 tables)
     const tables = [
-      'users', 'plans', 'qr_codes', 'qr_redirect_history', 'routing_rules', 
-      'qr_actions', 'scan_events', 'scan_daily_rollups', 'forms', 'form_submissions',
-      'api_keys', 'webhooks', 'webhook_deliveries', 'bulk_jobs', 'feature_flags',
-      'notifications', 'user_notifications', 'platform_feedback', 'billing_events',
-      'admin_audit_log', 'platform_config', 'maintenance_windows', 'announcements',
-      'competitions', 'competition_registrations', 'coupons', 'coupon_redemptions',
-      'features_quiz', 'abuse_reports', 'rate_limit_config', 'ip_blocks', 'rate_limit_violations'
+      'abuse_reports', 'admin_audit_log', 'announcements', 'api_keys', 
+      'api_usage_events', 'billing_events', 'bulk_jobs', 'competition_registrations', 
+      'competitions', 'coupon_redemptions', 'coupons', 'custom_qr_types', 
+      'feature_flags', 'features_quiz', 'form_submissions', 'forms', 
+      'ip_blocks', 'maintenance_windows', 'notifications', 'plan_rate_limits', 
+      'plans', 'platform_config', 'platform_feedback', 'qr_actions', 
+      'qr_codes', 'qr_redirect_history', 'rate_limit_violations', 'resolver_calls', 
+      'routing_rules', 'scan_daily_rollups', 'scan_events', 'type_marketplace_submissions', 
+      'type_resolvers', 'type_templates', 'usage_alert_channels', 'usage_monthly_snapshots', 
+      'user_notifications', 'user_rate_limit_overrides', 'users', 'webhook_deliveries', 'webhooks'
     ]
 
     const rowCounts: Record<string, number> = {}

@@ -2,7 +2,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { Redis } from '@upstash/redis';
 
-export async function proxy(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -35,13 +35,36 @@ export async function proxy(request: NextRequest) {
   );
 
   // ── Maintenance Mode Check ──
-  const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL!,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-  });
+  let isMaintenance = false;
+  let isReadOnly = false;
 
-  const isMaintenance = await redis.get('platform:maintenance');
-  const isReadOnly = await redis.get('platform:read_only');
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (redisUrl && redisToken) {
+    try {
+      const redis = new Redis({
+        url: redisUrl,
+        token: redisToken,
+      });
+
+      // Use a short timeout to prevent hanging the entire request if Redis is unreachable
+      const timeout = (ms: number) => new Promise((_, reject) => setTimeout(() => reject(new Error('Redis timeout')), ms));
+      
+      const maintenancePromise = redis.get('platform:maintenance');
+      const readOnlyPromise = redis.get('platform:read_only');
+
+      const [maintenanceRes, readOnlyRes] = await Promise.race([
+        Promise.all([maintenancePromise, readOnlyPromise]),
+        timeout(1000) // Reduced to 1s
+      ]) as [string | null, string | null];
+
+      isMaintenance = maintenanceRes === 'true';
+      isReadOnly = readOnlyRes === 'true';
+    } catch (e) {
+      console.error('Redis check skipped (timeout or error):', e);
+    }
+  }
   const { pathname } = request.nextUrl;
 
   // IMPORTANT: This refreshes the session cookie on every request (updateSession pattern)
@@ -90,6 +113,7 @@ export async function proxy(request: NextRequest) {
     '/api-manager',
     '/settings',
     '/onboarding',
+    '/marketplace',
   ];
   const isProtectedPath = protectedPaths.some((path) => pathname.startsWith(path));
 
@@ -106,7 +130,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  let profile: any = null;
+  let profile: { is_suspended: boolean; is_admin: boolean } | null = null;
   if (user) {
     const { data } = await supabase
       .from('users')
@@ -117,7 +141,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // ── Maintenance Enforcement ──
-  if ((isMaintenance === 'true' || isMaintenance === true) && !isEssentialPath) {
+  if (isMaintenance && !isEssentialPath) {
     const isAdmin = !!profile?.is_admin;
     if (!isAdmin && pathname !== '/maintenance') {
       return NextResponse.redirect(new URL('/maintenance', request.url));
@@ -126,7 +150,7 @@ export async function proxy(request: NextRequest) {
 
   // ── Read-Only Enforcement ──
   const isWriteRequest = ['POST', 'PATCH', 'DELETE', 'PUT'].includes(request.method);
-  if ((isReadOnly === 'true' || isReadOnly === true) && isWriteRequest && !isEssentialPath) {
+  if (isReadOnly && isWriteRequest && !isEssentialPath) {
     return new NextResponse(
       JSON.stringify({ error: 'Platform is in read-only mode for maintenance.' }),
       { status: 503, headers: { 'Content-Type': 'application/json' } }

@@ -9,6 +9,26 @@ import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
+interface UsageData {
+  usage: {
+    monthlyScans: number;
+    dynamicQrs: number;
+    apiCalls: number;
+    formSubmissions: number;
+    activeForms: number;
+  };
+  plan: {
+    name: string;
+    limits: {
+      monthlyScans: number;
+      dynamicQrs: number;
+      apiCalls: number;
+      formSubmissions: number;
+      forms: number;
+    };
+  };
+}
+
 export function UsageDialog() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -17,13 +37,7 @@ export function UsageDialog() {
   const isOpen = searchParams.get("usage") === "true";
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<any>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchUsage();
-    }
-  }, [isOpen]);
+  const [data, setData] = useState<UsageData | null>(null);
 
   const fetchUsage = async () => {
     setLoading(true);
@@ -44,6 +58,13 @@ export function UsageDialog() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchUsage();
+    }
+  }, [isOpen]);
+
 
   const handleClose = () => {
     const params = new URLSearchParams(searchParams.toString());

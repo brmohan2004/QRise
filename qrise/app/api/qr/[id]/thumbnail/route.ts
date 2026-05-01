@@ -33,11 +33,11 @@ export async function GET(
     const design = qr[0].designConfig || {};
     const shortCode = qr[0].shortCode;
 
-    const buffer = await generateQRBuffer({
-      data: `${process.env.NEXT_PUBLIC_APP_URL}/r/${shortCode}`,
-      size: 200,
-      ...design,
-    });
+     const buffer = await generateQRBuffer({
+       content: `${process.env.NEXT_PUBLIC_APP_URL}/r/${shortCode}`,
+       size: 200,
+       ...design,
+     });
 
     return new NextResponse(new Uint8Array(buffer), {
       headers: {

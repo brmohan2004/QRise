@@ -1,16 +1,7 @@
 
-import { pgTable, text, timestamp, uuid, boolean, jsonb, integer, varchar } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, boolean, jsonb, varchar } from 'drizzle-orm/pg-core';
 
-export const rateLimitConfig = pgTable('rate_limit_config', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  planName: varchar('plan_name', { length: 50 }).notNull().unique(),
-  requestsPerMinute: integer('requests_per_minute').notNull(),
-  requestsPerHour: integer('requests_per_hour').notNull(),
-  requestsPerDay: integer('requests_per_day').notNull(),
-  autoBlockDurationMinutes: integer('auto_block_duration_minutes').default(60),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-});
+
 
 export const ipBlocks = pgTable('ip_blocks', {
   id: uuid('id').primaryKey().defaultRandom(),

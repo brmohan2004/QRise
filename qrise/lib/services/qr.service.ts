@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { qrCodes, type QRCode, type NewQRCode, qrRedirectHistory, type NewQRRedirectHistory, routingRules, type NewRoutingRule, qrActions, type NewQRAction, bulkJobs, type NewBulkJob, type BulkJob } from '@/lib/db/schema';
+import { type RoutingRule as TypeRoutingRule, type QRAction as TypeQRAction } from '@/types/qr.types';
 import { eq, inArray, and } from 'drizzle-orm';
 import { generateShortCode } from '@/lib/short-code';
 import bcrypt from 'bcryptjs';
@@ -12,8 +13,8 @@ export async function createQR(
     targetUrl?: string;
     isDynamic?: boolean;
     password?: string;
-    rules?: any[];
-    actions?: any[];
+    rules?: Partial<TypeRoutingRule>[];
+    actions?: Partial<TypeQRAction>[];
   }
 ): Promise<QRCode> {
   const shortCode = await generateUniqueShortCode();
@@ -40,8 +41,8 @@ export async function createQR(
     const rulesToInsert: NewRoutingRule[] = data.rules.map((rule, index) => ({
       qrId: qr.id,
       priority: rule.priority ?? index,
-      conditions: rule.conditions,
-      targetUrl: rule.targetUrl,
+      conditions: rule.conditions!,
+      targetUrl: rule.targetUrl!,
       label: rule.label,
     }));
     
@@ -53,7 +54,7 @@ export async function createQR(
     const actionsToInsert: NewQRAction[] = data.actions.map((action, index) => ({
       qrId: qr.id,
       label: action.label,
-      actionType: action.actionType,
+      actionType: action.actionType!,
       actionValue: action.actionValue,
       icon: action.icon,
       displayOrder: action.displayOrder ?? index,
@@ -71,9 +72,9 @@ export async function createBulkQR(
   userId: string,
   data: {
     name: string;
-    rows: any[];
+    rows: Record<string, unknown>[];
     isDynamic?: boolean;
-    designConfig?: any;
+    designConfig?: Record<string, unknown>;
     bulkType?: 'url' | 'multi_action' | 'password' | 'smart_routing';
   }
 ): Promise<BulkJob> {
@@ -93,7 +94,7 @@ export async function createBulkQR(
     const shortCode = await generateUniqueShortCode();
     let passwordHash: string | undefined;
     if (data.bulkType === 'password' && row.password) {
-      passwordHash = await bcrypt.hash(row.password, 12);
+      passwordHash = await bcrypt.hash(row.password as string, 12);
     }
     
     // Default to data.isDynamic if row.isDynamic is not explicitly defined
@@ -121,12 +122,12 @@ export async function createBulkQR(
     insertedQRs.forEach((qr, index) => {
       const row = data.rows[index];
       if (row.actions && Array.isArray(row.actions)) {
-        row.actions.forEach((action: any, aIndex: number) => {
+        row.actions.forEach((action: TypeQRAction, aIndex: number) => {
           allActions.push({
             qrId: qr.id,
-            actionType: action.actionType || action.type,
+            actionType: action.actionType,
             label: action.label,
-            actionValue: action.actionValue || action.value,
+            actionValue: action.actionValue,
             displayOrder: aIndex,
           });
         });
@@ -143,7 +144,7 @@ export async function createBulkQR(
     insertedQRs.forEach((qr, index) => {
       const row = data.rows[index];
       if (row.rules && Array.isArray(row.rules)) {
-        row.rules.forEach((rule: any, rIndex: number) => {
+        row.rules.forEach((rule: TypeRoutingRule, rIndex: number) => {
           allRules.push({
             qrId: qr.id,
             priority: rIndex,
@@ -174,8 +175,8 @@ export async function updateQR(
     status?: 'active' | 'suspended' | 'deleted';
     isDynamic?: boolean;
     design?: Record<string, unknown>;
-    rules?: any[];
-    actions?: any[];
+    rules?: Partial<TypeRoutingRule>[];
+    actions?: Partial<TypeQRAction>[];
     password?: string;
   }
 ): Promise<QRCode> {
@@ -193,7 +194,7 @@ export async function updateQR(
     } as NewQRRedirectHistory);
   }
   
-  const updateData: any = { ...data, updatedAt: new Date() };
+  const updateData: Record<string, unknown> = { ...data, updatedAt: new Date() };
   if (data.design) {
     updateData.designConfig = data.design;
     delete updateData.design;
@@ -214,8 +215,8 @@ export async function updateQR(
       const rulesToInsert: NewRoutingRule[] = data.rules.map((rule, index) => ({
         qrId: id,
         priority: rule.priority ?? index,
-        conditions: rule.conditions,
-        targetUrl: rule.targetUrl,
+        conditions: rule.conditions!,
+        targetUrl: rule.targetUrl!,
         label: rule.label,
       }));
       await db.insert(routingRules).values(rulesToInsert);
@@ -233,7 +234,7 @@ export async function updateQR(
       const actionsToInsert: NewQRAction[] = data.actions.map((action, index) => ({
         qrId: id,
         label: action.label,
-        actionType: action.actionType,
+        actionType: action.actionType!,
         actionValue: action.actionValue,
         icon: action.icon,
         displayOrder: action.displayOrder ?? index,
@@ -258,7 +259,7 @@ export async function updateQR(
   return result[0];
 }
 
-export async function deleteQR(id: string, userId: string, existingQR?: any): Promise<void> {
+export async function deleteQR(id: string, userId: string, existingQR?: QRCode): Promise<void> {
   const qr = existingQR || (await db.select().from(qrCodes).where(eq(qrCodes.id, id)).limit(1))[0];
   
   if (!qr || qr.userId !== userId) {

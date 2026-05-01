@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { scanEvents, qrCodes, users, type ScanEvent } from '@/lib/db/schema';
+import { scanEvents, qrCodes, type ScanEvent } from '@/lib/db/schema';
 import { eq, gte, lte, desc, sql, and } from 'drizzle-orm';
 
 export async function getScanSummary(

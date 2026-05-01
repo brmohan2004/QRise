@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
   if (search) singleQuery = singleQuery.ilike('name', `%${search}%`)
 
   // 2. Fetch bulk jobs (batches)
-  let bulkQuery = adminClient
+  const bulkQuery = adminClient
     .from('bulk_jobs')
     .select(`
       id,

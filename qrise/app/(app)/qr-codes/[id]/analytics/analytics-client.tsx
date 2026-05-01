@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EmbedPreview } from "@/components/qr/embed-preview";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { ArrowLeft, Loader2, Edit3, ExternalLink, Calendar, BarChart3, Download } from "lucide-react";
@@ -254,10 +255,10 @@ export function AnalyticsClient({ id, exportEnabled }: AnalyticsClientProps) {
         <Tabs defaultValue="overview" className="w-full">
           <div className="border-b bg-gray-50/50 px-4 sm:px-8 pt-2 overflow-x-auto no-scrollbar">
             <TabsList className="bg-transparent h-auto p-0 flex space-x-6 sm:space-x-8 min-w-max">
-              {["Overview", "Location", "Devices", "Time", "Raw Events"].map(tab => (
+              {["Overview", "Location", "Devices", "Time", "Raw Events", "Embed & Export"].map(tab => (
                 <TabsTrigger 
                   key={tab} 
-                  value={tab.toLowerCase().replace(" ", "-")}
+                  value={tab.toLowerCase().replace(" ", "-").replace("&", "and")}
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 text-gray-400 font-black text-[10px] uppercase tracking-[0.2em] pb-4 transition-all data-[state=active]:shadow-none px-0"
                 >
                   {tab}
@@ -285,6 +286,10 @@ export function AnalyticsClient({ id, exportEnabled }: AnalyticsClientProps) {
              
              <TabsContent value="raw-events" className="mt-0 focus-visible:outline-none">
                 <RawEventsTable events={rawQuery.data || []} isLoading={rawQuery.isLoading} />
+             </TabsContent>
+
+             <TabsContent value="embed-and-export" className="mt-0 focus-visible:outline-none">
+                <EmbedPreview id={id} name={qr?.name || "Untitled QR"} />
              </TabsContent>
           </div>
         </Tabs>

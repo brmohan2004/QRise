@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation";
 
-export default function DocsRoot() {
-  redirect('/docs/introduction')
+export default function DocsRootPage() {
+  redirect("/docs/introduction");
 }

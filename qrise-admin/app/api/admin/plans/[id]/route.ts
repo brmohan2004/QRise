@@ -15,7 +15,8 @@ export async function GET(
   const { id } = await params
   const adminClient = createAdminClient()
 
-  const { data, error } = await adminClient
+  // Fetch plan
+  const { data: plan, error } = await adminClient
     .from('plans')
     .select('*')
     .eq('id', id)
@@ -25,7 +26,17 @@ export async function GET(
     return NextResponse.json({ error: error.message }, { status: 404 })
   }
 
-  return NextResponse.json(data)
+  // Fetch rate limits
+  const { data: limits } = await adminClient
+    .from('plan_rate_limits')
+    .select('*')
+    .eq('plan', plan.name.toLowerCase())
+    .single()
+
+  // Clean limits to avoid overwriting plan ID or timestamps
+  const { id: _, updated_at: __, plan: ___, ...cleanLimits } = limits || {}
+
+  return NextResponse.json({ ...plan, ...cleanLimits })
 }
 
 export async function PATCH(
@@ -38,7 +49,14 @@ export async function PATCH(
   }
 
   const { id } = await params
-  const body = await request.json()
+  const { 
+    rpm, rpd, max_burst, 
+    image_renders_per_month, embed_renders_per_month, 
+    resolver_calls_per_month, api_calls_per_month,
+    max_webhooks, max_custom_types, max_resolver_timeout_ms,
+    ...planData 
+  } = await request.json()
+  
   const adminClient = createAdminClient()
 
   // Get current state for audit
@@ -48,9 +66,10 @@ export async function PATCH(
     .eq('id', id)
     .single()
 
+  // Update Plan
   const { data: updatedPlan, error } = await adminClient
     .from('plans')
-    .update(body)
+    .update(planData)
     .eq('id', id)
     .select()
     .single()
@@ -59,17 +78,38 @@ export async function PATCH(
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  // Update Rate Limits
+  if (currentPlan) {
+    const limitsData = {
+      rpm, rpd, max_burst,
+      image_renders_per_month, embed_renders_per_month,
+      resolver_calls_per_month, api_calls_per_month,
+      max_webhooks, max_custom_types, max_resolver_timeout_ms,
+      plan: updatedPlan.name.toLowerCase()
+    }
+
+    // Upsert rate limits (using plan name as key)
+    const { error: limitError } = await adminClient
+      .from('plan_rate_limits')
+      .upsert(limitsData, { onConflict: 'plan' })
+    
+    if (limitError) {
+      console.error('Failed to update rate limits:', limitError)
+      // We don't fail the whole request, but we log it
+    }
+  }
+
   // Audit log
   await writeAuditLog({
     adminUserId: admin.adminId,
     action: 'plan.update',
     targetType: 'plan',
     targetId: id,
-    details: { before: currentPlan, after: body },
+    details: { before: currentPlan, after: { ...planData, rpm, rpd } },
     ipAddress: admin.ipAddress
   })
 
-  return NextResponse.json(updatedPlan)
+  return NextResponse.json({ ...updatedPlan, rpm, rpd })
 }
 
 export async function DELETE(

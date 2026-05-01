@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, uuid, integer } from 'drizzle-orm/pg-core';
 
 export const qrActions = pgTable('qr_actions', {
   id: uuid('id').primaryKey().defaultRandom(),

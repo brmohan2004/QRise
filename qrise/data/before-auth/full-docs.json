@@ -1,0 +1,1889 @@
+{
+  "analytics-overview": {
+    "title": "Analytics",
+    "description": "Track every scan with detailed insights while staying privacy-compliant.",
+    "breadcrumb": [
+      {
+        "label": "Analytics"
+      }
+    ],
+    "sections": [
+      {
+        "id": "privacy",
+        "title": "Privacy and compliance",
+        "content": "QRise is built with privacy-first principles. We use non-invasive fingerprinting to track unique scans without storing PII (Personally Identifiable Information). Our analytics are GDPR and CCPA compliant by default."
+      },
+      {
+        "id": "bot-filtering",
+        "title": "Bot filtering",
+        "content": "We automatically filter out scans from known bots, spiders, and search engine crawlers. This ensures your analytics represent real human engagement."
+      },
+      {
+        "id": "endpoints",
+        "title": "Endpoints",
+        "links": [
+          {
+            "text": "GET /qr/:id/analytics — Get QR analytics",
+            "href": "/docs/analytics"
+          }
+        ]
+      }
+    ]
+  },
+  "authentication": {
+    "title": "Authentication",
+    "description": "All API requests require an API key passed in the Authorization header.",
+    "breadcrumb": [
+      {
+        "label": "Authentication"
+      }
+    ],
+    "sections": [
+      {
+        "id": "getting-your-api-key",
+        "title": "Getting your API key",
+        "items": [
+          "Log in to your QRise account",
+          "Navigate to API Manager in the sidebar",
+          "Click \"Create API key\"",
+          "Select the scopes you need",
+          "Copy the key immediately — it cannot be shown again"
+        ],
+        "listType": "decimal"
+      },
+      {
+        "id": "scopes",
+        "title": "Scopes",
+        "table": {
+          "headers": [
+            "Scope",
+            "Description"
+          ],
+          "rows": [
+            [
+              "qr:read",
+              "Read QR codes, list, export, analytics"
+            ],
+            [
+              "qr:write",
+              "Create, update, delete QR codes"
+            ],
+            [
+              "analytics:read",
+              "View scan analytics"
+            ],
+            [
+              "forms:read",
+              "Create and manage forms"
+            ],
+            [
+              "bulk:write",
+              "Run bulk generation jobs"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "making-requests",
+        "title": "Making authenticated requests",
+        "content": "Include your API key in the Authorization header:",
+        "codeBlock": {
+          "code": "Authorization: Bearer YOUR_API_KEY",
+          "language": "bash"
+        }
+      },
+      {
+        "id": "security-callout",
+        "type": "warning",
+        "title": "API key security",
+        "content": "Never commit API keys to source control. Use environment variables. Rotate keys immediately if exposed."
+      },
+      {
+        "id": "demo-key",
+        "title": "Demo key",
+        "content": "The Try-It console includes a pre-filled demo key for testing. It's read-only and limited to 10 calls per hour."
+      }
+    ]
+  },
+  "bulk-overview": {
+    "title": "Bulk Generation",
+    "description": "Generate thousands of QR codes at once with bulk jobs. Submit an array of QR code definitions and receive a job ID to track progress.",
+    "breadcrumb": [
+      {
+        "label": "Bulk"
+      }
+    ],
+    "sections": [
+      {
+        "id": "overview",
+        "title": "How it works",
+        "items": [
+          "Submit a bulk job with an array of QR code definitions (up to 1,000 on Pro, 10,000 on Business/Enterprise)",
+          "Receive a job ID immediately",
+          "Poll the job status endpoint until status is done",
+          "Download a ZIP file containing all QR code images (valid for 24 hours)"
+        ],
+        "listType": "decimal"
+      },
+      {
+        "id": "limits",
+        "title": "Limits",
+        "table": {
+          "headers": [
+            "Plan",
+            "Max rows per job",
+            "Required scope"
+          ],
+          "rows": [
+            [
+              "Free",
+              "—",
+              "—"
+            ],
+            [
+              "Pro",
+              "1,000",
+              "bulk:write"
+            ],
+            [
+              "Business",
+              "10,000",
+              "bulk:write"
+            ],
+            [
+              "Enterprise",
+              "10,000",
+              "bulk:write"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "endpoints",
+        "title": "Endpoints",
+        "links": [
+          {
+            "text": "POST /bulk — Create bulk job",
+            "href": "/docs/bulk/create"
+          },
+          {
+            "text": "GET /bulk/:jobId — Get job status",
+            "href": "/docs/bulk/status"
+          }
+        ]
+      }
+    ]
+  },
+  "changelog": {
+    "title": "Changelog",
+    "description": "Stay updated with the latest changes to the QRise API.",
+    "breadcrumb": [
+      {
+        "label": "Changelog"
+      }
+    ],
+    "sections": [
+      {
+        "id": "2024-03-20",
+        "title": "March 20, 2024",
+        "items": [
+          "Added Smart Routing 'time_range' condition",
+          "Improved bot filtering accuracy",
+          "Analytics GET endpoint now supports 'hour' breakdown"
+        ]
+      },
+      {
+        "id": "2024-02-15",
+        "title": "February 15, 2024",
+        "items": [
+          "Launched Bulk Generation API",
+          "Added multi-action QR type support",
+          "API rate limits increased for Pro plans"
+        ]
+      },
+      {
+        "id": "v1-launch",
+        "title": "January 1, 2024",
+        "content": "Initial release of QRise API v1.0.0"
+      }
+    ]
+  },
+  "create-qr": {
+    "breadcrumb": [
+      {
+        "label": "QR codes"
+      },
+      {
+        "label": "Create QR",
+        "href": "/docs/qr-codes/create"
+      }
+    ],
+    "endpoint": {
+      "id": "create-qr",
+      "method": "POST",
+      "path": "/qr",
+      "title": "Create a QR code",
+      "description": "Creates a new QR code. For Dynamic QRs the short redirect code is generated automatically. For password-protected QRs supply the raw password — it will be hashed server-side.",
+      "requiredScope": "qr:write",
+      "notes": [
+        "Plan limits apply: Free accounts can create up to 5 QR codes. Pro allows unlimited.",
+        "Password QRs require the password field and are always dynamic."
+      ],
+      "bodyParams": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "description": "Display name for this QR code. Max 200 chars.",
+          "example": "\"Product launch poster\""
+        },
+        {
+          "name": "type",
+          "type": "enum",
+          "required": true,
+          "description": "QR code type.",
+          "enumValues": [
+            "url",
+            "smart_routing",
+            "password",
+            "multi_action",
+            "bulk"
+          ],
+          "example": "\"url\""
+        },
+        {
+          "name": "target_url",
+          "type": "string",
+          "required": false,
+          "description": "The destination URL. Required for url, smart_routing, and password types. Must begin with https:// or http://.",
+          "example": "\"https://yourstore.com/sale\""
+        },
+        {
+          "name": "is_dynamic",
+          "type": "boolean",
+          "required": false,
+          "description": "When true, the QR encodes a short redirect that can be updated without reprinting. Default: true.",
+          "defaultValue": "true"
+        },
+        {
+          "name": "password",
+          "type": "string",
+          "required": false,
+          "description": "Required when type is password. Raw string — hashed server-side. Never stored in plaintext."
+        },
+        {
+          "name": "design",
+          "type": "object",
+          "required": false,
+          "description": "Design configuration. See Design object below."
+        },
+        {
+          "name": "design.dot_color",
+          "type": "string",
+          "required": false,
+          "description": "Hex color for QR dots. Default: #000000."
+        },
+        {
+          "name": "design.background_color",
+          "type": "string",
+          "required": false,
+          "description": "Hex color for QR background. Default: #ffffff."
+        },
+        {
+          "name": "design.error_correction",
+          "type": "enum",
+          "required": false,
+          "description": "Error correction level. Higher levels allow larger logos but reduce data density.",
+          "enumValues": [
+            "L",
+            "M",
+            "Q",
+            "H"
+          ],
+          "defaultValue": "M"
+        }
+      ],
+      "responseSchema": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "description": "Unique QR code identifier."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Display name."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "description": "QR code type."
+        },
+        {
+          "name": "short_code",
+          "type": "string",
+          "description": "8-character URL-safe redirect code. Null for static QRs."
+        },
+        {
+          "name": "redirect_url",
+          "type": "string",
+          "description": "Full scannable URL encoded in the QR (e.g. https://r.qrise.io/abc12345). Null for static QRs."
+        },
+        {
+          "name": "target_url",
+          "type": "string",
+          "description": "Current destination URL."
+        },
+        {
+          "name": "is_dynamic",
+          "type": "boolean",
+          "description": "Whether this QR uses a redirect."
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "description": "Whether this QR is currently scannable."
+        },
+        {
+          "name": "scan_count",
+          "type": "number",
+          "description": "Total scan count since creation."
+        },
+        {
+          "name": "design",
+          "type": "object",
+          "description": "Design configuration object."
+        },
+        {
+          "name": "created_at",
+          "type": "string",
+          "description": "ISO 8601 creation timestamp."
+        },
+        {
+          "name": "updated_at",
+          "type": "string",
+          "description": "ISO 8601 last update timestamp."
+        }
+      ],
+      "exampleRequest": {
+        "name": "Summer sale campaign",
+        "type": "url",
+        "target_url": "https://yourstore.com/summer-sale",
+        "is_dynamic": true,
+        "design": {
+          "dot_color": "#1D9E75",
+          "background_color": "#ffffff",
+          "error_correction": "M"
+        }
+      },
+      "exampleResponse": {
+        "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "Summer sale campaign",
+        "type": "url",
+        "short_code": "xK9mPqR2",
+        "redirect_url": "https://r.qrise.io/xK9mPqR2",
+        "target_url": "https://yourstore.com/summer-sale",
+        "is_dynamic": true,
+        "is_active": true,
+        "scan_count": 0,
+        "design": {
+          "dot_color": "#1D9E75",
+          "background_color": "#ffffff",
+          "error_correction": "M"
+        },
+        "created_at": "2025-06-01T10:30:00Z",
+        "updated_at": "2025-06-01T10:30:00Z"
+      },
+      "errorCodes": [
+        "400",
+        "401",
+        "403",
+        "422",
+        "429"
+      ]
+    },
+    "examples": {
+      "js": "const response = await fetch('https://api.qrise.io/qr', {\n  method: 'POST',\n  headers: { 'Authorization': 'Bearer YOUR_API_KEY', 'Content-Type': 'application/json' },\n  body: JSON.stringify({ name: 'Summer sale campaign', type: 'url', target_url: 'https://yourstore.com/summer-sale', is_dynamic: true }) })\nconst qr = await response.json()\nconsole.log(qr.redirect_url)",
+      "python": "import requests\nresponse = requests.post('https://api.qrise.io/qr',\n    headers={'Authorization': 'Bearer YOUR_API_KEY', 'Content-Type': 'application/json'},\n    json={'name': 'Summer sale campaign', 'type': 'url', 'target_url': 'https://yourstore.com/summer-sale', 'is_dynamic': True})\nqr = response.json()\nprint(qr['redirect_url'])",
+      "curl": "curl -X POST https://api.qrise.io/qr -H \"Authorization: Bearer YOUR_API_KEY\" -H \"Content-Type: application/json\" -d '{\"name\": \"Summer sale campaign\", \"type\": \"url\", \"target_url\": \"https://yourstore.com/summer-sale\", \"is_dynamic\": true}'"
+    }
+  },
+  "custom-types-field-schema": {
+    "title": "Custom Types — Field Schema",
+    "description": "Define structured data fields for your custom QR types using JSON Schema Draft-07.",
+    "breadcrumb": [
+      {
+        "label": "Custom Types"
+      },
+      {
+        "label": "Field schema"
+      }
+    ],
+    "sections": [
+      {
+        "id": "principles",
+        "title": "Key principles",
+        "content": "The fields_schema field follows JSON Schema Draft-07. Only object schemas with properties are supported — primitives at the root level are rejected.",
+        "items": [
+          "Root must have type: 'object'",
+          "Define fields via properties object",
+          "Use required[] array to enforce mandatory fields",
+          "Supported property types: string, number, boolean, array, object",
+          "Use enum for fixed choices",
+          "Maximum depth: 3 levels (object-in-object-in-object)"
+        ]
+      },
+      {
+        "id": "example",
+        "title": "Example hospital wristband",
+        "content": "A typical use case: patient identification with ward and blood type as controlled vocabularies.",
+        "code": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"patient_id\": { \"type\": \"string\", \"maxLength\": 50 },\n    \"ward\": {\n      \"type\": \"string\",\n      \"enum\": [\"ICU\", \"General\", \"Pediatric\", \"Emergency\"]\n    },\n    \"blood_type\": { \"type\": \"string\", \"enum\": [\"A+\",\"A-\",\"B+\",\"B-\",\"AB+\",\"AB-\",\"O+\",\"O-\"] },\n    \"allergies\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } }\n  },\n  \"required\": [\"patient_id\", \"ward\"]\n}"
+      },
+      {
+        "id": "validation",
+        "title": "Validation at creation",
+        "content": "The API validates your schema on creation:",
+        "items": [
+          "Must be valid JSON (of course)",
+          "$schema must be omitted or set to Draft-07",
+          "No $ref — inline schemas only",
+          "No circular references",
+          "Maximum size: 5 KB"
+        ]
+      },
+      {
+        "id": "updates",
+        "title": "Schema updates",
+        "content": "When you update a type's schema via PATCH /types/:slug, the version number increments. Existing QR codes keep the schema version they were created with — only new QRs use the updated schema. This ensures backward compatibility."
+      }
+    ]
+  },
+  "custom-types-marketplace": {
+    "title": "Custom Types — Marketplace",
+    "description": "Share your custom QR types with the QRise community or discover types built by others.",
+    "breadcrumb": [
+      {
+        "label": "Custom Types"
+      },
+      {
+        "label": "Marketplace"
+      }
+    ],
+    "sections": [
+      {
+        "id": "overview",
+        "title": "What is the marketplace?",
+        "content": "The marketplace is a curated collection of public custom types that have been verified by the QRise admin team. It's a place to discover useful QR type definitions or share your own with the world.",
+        "items": [
+          "Only is_public=true AND is_verified=true types appear",
+          "Admin approval required (typically 3 business days)",
+          "Shows creator username, scan count, QR count",
+          "Categories: healthcare, hospitality, retail, events, logistics, other"
+        ]
+      },
+      {
+        "id": "submit",
+        "title": "Submitting your type",
+        "content": "Before submitting, ensure your type meets these requirements:",
+        "items": [
+          "Type must be is_public=true with a description and icon_url",
+          "Resolver must be active and tested (use the Test Resolver button first)",
+          "Fields schema must be well-documented and appropriate for general use",
+          "You can have maximum 3 pending submissions at a time"
+        ],
+        "link": {
+          "text": "Submit your type now →",
+          "href": "/docs/custom-types/marketplace?action=submit"
+        }
+      },
+      {
+        "id": "review",
+        "title": "Review process",
+        "content": "The QRise admin team reviews each submission for quality, appropriateness, and completeness. You'll receive email notification when your submission is approved or rejected (with feedback).",
+        "items": [
+          "Review time: 1–3 business days",
+          "We check schema validity, naming clarity, and example use cases",
+          "Rejection includes notes for improvement",
+          "Approved types get a Verified badge and enter the marketplace"
+        ]
+      },
+      {
+        "id": "discover",
+        "title": "Discovering types",
+        "content": "Browse the public marketplace without authentication. Filter by category, search by name/slug, sort by usage or recency. When you find a type you want to use, click 'Use this type' to create QRs of that type from your account.",
+        "link": {
+          "text": "Browse public marketplace →",
+          "href": "/marketplace"
+        }
+      },
+      {
+        "id": "examples",
+        "title": "Submission API",
+        "examples": "marketplace"
+      }
+    ]
+  },
+  "custom-types-overview": {
+    "title": "Custom Types",
+    "description": "Create custom QR code types with validation schemas and external resolver endpoints for dynamic content delivery.",
+    "breadcrumb": [
+      {
+        "label": "Custom Types"
+      }
+    ],
+    "sections": [
+      {
+        "id": "what-are-types",
+        "title": "What are custom types?",
+        "content": "Custom types let you define structured data fields that a QR code carries. When scanned, the QR code triggers a resolver endpoint you control — enabling hospital wristbands, event tickets, product labels, and more.",
+        "items": [
+          "Define arbitrary fields via JSON Schema (Draft-07)",
+          "Resolution happens at the edge via Cloudflare Worker",
+          "Resolver can return redirect, HTML, or JSON + template rendering",
+          "Patrons can submit public types to the marketplace",
+          "Plan limits apply: max_custom_types from plan_rate_limits"
+        ]
+      },
+      {
+        "id": "creating",
+        "title": "Creating a type",
+        "content": "Use POST /types to register a new custom type with a globally-unique slug and valid JSON Schema. The schema defines all fields your QR codes will require when using this type.",
+        "examples": "create"
+      },
+      {
+        "id": "field-schema",
+        "title": "Field schema",
+        "content": "The fields_schema must be a valid JSON Schema object. Supported types: string, number, boolean, array, object. Use enum for fixed choices and required to enforce mandatory fields.",
+        "link": {
+          "text": "View field schema guide →",
+          "href": "/docs/custom-types/field-schema"
+        }
+      },
+      {
+        "id": "resolver",
+        "title": "Resolver protocol",
+        "content": "The resolver is your HTTPS endpoint that receives scan context and returns how the user should be routed. QRise signs every request with HMAC-SHA256 and enforces a configurable timeout.",
+        "link": {
+          "text": "View resolver protocol →",
+          "href": "/docs/custom-types/resolver-protocol"
+        }
+      },
+      {
+        "id": "templates",
+        "title": "Templates",
+        "content": "When your resolver returns type=json, you can specify a Mustache template slug to render the data into HTML at the edge. QRise fetches and renders the template, protecting you from XSS.",
+        "link": {
+          "text": "View templates guide →",
+          "href": "/docs/custom-types/templates"
+        }
+      },
+      {
+        "id": "marketplace",
+        "title": "Marketplace",
+        "content": "Make your custom type public and submit it to the marketplace for other QRise users to discover. Admin review required — typically 3 business days.",
+        "link": {
+          "text": "View marketplace submission →",
+          "href": "/docs/custom-types/marketplace"
+        },
+        "examples": "marketplace"
+      }
+    ]
+  },
+  "custom-types-register": {
+    "title": "Custom Types — Register a Type",
+    "description": "Create a new custom QR type with a JSON Schema to define its data fields.",
+    "breadcrumb": [
+      {
+        "label": "Custom Types"
+      },
+      {
+        "label": "Register type"
+      }
+    ],
+    "sections": [
+      {
+        "id": "endpoint",
+        "title": "Endpoint",
+        "content": "POST /v1/types",
+        "code": "POST https://api.qrise.io/types"
+      },
+      {
+        "id": "request",
+        "title": "Request body",
+        "table": [
+          {
+            "param": "slug",
+            "type": "string",
+            "default": "",
+            "description": "Unique lowercase slug, max 80 chars, hyphens only"
+          },
+          {
+            "param": "name",
+            "type": "string",
+            "default": "",
+            "description": "Display name, max 200 chars"
+          },
+          {
+            "param": "description",
+            "type": "string",
+            "default": "null",
+            "description": "Optional description"
+          },
+          {
+            "param": "icon_url",
+            "type": "string",
+            "default": "null",
+            "description": "Optional icon URL for marketplace listing"
+          },
+          {
+            "param": "fields_schema",
+            "type": "object",
+            "default": "",
+            "description": "Valid JSON Schema Draft-07 object"
+          },
+          {
+            "param": "is_public",
+            "type": "boolean",
+            "default": "false",
+            "description": "Whether this type is visible to other users"
+          }
+        ]
+      },
+      {
+        "id": "response",
+        "title": "Response",
+        "content": "Returns the created type with schema version starting at 1. Any future schema changes increment version — existing QRs retain their old payload structure.",
+        "items": [
+          "id: UUID of type",
+          "slug, name, version",
+          "created_at timestamp"
+        ]
+      },
+      {
+        "id": "errors",
+        "title": "Common errors",
+        "content": "409 if max_custom_types limit reached. 422 if fields_schema is invalid JSON Schema. 409 if slug already exists.",
+        "items": [
+          "409 CONFLICT: Plan limit reached or slug taken",
+          "422 VALIDATION_ERROR: Invalid JSON Schema",
+          "403 FORBIDDEN: Insufficient types:write scope"
+        ]
+      },
+      {
+        "id": "examples",
+        "title": "Examples",
+        "examples": "create"
+      }
+    ]
+  },
+  "custom-types-resolver-protocol": {
+    "title": "Custom Types — Resolver Protocol",
+    "description": "How QRise calls your external resolver endpoint with signed requests and handles responses.",
+    "breadcrumb": [
+      {
+        "label": "Custom Types"
+      },
+      {
+        "label": "Resolver protocol"
+      }
+    ],
+    "sections": [
+      {
+        "id": "overview",
+        "title": "What is a resolver?",
+        "content": "When a custom type QR is scanned, QRise Cloudflare Worker makes a signed POST request to your configured resolver URL. Your server returns a response that determines what the scanner sees — a redirect, raw HTML, or structured data that gets template-rendered."
+      },
+      {
+        "id": "request",
+        "title": "Request from QRise",
+        "content": "Your resolver receives a POST with JSON body containing scan_context and the QR's custom payload.",
+        "code": "POST https://your-resolver.com/resolve\n\n{\n  \"scan_context\": {\n    \"device_type\": \"mobile\",\n    \"os\": \"iOS\",\n    \"country\": \"US\",\n    \"language\": \"en-US\",\n    \"timestamp\": \"2025-06-01T12:34:56.789Z\"\n  },\n  \"qr_payload\": {\n    \"patient_id\": \"PT001234\",\n    \"ward\": \"ICU\",\n    \"blood_type\": \"A+\",\n    \"allergies\": [\"penicillin\"]\n  }\n}\n\nHeaders:\nX-QRise-Signature: t=1714000000,v1=abc123def456\nX-QRise-Type: patient-wristband\nX-QRise-QR-Id: qr_uuid_here",
+        "items": [
+          "Content-Type: application/json",
+          "Signature format: HMAC-SHA256(timestamp.body)",
+          "Timeout: configurable (default 3000ms, max from plan limits)",
+          "User-Agent: QRise-Resolver/1.0"
+        ]
+      },
+      {
+        "id": "responses",
+        "title": "Valid response formats",
+        "content": "Your resolver must return JSON with a type field indicating how to handle the request.",
+        "items": [
+          "{ type: 'redirect', url: 'https://...' } → 302 redirect",
+          "{ type: 'html', html: '<h1>...</h1>' } → HTML displayed directly",
+          "{ type: 'json', data: {...}, template?: 'slug' } → Template renders data"
+        ]
+      },
+      {
+        "id": "security",
+        "title": "Security",
+        "content": "Always verify the X-QRise-Signature header using your secret. Reject requests with timestamps older than 5 minutes to prevent replay attacks. Verify that type matches your expected type slug.",
+        "items": [
+          "Signature: HMAC-SHA256(secret, timestamp.body)",
+          "Reject old timestamps (>5 min)",
+          "Check X-QRise-Type matches your type",
+          "Respond within timeout_ms or fallback triggers"
+        ]
+      },
+      {
+        "id": "timeouts",
+        "title": "Timeout & fallback",
+        "content": "If your resolver does not respond within timeout_ms (configurable per type), QRise will either redirect to fallback_url or render fallback_html. If neither is configured, users see an error page.",
+        "items": [
+          "Default timeout: 3000 ms",
+          "Maximum: plan's max_resolver_timeout_ms",
+          "Plan limits: Enterprise up to 5000ms",
+          "On timeout: fallback_url → fallback_html → error page"
+        ]
+      },
+      {
+        "id": "examples",
+        "title": "Resolver examples",
+        "link": {
+          "text": "View example resolver code (Node.js, Python, cURL) →",
+          "href": "/docs/custom-types/test-resolver"
+        }
+      }
+    ]
+  },
+  "custom-types-templates": {
+    "title": "Custom Types — Templates",
+    "description": "Create Mustache templates to render structured JSON data into HTML at the edge.",
+    "breadcrumb": [
+      {
+        "label": "Custom Types"
+      },
+      {
+        "label": "Templates"
+      }
+    ],
+    "sections": [
+      {
+        "id": "overview",
+        "title": "What are templates?",
+        "content": "Templates let you separate presentation from resolver logic. Your resolver returns JSON data along with a template slug; QRise renders the Mustache template at the edge, shielding you from XSS.",
+        "items": [
+          "Templates use Mustache syntax: {{variable}}",
+          "Available variables: all fields_schema properties + scan_context",
+          "Rendered server-side at Cloudflare edge",
+          "Up to 10 templates per type",
+          "One template can be set as default"
+        ]
+      },
+      {
+        "id": "variables",
+        "title": "Available variables",
+        "content": "In your template HTML, you can access these top-level variables:",
+        "code": "{{patient_id}}           ← field from fields_schema\n{{ward}}                 ← another field\n{{device_type}}          ← from scan_context\n{{country}}              ← ISO country code\n{{os}}                   ← operating system\n{{language}}             ← BCP 47 language tag",
+        "items": [
+          "Scan context fields: device_type, os, country, language, timestamp",
+          "Payload fields: whatever you defined in fields_schema",
+          "All values are automatically HTML-escaped"
+        ]
+      },
+      {
+        "id": "example",
+        "title": "Example hospital template",
+        "content": "A nurse-facing view showing patient details with conditional rendering:",
+        "code": "<div class=\"patient-card\">\n  <h1>Patient: {{patient_id}}</h1>\n  <p><strong>Ward:</strong> {{ward}}</p>\n  {{#allergies}}\n    <div class=\"alert\">Allergies: {{.}}</div>\n  {{/allergies}}\n  <p class=\"meta\">Scanned on {{timestamp}} from {{country}}</p>\n</div>"
+      },
+      {
+        "id": "api",
+        "title": "API endpoints",
+        "content": "Templates are managed via the types API:",
+        "items": [
+          "GET /types/{slug}/templates — list all templates",
+          "POST /types/{slug}/templates — create (slug, name, template_html, is_default)",
+          "PATCH /types/{slug}/templates/:templateSlug — update HTML or default flag",
+          "DELETE /types/{slug}/templates/:templateSlug — delete"
+        ]
+      }
+    ]
+  },
+  "custom-types-test-resolver": {
+    "title": "Custom Types — Test Resolver",
+    "description": "Send test requests to your custom type resolver to validate connectivity and response format.",
+    "breadcrumb": [
+      {
+        "label": "Custom Types"
+      },
+      {
+        "label": "Test resolver"
+      }
+    ],
+    "sections": [
+      {
+        "id": "endpoint",
+        "title": "Endpoint",
+        "content": "POST /v1/types/:slug/resolver/test",
+        "code": "POST https://api.qrise.io/types/{slug}/resolver/test"
+      },
+      {
+        "id": "purpose",
+        "title": "Purpose",
+        "content": "The test endpoint sends a synthetic scan_context to your resolver without creating a real scan event. This is how you verify your resolver is correctly configured before going live.",
+        "items": [
+          "No quota consumption (doesn't count against resolver_calls_per_month)",
+          "Does NOT create a resolver_calls log entry",
+          "Immediate response with status, latency, and parsed result",
+          "Includes signature verification check"
+        ]
+      },
+      {
+        "id": "request",
+        "title": "Request body",
+        "content": "Optionally provide your own scan_context for specific device/country testing. If omitted, a default context (mobile/US) is used.",
+        "code": "{\n  \"scan_context\": {\n    \"device_type\": \"mobile\",\n    \"os\": \"iOS\",\n    \"country\": \"US\",\n    \"language\": \"en-US\"\n  }\n}"
+      },
+      {
+        "id": "response",
+        "title": "Response fields",
+        "table": [
+          {
+            "param": "status",
+            "type": "number",
+            "default": "",
+            "description": "HTTP status code returned by your resolver"
+          },
+          {
+            "param": "latency_ms",
+            "type": "number",
+            "default": "",
+            "description": "Time from request to final byte"
+          },
+          {
+            "param": "response_type",
+            "type": "enum",
+            "default": "",
+            "description": "Parsed: redirect, html, or json"
+          },
+          {
+            "param": "response_body",
+            "type": "object",
+            "default": "",
+            "description": "The returned JSON (for type=json)"
+          },
+          {
+            "param": "fallback_used",
+            "type": "boolean",
+            "default": "",
+            "description": "True if resolver timed out and fallback was used"
+          },
+          {
+            "param": "signed_correctly",
+            "type": "boolean",
+            "default": "",
+            "description": "Whether our signature matched your verification"
+          }
+        ]
+      },
+      {
+        "id": "code-examples",
+        "title": "Code examples",
+        "examples": "test"
+      }
+    ]
+  },
+  "errors": {
+    "title": "Errors",
+    "description": "Standardized error responses help you debug issues quickly.",
+    "breadcrumb": [
+      {
+        "label": "Errors"
+      }
+    ],
+    "sections": [
+      {
+        "id": "format",
+        "title": "Error format",
+        "content": "All errors are returned in a consistent JSON format:",
+        "codeBlock": {
+          "code": "{\n  \"error\": {\n    \"code\": \"invalid_request\",\n    \"message\": \"The target_url field is required.\",\n    \"field\": \"target_url\"\n  }\n}",
+          "language": "json"
+        }
+      },
+      {
+        "id": "http-codes",
+        "title": "HTTP Status Codes",
+        "table": {
+          "headers": [
+            "Code",
+            "Title",
+            "Description"
+          ],
+          "rows": [
+            [
+              "400",
+              "Bad Request",
+              "Missing or invalid parameters"
+            ],
+            [
+              "401",
+              "Unauthorized",
+              "Missing or invalid API key"
+            ],
+            [
+              "403",
+              "Forbidden",
+              "API key lacks required scope"
+            ],
+            [
+              "404",
+              "Not Found",
+              "Resource dose not exist"
+            ],
+            [
+              "422",
+              "Unprocessable Entity",
+              "Validation failed"
+            ],
+            [
+              "429",
+              "Too Many Requests",
+              "Rate limit exceeded"
+            ],
+            [
+              "500",
+              "Server Error",
+              "Something went wrong on our side"
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  "forms-overview": {
+    "title": "Forms",
+    "description": "Collect data from scanners using dynamic forms and webhooks.",
+    "breadcrumb": [
+      {
+        "label": "Forms"
+      }
+    ],
+    "sections": [
+      {
+        "id": "overview",
+        "title": "Overview",
+        "content": "QRise allows you to attach a lead capture form to any dynamic QR code. When a user scans the QR, they are presented with a form before being redirected to the target URL."
+      },
+      {
+        "id": "field-types",
+        "title": "Supported field types",
+        "items": [
+          "Email (validated)",
+          "Short text",
+          "Long text (paragraphs)",
+          "Select / Dropdown",
+          "Checkbox / Consent"
+        ]
+      },
+      {
+        "id": "integrations",
+        "title": "Data handling",
+        "content": "Form submissions can be retrieved via the API, exported to CSV, or sent in real-time to your CRM via webhooks."
+      }
+    ]
+  },
+  "introduction": {
+    "title": "Introduction",
+    "description": "QRise API lets you create, manage, and track QR codes programmatically.",
+    "breadcrumb": [
+      {
+        "label": "Introduction"
+      }
+    ],
+    "sections": [
+      {
+        "id": "base-url",
+        "title": "Base URL",
+        "content": "All API requests should be made to:",
+        "code": "https://api.qrise.io"
+      },
+      {
+        "id": "what-you-can-do",
+        "title": "What you can do",
+        "items": [
+          "Create and manage QR codes (url, smart routing, password, multi-action)",
+          "Update target URLs on the fly without reprinting (Dynamic QRs)",
+          "Set up Smart Routing rules to redirect based on device, location, time",
+          "Track scan analytics with bot filtering",
+          "Generate QR codes in bulk from CSV data",
+          "Receive webhooks for real-time events"
+        ]
+      },
+      {
+        "id": "rest-api",
+        "title": "REST API",
+        "content": "The QRise API is REST-based with JSON request and response bodies. All endpoints require authentication via an API key in the Authorization header."
+      },
+      {
+        "id": "quickstart",
+        "title": "Quickstart",
+        "content": "Create your first QR code in just a few lines:",
+        "useQuickstartExamples": true
+      },
+      {
+        "id": "openapi-spec",
+        "title": "OpenAPI Specification",
+        "content": "Download our OpenAPI 3.1 specification:",
+        "link": {
+          "text": "Download OpenAPI spec →",
+          "href": "/api/docs/openapi.json"
+        }
+      },
+      {
+        "id": "sdks",
+        "title": "SDKs",
+        "content": "We don't provide an official SDK yet — the API is simple REST+JSON and works with any HTTP client. Check out the examples above for JavaScript, Python, and cURL."
+      }
+    ]
+  },
+  "qr-codes-overview": {
+    "title": "QR Codes",
+    "description": "Create and manage QR codes with different types and capabilities.",
+    "breadcrumb": [
+      {
+        "label": "QR codes"
+      }
+    ],
+    "sections": [
+      {
+        "id": "types",
+        "title": "QR code types",
+        "table": {
+          "headers": [
+            "Type",
+            "Dynamic",
+            "Analytics",
+            "Routing",
+            "Password"
+          ],
+          "rows": [
+            [
+              "URL",
+              "Optional",
+              "Optional",
+              "—",
+              "—"
+            ],
+            [
+              "Smart Routing",
+              "Always",
+              "✓",
+              "✓",
+              "—"
+            ],
+            [
+              "Password",
+              "Always",
+              "✓",
+              "—",
+              "✓"
+            ],
+            [
+              "Multi Action",
+              "Optional",
+              "✓",
+              "—",
+              "—"
+            ],
+            [
+              "Bulk",
+              "Optional",
+              "Optional",
+              "—",
+              "—"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "endpoints",
+        "title": "Endpoints",
+        "links": [
+          {
+            "text": "POST /qr — Create a QR code",
+            "href": "/docs/qr-codes/create"
+          },
+          {
+            "text": "GET /qr — List QR codes",
+            "href": "/docs/qr-codes/list"
+          },
+          {
+            "text": "GET /qr/:id — Get a QR code",
+            "href": "/docs/qr-codes/get"
+          },
+          {
+            "text": "PUT /qr/:id — Update a QR code",
+            "href": "/docs/qr-codes/update"
+          },
+          {
+            "text": "DELETE /qr/:id — Delete a QR code",
+            "href": "/docs/qr-codes/delete"
+          },
+          {
+            "text": "GET /qr/:id/export — Export QR image",
+            "href": "/docs/qr-codes/export"
+          },
+          {
+            "text": "GET /qr/:id/history — Redirect history",
+            "href": "/docs/qr-codes/history"
+          }
+        ]
+      }
+    ]
+  },
+  "qr-embed": {
+    "title": "Get Embed Snippet",
+    "description": "Retrieve HTML, iframe, or React snippets to embed QR code cards on external websites.",
+    "breadcrumb": [
+      {
+        "label": "QR codes"
+      },
+      {
+        "label": "Get Embed"
+      }
+    ],
+    "sections": [
+      {
+        "id": "endpoint",
+        "title": "Endpoint",
+        "content": "GET /v1/qr/{id}/embed",
+        "code": "GET https://api.qrise.io/qr/{id}/embed?style=card&theme=auto&size=md"
+      },
+      {
+        "id": "parameters",
+        "title": "Query parameters",
+        "table": [
+          {
+            "param": "style",
+            "type": "enum",
+            "default": "card",
+            "description": "card, minimal, badge, or floating"
+          },
+          {
+            "param": "theme",
+            "type": "enum",
+            "default": "auto",
+            "description": "light, dark, or auto (respects system)"
+          },
+          {
+            "param": "size",
+            "type": "enum",
+            "default": "md",
+            "description": "sm, md, or lg"
+          },
+          {
+            "param": "show_name",
+            "type": "boolean",
+            "default": "true",
+            "description": "Display QR name below the card"
+          },
+          {
+            "param": "show_scan_count",
+            "type": "boolean",
+            "default": "false",
+            "description": "Display total scan count"
+          }
+        ]
+      },
+      {
+        "id": "response",
+        "title": "Response",
+        "content": "The endpoint returns a JSON object with four rendering options for different use cases.",
+        "items": [
+          "html: Self-contained div with inline styles — no external CSS required",
+          "iframe_url: Full-page iframe embed for no-JS environments",
+          "css_url: External stylesheet for advanced customization",
+          "react_snippet: JSX for React applications"
+        ]
+      },
+      {
+        "id": "billing",
+        "title": "Billing",
+        "content": "Each embed render counts as 1 embed_render against your monthly quota. The embed endpoint is designed for high-volume websites and caches aggressively.",
+        "items": [
+          "Billable unit: embed_render",
+          "Cache-Control: public, max-age=3600"
+        ]
+      },
+      {
+        "id": "examples",
+        "title": "Examples",
+        "examples": true
+      }
+    ]
+  },
+  "qr-image": {
+    "title": "Get QR Image",
+    "description": "Generates server-side QR images with design overrides and multiple export formats.",
+    "breadcrumb": [
+      {
+        "label": "QR codes"
+      },
+      {
+        "label": "Get QR image"
+      }
+    ],
+    "sections": [
+      {
+        "id": "endpoint",
+        "title": "Endpoint",
+        "content": "GET /v1/qr/{id}/image",
+        "code": "GET https://api.qrise.io/qr/{id}/image?format=png&size=512"
+      },
+      {
+        "id": "parameters",
+        "title": "Query parameters",
+        "table": [
+          {
+            "param": "format",
+            "type": "enum",
+            "default": "png",
+            "description": "Output format: png, svg, or webp"
+          },
+          {
+            "param": "size",
+            "type": "number",
+            "default": "512",
+            "description": "Pixel dimension (128–2048)"
+          },
+          {
+            "param": "dpi",
+            "type": "enum",
+            "default": "72",
+            "description": "DPI for PNG only: 72, 150, 300"
+          },
+          {
+            "param": "margin",
+            "type": "number",
+            "default": "4",
+            "description": "Quiet zone modules (0–10)"
+          },
+          {
+            "param": "dark",
+            "type": "hex color",
+            "default": "#000000",
+            "description": "Override dot color"
+          },
+          {
+            "param": "light",
+            "type": "hex color",
+            "default": "#ffffff",
+            "description": "Override background color"
+          },
+          {
+            "param": "error_correction",
+            "type": "enum",
+            "default": "M",
+            "description": "Error correction: L, M, Q, H"
+          }
+        ]
+      },
+      {
+        "id": "billing",
+        "title": "Billing",
+        "content": "Each image generation counts as 1 image_render against your monthly quota. There is also a hard rate limit of 60 image renders per minute per API key, regardless of plan, to protect server CPU.",
+        "items": [
+          "Billable unit: image_render",
+          "Hard limit: 60 renders/minute/key",
+          "Returns 429 with Retry-After when exceeded"
+        ]
+      },
+      {
+        "id": "examples",
+        "title": "Examples",
+        "examples": true
+      }
+    ]
+  },
+  "quickstart": {
+    "title": "Quickstart",
+    "description": "Create your first QR code in minutes.",
+    "breadcrumb": [
+      {
+        "label": "Quickstart"
+      }
+    ],
+    "sections": [
+      {
+        "id": "intro",
+        "title": "Introduction",
+        "content": "This guide will help you create your first dynamic QR code using the QRise API. You'll need an API key from your dashboard."
+      },
+      {
+        "id": "step-1",
+        "title": "1. Create a QR code",
+        "content": "Send a POST request to /qr to create a dynamic URL QR:",
+        "useQuickstartExamples": true
+      },
+      {
+        "id": "step-2",
+        "title": "2. Save the redirect URL",
+        "content": "The response will include a `redirect_url`. This is the URL that you should encode into your QR code image. You can also download the generated image directly from our API."
+      },
+      {
+        "id": "step-3",
+        "title": "3. Track scans",
+        "content": "As soon as you scan the QR code, analytics will start populating in your dashboard and via the analytics API."
+      }
+    ]
+  },
+  "rate-limits": {
+    "title": "Rate Limits",
+    "description": "API rate limits ensure stability and fair usage for todos los usuarios.",
+    "breadcrumb": [
+      {
+        "label": "Rate limits"
+      }
+    ],
+    "sections": [
+      {
+        "id": "overview",
+        "title": "Overview",
+        "content": "QRise enforces rate limits on a per-API-key basis. If you exceed these limits, the API will respond with a 429 Too Many Requests error."
+      },
+      {
+        "id": "limits",
+        "title": "Limits by plan",
+        "table": {
+          "headers": [
+            "Plan",
+            "Requests per second",
+            "Requests per month"
+          ],
+          "rows": [
+            [
+              "Free",
+              "2",
+              "1,000"
+            ],
+            [
+              "Pro",
+              "10",
+              "50,000"
+            ],
+            [
+              "Business",
+              "50",
+              "Unlimited"
+            ],
+            [
+              "Enterprise",
+              "Custom",
+              "Unlimited"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "headers",
+        "title": "Rate limit headers",
+        "content": "Every response includes headers to help you track your usage:",
+        "items": [
+          "X-RateLimit-Limit: Total requests allowed per window",
+          "X-RateLimit-Remaining: Requests remaining in current window",
+          "X-RateLimit-Reset: Seconds until window resets"
+        ]
+      }
+    ]
+  },
+  "response-format": {
+    "title": "Response Format",
+    "description": "All v1 API responses follow a consistent envelope structure for both success and error cases.",
+    "breadcrumb": [
+      {
+        "label": "Response format"
+      }
+    ],
+    "sections": [
+      {
+        "id": "envelope",
+        "title": "Standard envelope",
+        "content": "Every response from the QRise API — including errors — is wrapped in a JSON envelope with a consistent shape."
+      },
+      {
+        "id": "success",
+        "title": "Success response",
+        "content": "Successful requests return ok: true with the actual data in the data field. The meta object contains pagination and usage information.",
+        "code": "{\n  \"ok\": true,\n  \"data\": {\n    \"id\": \"uuid\",\n    \"name\": \"My QR\"\n  },\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 142,\n    \"usage\": {\n      \"calls_this_month\": 344,\n      \"calls_limit\": 10000,\n      \"resets_at\": \"2026-05-01T00:00:00Z\"\n    }\n  }\n}"
+      },
+      {
+        "id": "error",
+        "title": "Error response",
+        "content": "Failed requests return ok: false with an error object containing a machine-readable code, human-readable message, and optional details.",
+        "code": "{\n  \"ok\": false,\n  \"error\": {\n    \"code\": \"QR_NOT_FOUND\",\n    \"message\": \"QR code not found.\",\n    \"details\": {}\n  }\n}"
+      },
+      {
+        "id": "usage-tracking",
+        "title": "Usage tracking in meta",
+        "content": "Every successful v1 response includes usage statistics in meta. This lets you monitor your quota consumption in real-time without making a separate /usage call.",
+        "items": [
+          "calls_this_month: Your billable API calls this month",
+          "calls_limit: Your plan's monthly limit",
+          "resets_at: When the current period ends (UTC midnight on 1st of month)"
+        ]
+      },
+      {
+        "id": "rate-headers",
+        "title": "Rate limit headers",
+        "content": "In addition to the body envelope, every response includes rate limit headers:",
+        "code": "X-RateLimit-Limit: 100\nX-RateLimit-Remaining: 67\nX-RateLimit-Reset: 1714000000\nX-RateLimit-Window: 60\nX-QRise-Request-Id: req_uuid\nX-QRise-Plan: pro"
+      },
+      {
+        "id": "error-codes",
+        "title": "Common error codes",
+        "content": "The error.code field is a stable identifier you can programmatically check for. Do not parse error.message — it may change.",
+        "items": [
+          "BAD_REQUEST (400): Malformed JSON or invalid parameters",
+          "UNAUTHORIZED (401): Missing or invalid API key",
+          "FORBIDDEN (403): Valid key but insufficient scope",
+          "NOT_FOUND (404): Resource doesn't exist",
+          "VALIDATION_ERROR (422): Request body fails validation",
+          "RATE_LIMITED (429): Too many requests — check Retry-After header",
+          "INTERNAL_ERROR (500): QRise server error"
+        ]
+      }
+    ]
+  },
+  "sandbox": {
+    "title": "Sandbox Environment",
+    "description": "Test your integration safely using isolated sandbox data that never touches production.",
+    "breadcrumb": [
+      {
+        "label": "Sandbox"
+      }
+    ],
+    "sections": [
+      {
+        "id": "what-is-sandbox",
+        "title": "What is the sandbox?",
+        "content": "The sandbox environment provides complete isolation from your live production data. Sandbox API keys (qr_test_*) read and write to a separate database schema, ensuring test QRs, scans, and webhooks never pollute your production metrics or billing."
+      },
+      {
+        "id": "using-sandbox",
+        "title": "Using the sandbox",
+        "content": "To use the sandbox, create an API key with the qr_test_ prefix (available from your dashboard). All requests made with a sandbox key are routed to the sandbox schema automatically.",
+        "code": "Authorization: Bearer qr_test_xxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      {
+        "id": "isolation",
+        "title": "Complete isolation",
+        "content": "Sandbox data is stored in a separate PostgreSQL schema and cached separately in Redis. There is no risk of test data affecting production analytics, billing calculations, or rate limits. However, plan limits (like max_custom_types) are still enforced per environment.",
+        "items": [
+          "Sandbox QRs are not visible in the production dashboard",
+          "Sandbox scans do not count toward analytics or billing",
+          "Sandbox API usage does not consume your paid quota",
+          "Sandbox webhooks fire to test endpoints only"
+        ]
+      },
+      {
+        "id": "switching",
+        "title": "Switching between environments",
+        "content": "To switch from sandbox to live, simply use a qr_live_ key. The API behavior is identical; only the data routing differs. Your code does not need to change — swap the key and you're in production."
+      }
+    ]
+  },
+  "smart-routing-overview": {
+    "title": "Smart Routing",
+    "description": "Smart Routing allows you to redirect users to different destinations based on their device, location, time, or language.",
+    "breadcrumb": [
+      {
+        "label": "Smart routing"
+      }
+    ],
+    "sections": [
+      {
+        "id": "how-it-works",
+        "title": "How it works",
+        "content": "When a user scans a Smart Routing QR code, QRise evaluates a list of rules from top to bottom. The first rule that matches the user's scan context (device, location, etc.) determines the destination. If no rules match, the user is sent to the default URL."
+      },
+      {
+        "id": "rules-hierarchy",
+        "title": "Rule evaluation",
+        "items": [
+          "Rules are evaluated in order of priority (lowest number first)",
+          "The first matching rule 'wins'",
+          "If multiple conditions exist in a rule, ALL must match (AND logic)",
+          "If no rule matches, the default destination is used"
+        ]
+      },
+      {
+        "id": "endpoints",
+        "title": "Endpoints",
+        "links": [
+          {
+            "text": "GET /qr/:id/routing-rules — Get routing rules",
+            "href": "/docs/smart-routing/get-rules"
+          },
+          {
+            "text": "PUT /qr/:id/routing-rules — Update routing rules",
+            "href": "/docs/smart-routing/update-rules"
+          }
+        ]
+      }
+    ]
+  },
+  "usage-alerts": {
+    "title": "Usage Alerts",
+    "description": "Configure Slack, Discord, or email notifications when your API usage reaches a threshold.",
+    "breadcrumb": [
+      {
+        "label": "Usage & Billing"
+      },
+      {
+        "label": "Alerts"
+      }
+    ],
+    "sections": [
+      {
+        "id": "overview",
+        "title": "What are usage alerts?",
+        "content": "Usage alerts proactively notify you when your consumption approaches plan limits. Set a threshold percentage (50–100%) and we'll send a message to your chosen channel before you hit overage charges.",
+        "items": [
+          "Three channel types: Slack (Incoming Webhook), Discord (Webhook), Email",
+          "Threshold: 50%–100% (default 80%)",
+          "One alert per threshold per month (no spam)",
+          "Alert includes current usage, reset date, and upgrade link"
+        ]
+      },
+      {
+        "id": "slack",
+        "title": "Slack alerts",
+        "content": "Create an Incoming Webhook in your Slack workspace (Apps → Incoming Webhooks). Copy the webhook URL and use it as the webhook_url parameter.",
+        "items": [
+          "Go to slack.com/apps → search 'Incoming Webhooks'",
+          "Add to your workspace, pick a channel",
+          "Copy the webhook URL (starts with https://hooks.slack.com/services/)",
+          "Create alert with channel_type='slack'"
+        ]
+      },
+      {
+        "id": "discord",
+        "title": "Discord alerts",
+        "content": "Create a Discord Webhook in your server: Server Settings → Integrations → Webhooks → Create Webhook. Copy the URL.",
+        "items": [
+          "Server Settings → Integrations → Webhooks",
+          "Choose channel and create webhook",
+          "Copy the webhook URL",
+          "Create alert with channel_type='discord'"
+        ]
+      },
+      {
+        "id": "email",
+        "title": "Email alerts",
+        "content": "Provide any email address. Notifications are sent from alerts@qrise.io. Add this to your contacts to avoid spam filtering.",
+        "items": [
+          "Simple: just provide an email address",
+          "Emails come from alerts@qrise.io",
+          "Whitelist this address to ensure delivery"
+        ]
+      },
+      {
+        "id": "testing",
+        "title": "Testing and management",
+        "content": "Each alert channel has a test button in the dashboard and a POST /usage/alerts/:id/test endpoint to verify delivery before relying on it. You can also list, update, or delete alerts via the API.",
+        "items": [
+          "POST /usage/alerts/:id/test sends a test notification",
+          "DELETE /usage/alerts/:id removes the channel",
+          "GET /usage/alerts lists all configured channels"
+        ]
+      }
+    ]
+  },
+  "usage": {
+    "title": "Usage & Billing",
+    "description": "Track your API consumption, monitor limits, and understand billing metrics.",
+    "breadcrumb": [
+      {
+        "label": "Usage & Billing"
+      }
+    ],
+    "sections": [
+      {
+        "id": "overview",
+        "title": "Usage endpoint",
+        "content": "The /usage endpoint returns detailed consumption data for the current or any historical month. All usage is tracked automatically on every API call.",
+        "examples": "usage"
+      },
+      {
+        "id": "history",
+        "title": "Usage history",
+        "content": "View 12 months of historical usage snapshots to identify trends and plan capacity.",
+        "examples": "history"
+      },
+      {
+        "id": "export",
+        "title": "Usage export",
+        "content": "Download a CSV of all API events for a given month for internal reconciliation or audit purposes.",
+        "examples": "export"
+      },
+      {
+        "id": "alerts",
+        "title": "Usage alerts",
+        "content": "You can create alert channels to notify you via Slack, Discord, or email when usage crosses a threshold (50–100%). Alerts are sent once per threshold crossing per month to avoid noise."
+      }
+    ]
+  },
+  "webhooks-filters": {
+    "title": "Webhooks — Event Filters",
+    "description": "Reduce webhook noise by filtering which specific QRs or events trigger notifications.",
+    "breadcrumb": [
+      {
+        "label": "Webhooks"
+      },
+      {
+        "label": "Event filters"
+      }
+    ],
+    "sections": [
+      {
+        "id": "overview",
+        "title": "Why filter?",
+        "content": "Not every webhook subscriber needs every event. Filters let you narrow the scope so you only receive relevant events, reducing unnecessary HTTP requests and processing.",
+        "items": [
+          "Filter qr.scanned to specific QR IDs only",
+          "Filter qr.updated to URL-change-only events",
+          "Filter form.submission to specific forms",
+          "Filter usage.threshold_reached to your chosen percentage"
+        ]
+      },
+      {
+        "id": "structure",
+        "title": "Filter structure",
+        "content": "The filter_config field on webhook creation/update is a JSON object where keys are event types and values are filter criteria.",
+        "code": "{\n  \"filter_config\": {\n    \"qr.scanned\": {\n      \"qr_ids\": [\"uuid-1\", \"uuid-2\", \"uuid-3\"]\n    },\n    \"qr.updated\": {\n      \"url_changed_only\": true\n    },\n    \"usage.threshold_reached\": {\n      \"min_pct\": 85\n    }\n  }\n}",
+        "items": [
+          "Event-specific keys: qr.scanned, qr.updated, form.submission, usage.threshold_reached",
+          "Null or empty filter_config = receive ALL events of subscribed types",
+          "Multiple filters stack (AND logic)"
+        ]
+      },
+      {
+        "id": "qr-scanned-filter",
+        "title": "qr.scanned filter",
+        "content": "Limit scans to a specific set of QR codes. Useful when you only care about high-value QRs. The qr_ids array accepts up to 100 UUIDs per webhook.",
+        "code": "{ \"qr.scanned\": { \"qr_ids\": [\"uuid-1\", \"uuid-2\"] } }"
+      },
+      {
+        "id": "qr-updated-filter",
+        "title": "qr.updated filter",
+        "content": "Receive updates only when the target_url changes (not when name or design changes). Useful for redirect monitoring.",
+        "code": "{ \"qr.updated\": { \"url_changed_only\": true } }"
+      },
+      {
+        "id": "usage-threshold-filter",
+        "title": "usage.threshold_reached filter",
+        "content": "By default the threshold_reached event fires at 80%. Override per-webhook with min_pct (50–100).",
+        "code": "{ \"usage.threshold_reached\": { \"min_pct\": 90 } }"
+      }
+    ]
+  },
+  "webhooks-overview": {
+    "title": "Webhooks",
+    "description": "Receive real-time notifications when events happen in your QRise account.",
+    "breadcrumb": [
+      {
+        "label": "Webhooks"
+      }
+    ],
+    "sections": [
+      {
+        "id": "overview",
+        "title": "Overview",
+        "content": "Webhooks allow your application to receive and react to events as they happen. QRise sends a POST request with a JSON payload to your configured endpoint."
+      },
+      {
+        "id": "retries",
+        "title": "Retries",
+        "content": "If your server responds with anything other than 2xx, or times out (10s), QRise will retry delivery with exponential backoff up to 5 times over 12 hours."
+      },
+      {
+        "id": "endpoints",
+        "title": "Endpoints",
+        "links": [
+          {
+            "text": "POST /webhooks — Create a webhook",
+            "href": "/docs/webhooks/create"
+          },
+          {
+            "text": "GET /webhooks/events — Event reference",
+            "href": "/docs/webhooks/events"
+          }
+        ]
+      }
+    ]
+  },
+  "webhooks-replay": {
+    "title": "Replay deliveries",
+    "description": "Recover from delivery failures by re-sending past webhook events.",
+    "breadcrumb": [
+      {
+        "label": "Webhooks"
+      },
+      {
+        "label": "Replay deliveries"
+      }
+    ],
+    "sections": [
+      {
+        "id": "overview",
+        "title": "When to replay",
+        "content": "If a webhook delivery fails (your endpoint returned non-2xx or timed out), you can replay it. This creates a new delivery attempt with the same payload and retry schedule. The original delivery record remains for audit.",
+        "items": [
+          "Replay only failed or pending deliveries",
+          "Creates a new delivery with fresh retry clock",
+          "Original record preserved unchanged",
+          "Useful after temporary outage or bug fix"
+        ]
+      },
+      {
+        "id": "list-first",
+        "title": "List deliveries to find the ID",
+        "content": "Before replaying, you need the delivery ID. List deliveries for a webhook to find the failed one.",
+        "code": "GET /webhooks/{id}/deliveries?status=failed"
+      },
+      {
+        "id": "replay-endpoint",
+        "title": "Replay endpoint",
+        "content": "POST to the replay URL with the delivery ID in the path.",
+        "code": "POST /webhooks/{id}/deliveries/{deliveryId}/replay",
+        "items": [
+          "Returns: { new_delivery_id: uuid, status: 'pending' }",
+          "New delivery enters the retry queue immediately",
+          "No request body required"
+        ]
+      }
+    ]
+  },
+  "webhooks-test-replay": {
+    "title": "Webhooks — Test & Replay",
+    "description": "Test your webhook integrations and replay failed deliveries.",
+    "breadcrumb": [
+      {
+        "label": "Webhooks"
+      },
+      {
+        "label": "Test & Replay"
+      }
+    ],
+    "sections": [
+      {
+        "id": "test-endpoint",
+        "title": "Testing webhooks",
+        "content": "The /webhooks/{id}/test endpoint sends a synthetic event immediately to your webhook URL. Use this to verify connectivity and signature validation during setup.",
+        "items": [
+          "Method: POST /webhooks/{id}/test",
+          "Optional body: { event: 'qr.created' } — defaults to qr.created",
+          "Bypasses retry queue — delivered synchronously",
+          "Response includes delivered status, status_code, latency_ms, and the signature that was sent",
+          "Does NOT count against any quota"
+        ]
+      },
+      {
+        "id": "replay",
+        "title": "Replaying deliveries",
+        "content": "If a webhook delivery failed (e.g., your endpoint was down), you can replay it from the delivery log. Replay creates a new delivery record with the same payload and retry schedule.",
+        "items": [
+          "Method: POST /webhooks/{id}/deliveries/{deliveryId}/replay",
+          "Original delivery record is preserved for audit",
+          "New delivery gets its own retry schedule",
+          "Useful for recovering from temporary outages"
+        ]
+      },
+      {
+        "id": "delivery-log",
+        "title": "Inspecting deliveries",
+        "content": "GET /webhooks/{id}/deliveries returns a paginated list of all delivery attempts with status, response code, latency, and timestamp. Filter by status (pending, delivered, failed, retrying, abandoned) or event type.",
+        "items": [
+          "Status pending: queued, not yet sent",
+          "Status delivered: endpoint returned 2xx",
+          "Status failed: non-2xx response or network error",
+          "Status retrying: will retry per schedule",
+          "Status abandoned: all 6 attempts exhausted"
+        ]
+      }
+    ]
+  },
+  "webhooks-test": {
+    "title": "Test webhook",
+    "description": "Send a test event to your webhook endpoint to verify connectivity and signature validation.",
+    "breadcrumb": [
+      {
+        "label": "Webhooks"
+      },
+      {
+        "label": "Test webhook"
+      }
+    ],
+    "sections": [
+      {
+        "id": "purpose",
+        "title": "Purpose",
+        "content": "Use the test endpoint to confirm your webhook URL is reachable and that you can correctly verify signatures. This sends a synthetic event immediately, bypassing the retry queue.",
+        "items": [
+          "Immediate synchronous delivery",
+          "Does not count against any quota",
+          "Returns detailed result: delivered status, HTTP status, latency, and signature sent",
+          "Ideal for testing during initial setup"
+        ]
+      },
+      {
+        "id": "request",
+        "title": "Request",
+        "content": "POST /webhooks/{id}/test with optional event type in body.",
+        "code": "POST https://api.qrise.io/webhooks/{id}/test\n\n{ \"event\": \"qr.created\" }  // optional, defaults to qr.created"
+      },
+      {
+        "id": "response",
+        "title": "Response",
+        "content": "Returns immediate delivery result:",
+        "items": [
+          "delivered: boolean — true if your endpoint returned 2xx",
+          "status_code: number — HTTP status your endpoint returned",
+          "latency_ms: number — time from POST to final byte",
+          "response_body: string — truncated response (max 1 KB)",
+          "signature_sent: string — the X-QRise-Signature header value (for debugging)"
+        ]
+      }
+    ]
+  },
+  "webhooks-verify": {
+    "title": "Webhooks — Verify Signatures",
+    "description": "Learn how to verify webhook signatures to ensure events are authentic and not tampered with.",
+    "breadcrumb": [
+      {
+        "label": "Webhooks"
+      },
+      {
+        "label": "Verify signatures"
+      }
+    ],
+    "sections": [
+      {
+        "id": "how-it-works",
+        "title": "How signing works",
+        "content": "Every webhook delivery from QRise includes an X-QRise-Signature header. This is an HMAC-SHA256 signature of timestamp.request-body using your webhook secret. Verifying this signature ensures the request truly came from QRise and was not altered in transit.",
+        "items": [
+          "Signature format: t=timestamp,v1=hmac",
+          "HMAC key: your webhook secret (shown once on creation)",
+          "Payload: raw request body as string (not parsed JSON)",
+          "Timestamp tolerance: 5 minutes (reject older requests)",
+          "Use timing-safe comparison to prevent timing attacks"
+        ]
+      },
+      {
+        "id": "verify-algorithm",
+        "title": "Verification algorithm",
+        "content": "Implement this logic on your webhook endpoint:",
+        "code": "1. Extract header: 'X-QRise-Signature'\n2. Split into parts: t=<timestamp>, v1=<hmac>\n3. Check timestamp: reject if >5 minutes old\n4. Compute your own HMAC: crypto.createHmac('sha256', secret).update(timestamp + '.' + body).digest('hex')\n5. Compare using timing-safe-equal\n6. If equal → process event; else → return 401"
+      },
+      {
+        "id": "code-examples",
+        "title": "Code examples",
+        "items": []
+      }
+    ]
+  }
+}

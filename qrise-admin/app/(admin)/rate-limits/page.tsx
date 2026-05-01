@@ -1,53 +1,42 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { RateLimitConfigForm } from '@/components/rate-limits/rate-limit-config-form'
-import { ViolationsTable } from '@/components/rate-limits/violations-table'
-import { IPBlocksTable } from '@/components/rate-limits/ip-blocks-table'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { ShieldAlert, Ban, Settings, UserCog } from 'lucide-react'
-import { OverridesTable } from '@/components/rate-limits/overrides-table'
+'use client'
+
+import { useState, useEffect } from 'react';
+import { RateLimitCard } from '@/components/rate-limits/rate-limit-card';
+import { RateLimitPerUserOverride } from '@/components/rate-limits/rate-limit-per-user-override';
+import { Badge } from '@/components/ui/badge';
+import { AlertTriangle } from 'lucide-react';
 
 export default function RateLimitsPage() {
+  const [hasRecentChanges, setHasRecentChanges] = useState(false);
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const res = await fetch('/api/admin/rate-limits/status');
+        const data = await res.json();
+        setHasRecentChanges(data.changedRecently);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    checkStatus();
+  }, []);
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight text-white">Rate Limit Management</h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-3xl font-bold tracking-tight text-white">Rate Limits</h2>
+          {hasRecentChanges && (
+            <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 px-2 py-1 flex items-center gap-1.5 animate-in fade-in zoom-in duration-300">
+              <AlertTriangle className="h-3.5 w-3.5" />
+              <span className="text-[11px] font-semibold tracking-wide uppercase">Plan limits changed in last 24h</span>
+            </Badge>
+          )}
+        </div>
       </div>
-
-      <Tabs defaultValue="violations" className="space-y-4">
-        <TabsList className="bg-zinc-900 border border-zinc-800">
-          <TabsTrigger value="violations" className="gap-2">
-            <ShieldAlert className="h-4 w-4" />
-            Violations
-          </TabsTrigger>
-          <TabsTrigger value="ip-blocks" className="gap-2">
-            <Ban className="h-4 w-4" />
-            IP Blocks
-          </TabsTrigger>
-          <TabsTrigger value="plan-limits" className="gap-2">
-            <Settings className="h-4 w-4" />
-            Plan Limits
-          </TabsTrigger>
-          <TabsTrigger value="overrides" className="gap-2">
-            <UserCog className="h-4 w-4" />
-            Overrides
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="violations" className="space-y-4">
-          <ViolationsTable />
-        </TabsContent>
-
-        <TabsContent value="ip-blocks" className="space-y-4">
-          <IPBlocksTable />
-        </TabsContent>
-
-        <TabsContent value="plan-limits" className="space-y-4">
-          <RateLimitConfigForm />
-        </TabsContent>
-        <TabsContent value="overrides" className="space-y-4">
-          <OverridesTable />
-        </TabsContent>
-      </Tabs>
+      <RateLimitCard />
+      <RateLimitPerUserOverride />
     </div>
-  )
+  );
 }

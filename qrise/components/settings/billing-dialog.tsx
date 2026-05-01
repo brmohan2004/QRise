@@ -167,7 +167,7 @@ export function BillingDialog() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {billingData?.invoices?.map((invoice: any, i: number) => (
+                      {billingData?.invoices?.map((invoice: Record<string, any>, _i: number) => (
                         <tr key={invoice.id} className="group hover:bg-slate-50/50 transition-colors">
                           <td className="px-10 py-6">
                             <div className="flex items-center gap-4">

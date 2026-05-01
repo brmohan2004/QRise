@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
         try {
           // In a real app we'd create the QR record first
           // For this bulk process, we'll just generate the images
-          const buffer = await generateQRBuffer({ data: row.url });
+           const buffer = await generateQRBuffer({ content: row.url });
           const filename = `${row.name.replace(/[^a-z0-9]/gi, '_')}_${jobId.slice(0,4)}_${i + index}.png`;
           zipData[filename] = new Uint8Array(buffer);
           processedCount++;

@@ -1,7 +1,7 @@
 import { ApiResponse } from '@/lib/api-response';
 import { db } from '@/lib/db';
 import { bulkJobs, qrCodes, type BulkJob, type NewBulkJob } from '@/lib/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { generateShortCode } from '@/lib/short-code';
 
 export async function createBulkJob(

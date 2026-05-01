@@ -9,28 +9,13 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { BulkEditorTable } from "./bulk-editor-table";
 
-interface BulkRow {
-  name: string;
-  url?: string;
-  type?: string;
-  label?: string;
-  value?: string;
-  routingField?: string;
-  routingOp?: string;
-  routingValue?: string;
-  routingTargetUrl?: string;
-  actions?: { type: string; label: string; value: string }[];
-  password?: string;
-  isDynamic?: boolean;
-  status: "valid" | "error" | "duplicate";
-  error?: string;
-}
+import { BulkRow } from "@/types/qr.types";
 
 export function BulkUpload() {
   const { config, setConfig } = useWizardStore();
   const toast = useToast();
   const [file, setFile] = useState<File | null>(null);
-  const [data, setData] = useState<BulkRow[]>(config.rows || []);
+  const [data, setData] = useState<BulkRow[]>((config.rows as BulkRow[]) || []);
   const [isManualEntry, setIsManualEntry] = useState(!!config.rows?.length);
   const [isFetchingBatch, setIsFetchingBatch] = useState(false);
   const [bulkType, setBulkType] = useState<"url" | "multi_action" | "password" | "smart_routing">((config as any).bulkType || "url");

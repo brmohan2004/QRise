@@ -46,7 +46,16 @@ export function OverridesTable() {
   }
 
   useEffect(() => {
-    fetchOverrides()
+    let isMounted = true;
+    const load = async () => {
+      if (isMounted) {
+        await fetchOverrides();
+      }
+    };
+    load();
+    return () => {
+      isMounted = false;
+    };
   }, [])
 
   if (loading) {

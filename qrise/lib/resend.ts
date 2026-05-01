@@ -254,3 +254,50 @@ export async function sendExportEmail(
     console.error('Failed to send export email:', error);
   }
 }
+
+/**
+ * Send usage alert email
+ */
+export async function sendUsageAlertEmail(opts: {
+  to: string;
+  pct: number;
+  consumed: number;
+  limit: number;
+  unit: string;
+  resetAt: string;
+}): Promise<void> {
+  try {
+    const { to, pct, consumed, limit, unit, resetAt } = opts;
+    const resetDate = new Date(resetAt).toLocaleDateString();
+    
+    const content = `
+      <div style="background-color: #fef3c7; border: 1px solid #fde68a; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <p style="margin: 0; color: #92400e; font-weight: 700; font-size: 18px;">Usage Alert: ${pct}% Reached</p>
+        <p style="margin-top: 8px; font-size: 16px; color: #b45309;">
+          You have consumed <strong>${consumed.toLocaleString()}</strong> / ${limit.toLocaleString()} ${unit}.
+        </p>
+      </div>
+      <p style="font-size: 16px; margin-bottom: 24px;">
+        Your monthly quota will reset on <strong>${resetDate}</strong>.
+      </p>
+      <div style="text-align: center; margin-bottom: 32px;">
+        <a href="https://qrise.app/billing" style="display: inline-block; background-color: #0f6e56; color: white; padding: 16px 32px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 14px;">
+          UPGRADE PLAN
+        </a>
+      </div>
+      <p style="font-size: 14px; color: #6b7280; text-align: center;">
+        You can manage your alert channels in your dashboard settings.
+      </p>
+    `;
+
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to,
+      subject: `⚠️ QRise Usage Alert: ${pct}% Reached`,
+      html: wrapInCorporateTemplate('Usage Threshold Reached', content),
+    });
+  } catch (error) {
+    console.error('Failed to send usage alert email:', error);
+  }
+}
+

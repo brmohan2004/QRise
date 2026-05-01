@@ -1,16 +1,14 @@
 "use client";
 
 import { format } from "date-fns";
-import { User, FileText, Signature as SignatureIcon, Eye, ExternalLink, Trash2, Download } from "lucide-react";
+import { User, FileText, Signature as SignatureIcon, Eye, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 interface SubmissionsTableProps {
-  submissions: any[];
-  formFields: any[];
+  submissions: Record<string, unknown>[];
+  formFields: Record<string, unknown>[];
   formSlug?: string;
-  onViewDetails: (submission: any) => void;
+  onViewDetails: (submission: Record<string, unknown>) => void;
   onDelete: (id: string) => void;
   onDownload: (value: string, fileName: string) => void;
 }
@@ -18,12 +16,12 @@ interface SubmissionsTableProps {
 export function SubmissionsTable({ 
   submissions, 
   formFields, 
-  formSlug,
+  formSlug: _formSlug,
   onViewDetails, 
   onDelete,
   onDownload 
 }: SubmissionsTableProps) {
-  const fieldLabels = formFields.map((f: any) => f.label || f.type);
+  const fieldLabels = formFields.map((f: Record<string, any>) => (f.label as string) || (f.type as string));
 
   return (
     <div className="overflow-x-auto">
@@ -39,7 +37,7 @@ export function SubmissionsTable({
         </thead>
         <tbody className="divide-y border-t bg-white">
           {submissions.map((s: any) => {
-            const data = (s.submissionData || {}) as Record<string, any>;
+            const data = (s.submissionData || {}) as Record<string, unknown>;
             return (
               <tr key={s.id} className="hover:bg-slate-50/50 transition-colors group">
                 <td className="px-6 py-5">
@@ -78,7 +76,8 @@ export function SubmissionsTable({
                           variant="outline" 
                           size="sm" 
                           className="h-8 gap-2 rounded-lg text-xs border-slate-200 hover:text-[#0F6E56] hover:border-[#0F6E56]/30 hover:bg-[#0F6E56]/5 transition-all"
-                          onClick={() => onDownload(value, `${field.label || 'attachment'}_${s.id}.${ext}`)}
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          onClick={() => onDownload(value as string, `${(field as any).label || 'attachment'}_${(s as any).id}.${ext}`)}
                         >
                           {isFile ? <FileText className="h-3 w-3" /> : <SignatureIcon className="h-3 w-3" />}
                           Download

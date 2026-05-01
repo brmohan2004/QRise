@@ -4,10 +4,30 @@ import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
 import { AlertTriangle, ExternalLink, User, Calendar, ShieldAlert, MessageSquare } from 'lucide-react'
 
+interface ReportData {
+  id: string
+  qr_codes?: { name: string; short_code: string }
+  reason?: string
+  users?: { email: string }
+  description?: string
+  url?: string
+  severity?: string
+  created_at: string
+  status: string
+  // Feedback specific
+  type?: string
+  subject?: string
+  content?: string
+  user_email?: string
+  action_taken?: string
+  resolution_notes?: string
+  qr_id?: string
+}
+
 interface ReportDetailsModalProps {
   isOpen: boolean
   onClose: () => void
-  report: any
+  report: ReportData | null
   type: 'abuse' | 'feedback'
 }
 

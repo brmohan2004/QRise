@@ -1,0 +1,873 @@
+openapi: 3.1.0
+info:
+  title: QRise API
+  version: '2026-04-01'
+  description: |
+    The QRise API lets you manage QR codes, custom types, webhooks, and usage programmatically.
+    All requests require an API key passed as a Bearer token (qr_live_xxxx or qr_test_xxxx).
+servers:
+  - url: https://app.qrise.app/api/v1
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: qr_live_xxx or qr_test_xxx
+  schemas:
+    QRCode:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        type: { type: string }
+        shortCode: { type: string }
+        targetUrl: { type: string, nullable: true }
+        isDynamic: { type: boolean }
+        status: { type: string }
+        scanCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+        short_url: { type: string }
+    CustomType:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        fieldsSchema: { type: object }
+        isPublic: { type: boolean }
+        isVerified: { type: boolean }
+    Webhook:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        endpointUrl: { type: string }
+        events: { type: array, items: { type: string } }
+        isActive: { type: boolean }
+        createdAt: { type: string, format: date-time }
+    PlanRateLimits:
+      type: object
+      properties:
+        plan: { type: string }
+        rpm: { type: integer }
+        rpd: { type: integer }
+        maxBurst: { type: integer }
+        imageRendersPerMonth: { type: integer }
+        embedRendersPerMonth: { type: integer }
+        resolverCallsPerMonth: { type: integer }
+        apiCallsPerMonth: { type: integer }
+        maxWebhooks: { type: integer }
+        maxCustomTypes: { type: integer }
+        maxResolverTimeoutMs: { type: integer }
+paths:
+  /me:
+    get:
+      summary: Get current user & API key info
+      security: [{ ApiKeyAuth: [] }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+  /usage:
+    get:
+      summary: Usage summary
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: query
+          name: month
+          schema: { type: string, format: dateYYYY-MM' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
+  /qr:
+    get:
+      summary: List QR codes
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: query
+          name: type
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QRListResponse'
+    post:
+      summary: Create QR code
+      security: [{ ApiKeyAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQRRequest'
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QRCode'
+  /qr/{id}:
+    get:
+      summary: Get QR code
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QRCode'
+    patch:
+      summary: Update QR code
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQRRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QRCode'
+    delete:
+      summary: Delete QR code
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204': { description: No Content }
+  /qr/{id}/image:
+    get:
+      summary: Render QR image
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: query
+          name: format
+          schema: { type: string, enum: [png,svg,webp], default: png }
+        - in: query
+          name: size
+          schema: { type: integer, enum: [128,256,512,1024,2048], default: 512 }
+        - in: query
+          name: margin
+          schema: { type: integer, minimum: 0, maximum: 10, default: 4 }
+        - in: query
+          name: dark
+          schema: { type: string, format: color }
+        - in: query
+          name: light
+          schema: { type: string, format: color }
+        - in: query
+          name: error_correction
+          schema: { type: string, enum: [L,M,Q,H], default: M }
+      responses:
+        '200':
+          description: Binary image
+          content:
+            image/png: {}
+            image/svg+xml: {}
+            image/webp: {}
+  /qr/{id}/embed:
+    get:
+      summary: Get embed snippet
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: query
+          name: style
+          schema: { type: string, enum: [card,minimal,badge,floating], default: card }
+        - in: query
+          name: theme
+          schema: { type: string, enum: [light,dark,auto], default: auto }
+        - in: query
+          name: size
+          schema: { type: string, enum: [sm,md,lg], default: md }
+        - in: query
+          name: show_scan_count
+          schema: { type: boolean, default: false }
+        - in: query
+          name: show_name
+          schema: { type: boolean, default: true }
+      responses:
+        '200':
+          description: Embed data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmbedResponse'
+  /qr/{id}/analytics:
+    get:
+      summary: Get QR analytics
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: query
+          name: range
+          schema: { type: string, enum: [24h,7d,30d,90d,custom], default: 24h }
+        - in: query
+          name: start
+          schema: { type: string, format: date-time }
+        - in: query
+          name: end
+          schema: { type: string, format: date-time }
+        - in: query
+          name: tz
+          schema: { type: string }
+      responses:
+        '200':
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse'
+  /types:
+    get:
+      summary: List custom types
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: query
+          name: scope
+          schema: { type: string, enum: [mine,public,marketplace], default: mine }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  types: { type: array, items: { $ref: '#/components/schemas/CustomType' } }
+    post:
+      summary: Create custom type
+      security: [{ ApiKeyAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomTypeRequest'
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomType'
+  /types/{slug}:
+    get:
+      summary: Get custom type
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomType'
+    patch:
+      summary: Update custom type
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomTypeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomType'
+    delete:
+      summary: Delete custom type
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: No Content }
+  /types/{slug}/resolver:
+    get:
+      summary: Get resolver config
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResolverConfig'
+    put:
+      summary: Set/update resolver
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetResolverRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResolverConfig'
+    delete:
+      summary: Disable resolver
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: No Content }
+  /types/{slug}/resolver/rotate-secret:
+    post:
+      summary: Rotate resolver secret
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: New secret
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  resolver_secret: { type: string }
+  /types/{slug}/resolver/test:
+    post:
+      summary: Test resolver
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scan_context:
+                  type: object
+      responses:
+        '200':
+          description: Test result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: integer }
+                  latency_ms: { type: integer }
+                  response: { type: string, nullable: true }
+                  fallback_used: { type: boolean }
+                  signed_correctly: { type: boolean }
+  /types/{slug}/templates:
+    get:
+      summary: List templates
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create template
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                slug: { type: string }
+                name: { type: string }
+                template_html: { type: string }
+                is_default: { type: boolean }
+      responses:
+        '200':
+          description: Created
+  /types/{slug}/templates/{templateSlug}:
+    patch:
+      summary: Update template
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+        - in: path
+          name: templateSlug
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                template_html: { type: string }
+                is_default: { type: boolean }
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Delete template
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+        - in: path
+          name: templateSlug
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: No Content }
+  /types/{slug}/marketplace:
+    post:
+      summary: Submit type to marketplace
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notes: { type: string }
+      responses:
+        '200':
+          description: Submission created
+  /webhooks:
+    get:
+      summary: List webhooks
+      security: [{ ApiKeyAuth: [] }]
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create webhook
+      security: [{ ApiKeyAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                endpoint_url: { type: string, format: uri }
+                events: { type: array, items: { type: string, enum: [qr.created, qr.updated, qr.deleted, qr.scanned, qr.scan_milestone, type.registered, type.updated, type.suspended, resolver.failed, usage.threshold_reached, usage.quota_exceeded, api_key.created, api_key.revoked, bulk.job_completed, form.submission, marketplace.submission_reviewed] } }
+                description: { type: string }
+                filter_config: { type: object }
+      responses:
+        '200':
+          description: Created
+  /webhooks/{id}:
+    get:
+      summary: Get webhook
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: OK
+    patch:
+      summary: Update webhook
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                endpoint_url: { type: string }
+                events: { type: array, items: { type: string } }
+                description: { type: string }
+                filter_config: { type: object }
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Delete webhook
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204': { description: No Content }
+  /webhooks/{id}/test:
+    post:
+      summary: Test webhook
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                  enum: [qr.created, qr.updated, qr.deleted, qr.scanned, qr.scan_milestone, type.registered, type.updated, type.suspended, resolver.failed, usage.threshold_reached, usage.quota_exceeded, api_key.created, api_key.revoked, bulk.job_completed, form.submission, marketplace.submission_reviewed]
+                  default: qr.created
+      responses:
+        '200':
+          description: Delivery attempt result
+  /webhooks/{id}/rotate-secret:
+    post:
+      summary: Rotate webhook secret
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: New secret
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  secret: { type: string }
+  /webhooks/{id}/deliveries:
+    get:
+      summary: List deliveries
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: query
+          name: status
+          schema: { type: string, enum: [pending,delivered,failed,retrying,abandoned] }
+        - in: query
+          name: event
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+      responses:
+        '200':
+          description: OK
+  /webhooks/{id}/deliveries/{deliveryId}/replay:
+    post:
+      summary: Replay delivery
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: path
+          name: deliveryId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Replay queued
+  /admin/rate-limits:
+    get:
+      summary: Admin list plan rate limits
+      security: [{ ApiKeyAuth: [] }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plans:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PlanRateLimits'
+    patch:
+      summary: Admin update plan rate limits
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: plan
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanRateLimits'
+      responses:
+        '200':
+          description: Updated
+  /admin/rate-limits/overrides:
+    get:
+      summary: Admin list user overrides
+      security: [{ ApiKeyAuth: [] }]
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Admin create override
+      security: [{ ApiKeyAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id: { type: string, format: uuid }
+                override: { type: object }
+                reason: { type: string }
+                expires_at: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Created
+  /admin/rate-limits/overrides/{id}:
+    delete:
+      summary: Admin delete override
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204': { description: No Content }
+  /admin/api-usage:
+    get:
+      summary: Admin platform usage stats
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: query
+          name: range
+          schema: { type: string, enum: [24h,7d,30d], default: 24h }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminApiUsageResponse'
+  /admin/api-usage/users/{userId}:
+    get:
+      summary: Admin per-user breakdown
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserUsageDetail'
+  /admin/custom-types:
+    get:
+      summary: Admin list all custom types
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: query
+          name: scope
+          schema: { type: string, enum: [all,queue,verified] }
+      responses:
+        '200':
+          description: OK
+  /admin/custom-types/{id}:
+    get:
+      summary: Admin detail type
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: OK
+    patch:
+      summary: Admin verify or suspend
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action: { type: string, enum: [verify,suspend] }
+                reason: { type: string }
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Admin delete type
+      security: [{ ApiKeyAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204': { description: No Content }
+  /admin/custom-types/marketplace:
+    get:
+      summary: Admin marketplace queue
+      security: [{ ApiKeyAuth: [] }]
+      responses:
+        '200':
+          description: OK
+  /internal/resolver-log:
+    post:
+      summary: Internal endpoint for logging resolver calls
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resolver_id: { type: string, format: uuid }
+                qr_id: { type: string, format: uuid, nullable: true }
+                scan_context: { type: object }
+                resolver_status: { type: integer }
+                resolver_latency_ms: { type: integer }
+                response_type: { type: string }
+                fallback_used: { type: boolean }
+                is_test: { type: boolean }
+      responses:
+        '204': { description: No Content }
+  /cron/usage-reset:
+    post:
+      summary: Cron: monthly usage reset
+      security: []
+      responses:
+        '200':
+          description: OK
+  /cron/webhook-processor:
+    post:
+      summary: Cron: process pending webhook deliveries
+      security: []
+      responses:
+        '200':
+          description: OK
+security:
+  - ApiKeyAuth: []

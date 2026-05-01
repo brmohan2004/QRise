@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import { AnyPgTable } from "drizzle-orm/pg-core";
 
 export interface AuthenticatedUser {
   id: string;
@@ -50,12 +51,14 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
   return null;
 }
 
-export async function verifyOwnership(userId: string, resourceId: string, table: any): Promise<boolean> {
-  const result = await db.select().from(table).where(eq(table.id, resourceId)).limit(1);
-  return result[0]?.userId === userId;
+export async function verifyOwnership(userId: string, resourceId: string, table: AnyPgTable): Promise<boolean> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const result = await db.select().from(table).where(eq((table as any).id, resourceId)).limit(1);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (result[0] as any)?.userId === userId;
 }
 
-export async function requirePlanFeature(userId: string, feature: string): Promise<boolean> {
+export async function requirePlanFeature(userId: string, _feature: string): Promise<boolean> {
   // Mock plan check for now, can be extended with real plan/feature lookup
   const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   if (!user[0]) return false;

@@ -3,22 +3,17 @@
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { 
   User, 
   Download, 
-  Calendar, 
   Hash, 
   Globe, 
   FileText, 
-  Signature as SignatureIcon, 
-  X, 
   Clock, 
   ShieldCheck,
-  ChevronRight,
   Info
 } from "lucide-react";
 import { format } from "date-fns";
@@ -28,8 +23,8 @@ import { motion, AnimatePresence } from "framer-motion";
 interface SubmissionDetailsDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  submission: any;
-  formFields: any[];
+  submission: Record<string, any>;
+  formFields: Record<string, any>[];
   formName: string;
   onDownload: (value: string, fileName: string) => void;
   onDelete: (id: string) => void;
@@ -108,7 +103,7 @@ export function SubmissionDetailsDialog({
 
           <div className="grid gap-3">
             <AnimatePresence>
-              {formFields.map((field: any, i: number) => {
+              {formFields.map((field: Record<string, any>, i: number) => {
                 const value = submissionData[field.id] || submissionData[field.label] || "---";
                 const isAttachment = field.type === 'file' || field.type === 'signature';
                 const hasValue = value && value !== "---";

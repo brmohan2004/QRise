@@ -40,7 +40,16 @@ export function RateLimitConfigForm() {
   }
 
   useEffect(() => {
-    fetchConfigs()
+    let isMounted = true;
+    const load = async () => {
+      if (isMounted) {
+        await fetchConfigs();
+      }
+    };
+    load();
+    return () => {
+      isMounted = false;
+    };
   }, [])
 
   const handleUpdate = async (plan: string, updates: Partial<PlanConfig>) => {
@@ -59,7 +68,7 @@ export function RateLimitConfigForm() {
       } else {
         toast.error('Failed to update limits')
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('An error occurred')
     } finally {
       setSaving(null)

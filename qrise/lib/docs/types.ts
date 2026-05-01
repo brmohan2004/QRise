@@ -4,7 +4,7 @@ export interface ParamSchema {
   name: string
   type: string            // 'string' | 'number' | 'boolean' | 'array' | 'object' | 'uuid' | 'enum'
   required: boolean
-  description: string
+  description?: string
   enumValues?: string[]
   defaultValue?: string
   example?: string
@@ -26,12 +26,13 @@ export interface EndpointSpec {
   exampleResponse?: Record<string, unknown>
   errorCodes: string[]    // e.g. ['400', '401', '403', '404']
   notes?: string[]        // extra callout notes
+  billableUnit?: string
 }
 
 export interface ResponseField {
   name: string
   type: string
-  description: string
+  description?: string
   nullable?: boolean
   children?: ResponseField[]  // for nested objects
 }

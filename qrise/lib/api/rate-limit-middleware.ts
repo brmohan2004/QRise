@@ -33,7 +33,7 @@ export async function rateLimitMiddleware(req: NextRequest) {
         .is('is_active', true)
         .single();
       
-      const castedData = data as any;
+      const castedData = data as { users: { plan: string } | null } | null;
       if (castedData?.users?.plan) {
         plan = castedData.users.plan;
         await redis.set(cacheKey, plan, { ex: 300 });

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, CreditCard, FileText } from "lucide-react";
+import { LayoutGrid, CreditCard, FileText, ShoppingCart } from "lucide-react";
 import { FeedbackModal } from "@/components/app/feedback-modal";
 import { PublicHeader } from "@/components/public/public-header";
 import { PublicSidebar } from "@/components/public/public-sidebar";
@@ -10,6 +10,7 @@ import { PublicSidebar } from "@/components/public/public-sidebar";
 const navigation = [
   { name: "Features", href: "/features", icon: LayoutGrid },
   { name: "Pricing", href: "/pricing", icon: CreditCard },
+  { name: "Marketplace", href: "/marketplace", icon: ShoppingCart },
   { name: "Docs", href: "/docs", icon: FileText },
 ];
 

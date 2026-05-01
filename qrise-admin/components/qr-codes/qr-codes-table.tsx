@@ -60,7 +60,7 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
       toast.success(`${variables.is_batch ? 'Batch' : 'QR code'} ${!variables.is_active ? 'activated' : 'suspended'} successfully`)
       queryClient.invalidateQueries({ queryKey: ['admin', 'qr_codes'] })
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'Failed to update status')
     }
   })
@@ -81,7 +81,7 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
       toast.success(`${variables.is_batch ? 'Batch' : 'QR code'} removed from database`)
       queryClient.invalidateQueries({ queryKey: ['admin', 'qr_codes'] })
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'Failed to delete item')
     }
   })
@@ -90,7 +90,7 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
     {
       accessorKey: 'name',
       header: 'QR Name',
-      cell: ({ row }: { row: any }) => (
+      cell: ({ row }: { row: { original: QRColumn, getValue: (key: string) => string } }) => (
         <div className="flex items-center gap-2">
           <div className="p-1.5 bg-[#1a1a1a] rounded-md">
             {row.original.is_batch ? (
@@ -116,12 +116,12 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
     {
       accessorKey: 'users.email',
       header: 'Owner',
-      cell: ({ row }: { row: any }) => <span className="text-sm text-gray-400">{row.original.users?.email}</span>
+      cell: ({ row }: { row: { original: QRColumn } }) => <span className="text-sm text-gray-400">{row.original.users?.email}</span>
     },
     {
       accessorKey: 'type',
       header: 'Type',
-      cell: ({ row }: { row: any }) => (
+      cell: ({ row }: { row: { getValue: (key: string) => string } }) => (
         <Badge variant="outline" className="text-[10px] uppercase border-[#333] text-gray-400">
           {row.getValue('type')}
         </Badge>
@@ -130,12 +130,12 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
     {
       accessorKey: 'scan_count',
       header: 'Scans',
-      cell: ({ row }: { row: any }) => <span className="text-sm font-mono text-gray-400">{((row.getValue('scan_count') as number) ?? 0).toLocaleString()}</span>
+      cell: ({ row }: { row: { getValue: (key: string) => number } }) => <span className="text-sm font-mono text-gray-400">{((row.getValue('scan_count') as number) ?? 0).toLocaleString()}</span>
     },
     {
       accessorKey: 'created_at',
       header: 'Created',
-      cell: ({ row }: { row: any }) => (
+      cell: ({ row }: { row: { getValue: (key: string) => string } }) => (
         <span className="text-xs text-gray-500">
           {format(new Date(row.getValue('created_at')), 'MMM d, yyyy')}
         </span>
@@ -144,7 +144,7 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
     {
       accessorKey: 'is_active',
       header: 'Status',
-      cell: ({ row }: { row: any }) => {
+      cell: ({ row }: { row: { original: QRColumn } }) => {
         const status = (row.original.status || (row.original.is_active ? 'active' : 'suspended')) as string
         return (
           <Badge 
@@ -163,7 +163,7 @@ export function QRCodesTable({ data }: QRCodesTableProps) {
     },
     {
       id: 'actions',
-      cell: ({ row }: { row: any }) => {
+      cell: ({ row }: { row: { original: QRColumn } }) => {
         const qr = row.original
         const isToggling = toggleStatus.isPending && toggleStatus.variables?.id === qr.id
         const isDeleting = deleteQR.isPending && deleteQR.variables?.id === qr.id

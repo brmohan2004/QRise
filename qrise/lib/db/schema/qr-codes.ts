@@ -1,6 +1,11 @@
 import { pgTable, text, timestamp, uuid, boolean, jsonb, varchar, integer } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users } from './users';
+import { customQrTypes } from './custom-qr-types';
+import { routingRules } from './routing-rules';
+import { qrActions } from './qr-actions';
+import { scanEvents } from './analytics';
+import { bulkJobs } from './bulk-jobs';
 
 export const qrCodes = pgTable('qr_codes', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -18,6 +23,9 @@ export const qrCodes = pgTable('qr_codes', {
   designConfig: jsonb('design_config').$type<{ logoUrl?: string; logoPublicId?: string }>(),
   bulkJobId: uuid('bulk_job_id'),
   scanCount: integer('scan_count').default(0),
+  customTypeId: uuid('custom_type_id').references(() => customQrTypes.id),
+  customTypePayload: jsonb('custom_type_payload'),
+  tags: text('tags').array().default([]),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -37,10 +45,7 @@ export const qrRedirectHistory = pgTable('qr_redirect_history', {
 export type QRRedirectHistory = typeof qrRedirectHistory.$inferSelect;
 export type NewQRRedirectHistory = typeof qrRedirectHistory.$inferInsert;
 
-const routingRules = {} as any;
-const qrActions = {} as any;
-const scanEvents = {} as any;
-const bulkJobs = {} as any;
+
 
 export const qrCodesRelations = relations(qrCodes, ({ one, many }) => ({
   user: one(users, {
@@ -53,5 +58,9 @@ export const qrCodesRelations = relations(qrCodes, ({ one, many }) => ({
   bulkJob: one(bulkJobs, {
     fields: [qrCodes.bulkJobId],
     references: [bulkJobs.id],
+  }),
+  customType: one(customQrTypes, {
+    fields: [qrCodes.customTypeId],
+    references: [customQrTypes.id],
   }),
 }));

@@ -17,7 +17,7 @@ function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
 }
 
 function TooltipTrigger({ asChild, ...props }: TooltipPrimitive.Trigger.Props & { asChild?: boolean }) {
-  const Comp = (asChild ? Slot : TooltipPrimitive.Trigger) as any
+  const Comp = (asChild ? Slot : TooltipPrimitive.Trigger) as React.ElementType
   return <Comp data-slot="tooltip-trigger" {...props} />
 }
 

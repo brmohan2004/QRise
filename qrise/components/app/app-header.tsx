@@ -27,6 +27,8 @@ export function AppHeader() {
     if (path.startsWith("/create")) return "Create QR";
     if (path.startsWith("/forms")) return "Form Builder";
     if (path.startsWith("/api-manager")) return "API Manager";
+    if (path.startsWith("/developer")) return "Developer Hub";
+    if (path.startsWith("/marketplace")) return "Marketplace";
     if (path.startsWith("/settings")) return "Settings";
     return "App";
   };
@@ -38,14 +40,24 @@ export function AppHeader() {
         <Sheet open={open} onOpenChange={setOpen}>
           <button
             onClick={() => setOpen(true)}
-            className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-slate-100 transition-colors text-slate-600 outline-none"
+            className="lg:hidden p-2 -ml-2 rounded-xl hover:bg-slate-100 transition-all active:scale-90 text-slate-600 outline-none"
             aria-label="Toggle Menu"
           >
             <Menu className="h-6 w-6" />
           </button>
-          <SheetContent side="left">
+          <SheetContent
+            side="bottom"
+            showCloseButton={false}
+            className="h-[85vh] rounded-t-3xl p-0 border-none shadow-[0_-8px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 ease-out"
+          >
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-            <SidebarNav isMobile={true} onNavClick={() => setOpen(false)} />
+
+            {/* Premium Bottom Sheet Handle */}
+            <div className="bottom-sheet-handle absolute top-0 left-0 right-0 z-20" />
+
+            <div className="flex flex-col h-full pt-0">
+              <SidebarNav isMobile={true} onNavClick={() => setOpen(false)} className="border-none" />
+            </div>
           </SheetContent>
         </Sheet>
 

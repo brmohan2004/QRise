@@ -1791,6 +1791,8 @@ Add to `vercel.json` (main SaaS project):
   ]
 }
 ```
+TO PREPARE THE STEP BY STEP TO GET THE NEW CREDENTIALS 
+
 
 ---
 
@@ -1963,9 +1965,12 @@ Rate Limits page should show a warning badge if any plan's limits were changed i
 
 Append to the main QRise deployment checklist:
 
-1. **Run DB migrations** for all new tables in Section 2 (in order: 2.3 → 2.1 → 2.2 → 2.4 → 2.5 → 2.6 → 2.7 → 2.8 → 2.9 → 2.10 → 2.11 → 2.12)
-2. **Seed plan_rate_limits** — run the INSERT in Section 2.3 if rows don't exist
-3. **Create sandbox Postgres schema** — run Task E7.1 migration
+1. **Run DB migrations** — Apply `supabase/migrations/20260430000000_api_v2_infrastructure.sql` to your Supabase instance. This script handles:
+   - Extending existing tables (`api_keys`, `qr_codes`, `webhooks`, `webhook_deliveries`).
+   - Creating all new v2 infrastructure tables.
+   - Handling data type migrations (e.g., `webhook_deliveries.attempts`).
+   - Seeding the `plan_rate_limits` table with default tiers.
+   - Creating and mirroring the `sandbox` Postgres schema.
 4. **Add Vercel Cron** entries from Section 14 to `vercel.json`
 5. **Set env vars** — all from Section 14
 6. **Deploy Cloudflare Worker** — with updated `custom-resolver.ts`

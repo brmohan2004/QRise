@@ -15,15 +15,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Table name is required' }, { status: 400 })
   }
 
-  // List of allowed tables to clean (Safety check)
+  // List of allowed tables to clean (Safety check - Includes all 41 public tables)
   const allowedTables = [
-    'users', 'plans', 'qr_codes', 'qr_redirect_history', 'routing_rules',
-    'qr_actions', 'scan_events', 'scan_daily_rollups', 'forms', 'form_submissions',
-    'api_keys', 'webhooks', 'webhook_deliveries', 'bulk_jobs',
-    'notifications', 'user_notifications', 'platform_feedback', 'billing_events',
-    'admin_audit_log', 'platform_config', 'maintenance_windows', 'announcements',
-    'competitions', 'competition_registrations', 'coupons', 'coupon_redemptions',
-    'features_quiz', 'abuse_reports', 'rate_limit_config', 'ip_blocks', 'rate_limit_violations', 'plans', 'users'
+    'abuse_reports', 'admin_audit_log', 'announcements', 'api_keys',
+    'api_usage_events', 'billing_events', 'bulk_jobs', 'competition_registrations',
+    'competitions', 'coupon_redemptions', 'coupons', 'custom_qr_types', 'features_quiz', 'form_submissions', 'forms',
+    'ip_blocks', 'maintenance_windows', 'notifications', 'plan_rate_limits',
+    'plans', 'platform_feedback', 'qr_actions',
+    'qr_codes', 'qr_redirect_history', 'rate_limit_violations', 'resolver_calls',
+    'routing_rules', 'scan_daily_rollups', 'scan_events', 'type_marketplace_submissions',
+    'type_resolvers', 'type_templates', 'usage_alert_channels', 'usage_monthly_snapshots',
+    'user_notifications', 'user_rate_limit_overrides', 'users', 'webhook_deliveries', 'webhooks'
   ]
 
   if (!allowedTables.includes(table)) {

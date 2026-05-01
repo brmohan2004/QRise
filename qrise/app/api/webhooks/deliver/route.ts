@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       });
 
       // Sign the payload if secret exists
-      const hmac = crypto.createHmac("sha256", webhook.secretHash || "default_secret");
+      const hmac = crypto.createHmac("sha256", webhook.secret || "default_secret");
       const signature = hmac.update(body).digest("hex");
 
       try {
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
           payload: JSON.parse(body),
           responseStatus: res.status.toString(),
           deliveredAt: new Date(),
-          attempts: "1",
+          attempts: 1,
         });
 
         return { id: webhook.id, status: res.status };
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
           payload: JSON.parse(body),
           responseStatus: "failed",
           deliveredAt: new Date(),
-          attempts: "1",
+          attempts: 1,
         });
 
         return { id: webhook.id, status: "failed" };

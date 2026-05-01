@@ -7,7 +7,7 @@ export async function createForm(
   userId: string,
   data: {
     name: string;
-    fieldsSchema: any;
+    fieldsSchema: unknown;
     successMessage?: string;
   }
 ): Promise<Form> {

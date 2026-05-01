@@ -24,7 +24,10 @@ import {
   DollarSign,
   Zap,
   Server,
-  Activity
+  Activity,
+  Monitor,
+  Boxes,
+  Globe
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -38,6 +41,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const navigation = [
   {
@@ -66,6 +80,11 @@ const navigation = [
       { name: 'Analytics', href: '/analytics', icon: BarChart3 },
       { name: 'Feature Flags', href: '/feature-flags', icon: Flag },
       { name: 'Features Quiz', href: '/features-quiz', icon: HelpCircle },
+      { name: 'Rate Limits', href: '/rate-limits', icon: Zap },
+      { name: 'API Monitor', href: '/api-monitor', icon: Monitor },
+      { name: 'Custom Types', href: '/custom-types', icon: Boxes },
+      { name: 'Subscription Plans', href: '/plans', icon: Settings },
+      { name: 'Webhooks', href: '/webhooks', icon: Globe },
     ]
   },
   {
@@ -90,8 +109,6 @@ const navigation = [
   {
     title: 'Config',
     items: [
-      { name: 'Plans', href: '/plans', icon: Settings },
-      { name: 'Rate Limits', href: '/rate-limits', icon: Zap },
       { name: 'Infra Ops', href: '/infra', icon: Server },
       { name: 'System Health', href: '/system', icon: Activity },
     ]
@@ -105,6 +122,9 @@ export function AdminSidebar() {
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [hasRecentRateLimitChanges, setHasRecentRateLimitChanges] = useState(false)
+  const [moduleStatus, setModuleStatus] = useState<any>(null)
+  const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false)
 
   useEffect(() => {
     setIsMounted(true)
@@ -117,8 +137,69 @@ export function AdminSidebar() {
       const { data: { user } } = await supabase.auth.getUser()
       setUserEmail(user?.email || null)
     }
+    
+    const fetchConfig = async () => {
+      try {
+        const [rateLimitRes, moduleRes] = await Promise.all([
+          fetch('/api/admin/rate-limits/status'),
+          fetch('/api/admin/config/modules')
+        ])
+        
+        const rateLimitData = await rateLimitRes.json()
+        setHasRecentRateLimitChanges(rateLimitData.changedRecently)
+        
+        const moduleData = await moduleRes.json()
+        setModuleStatus(moduleData)
+      } catch (e) {
+        console.error('Failed to fetch config', e)
+      }
+    }
+
+    const handleConfigUpdate = () => fetchConfig()
+    window.addEventListener('admin:config-updated', handleConfigUpdate)
+
     getUser()
-  }, [supabase.auth])
+    fetchConfig()
+
+    return () => {
+      window.removeEventListener('admin:config-updated', handleConfigUpdate)
+    }
+  }, [supabase.auth, pathname])
+
+  const filteredNavigation = navigation.map(section => ({
+    ...section,
+    items: section.items.filter(item => {
+      if (!moduleStatus) return true
+      
+      const mapping: Record<string, string> = {
+        'Dashboard': 'dashboard',
+        'Users': 'users',
+        'Abuse Reports': 'reports',
+        'QR Codes': 'qr_codes',
+        'Bulk Jobs': 'bulk_jobs',
+        'Analytics': 'analytics',
+        'Feature Flags': 'feature_flags',
+        'Features Quiz': 'features_quiz',
+        'Rate Limits': 'rate_limits',
+        'API Monitor': 'api_monitor',
+        'Custom Types': 'custom_types',
+        'Subscription Plans': 'plans',
+        'Webhooks': 'webhooks',
+        'Notifications': 'notifications',
+        'Revenue': 'revenue',
+        'Coupons': 'coupons',
+        'Competitions': 'competitions',
+        'Infra Ops': 'infra',
+        'System Health': 'system_health',
+        'Audit Logs': 'audit_logs'
+      }
+
+      const configId = mapping[item.name]
+      if (configId && moduleStatus[configId] === false) return false
+      
+      return true
+    })
+  })).filter(section => section.items.length > 0)
 
   const toggleSidebar = () => {
     const nextState = !isCollapsed
@@ -171,7 +252,7 @@ export function AdminSidebar() {
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-2 space-y-6 no-scrollbar">
-          {navigation.map((section) => (
+          {filteredNavigation.map((section) => (
             <div key={section.title} className="space-y-2">
               {!isCollapsed && (
                 <h3 className="px-2 text-[10px] font-bold text-gray-600 uppercase tracking-[0.1em] animate-in fade-in slide-in-from-left-1 duration-300">
@@ -199,9 +280,16 @@ export function AdminSidebar() {
                         isActive ? "text-white" : "text-gray-500"
                       )} />
                       {!isCollapsed && (
-                        <span className="truncate animate-in fade-in slide-in-from-left-1 duration-300">
-                          {item.name}
-                        </span>
+                        <div className="flex-1 flex items-center justify-between min-w-0">
+                          <span className="truncate animate-in fade-in slide-in-from-left-1 duration-300">
+                            {item.name}
+                          </span>
+                          {(item.name === 'Rate Limits' && hasRecentRateLimitChanges) && (
+                            <Badge className="ml-2 bg-amber-500 hover:bg-amber-600 text-[10px] h-4 px-1 py-0 animate-pulse border-none">
+                              UPDATED
+                            </Badge>
+                          )}
+                        </div>
                       )}
                     </Link>
                   )
@@ -272,11 +360,32 @@ export function AdminSidebar() {
             {isCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
+                  <Link href="/settings/page-config" className="w-full flex justify-center p-0 h-8 text-gray-400 hover:text-white hover:bg-transparent">
+                    <Settings className="h-4 w-4" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-[#111] border-[#1a1a1a] text-white">
+                  Page Configuration
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Link 
+                href="/settings/page-config"
+                className="w-full flex justify-start gap-2 h-8 px-0 text-gray-400 hover:text-white hover:bg-transparent items-center text-sm"
+              >
+                <Settings className="h-4 w-4" />
+                Page Config
+              </Link>
+            )}
+            
+            {isCollapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <Button 
                     variant="ghost" 
                     size="sm" 
                     className="w-full justify-center p-0 h-8 text-gray-400 hover:text-white hover:bg-transparent"
-                    onClick={handleSignOut}
+                    onClick={() => setIsSignOutDialogOpen(true)}
                   >
                     <LogOut className="h-4 w-4" />
                   </Button>
@@ -290,7 +399,7 @@ export function AdminSidebar() {
                 variant="ghost" 
                 size="sm" 
                 className="w-full justify-start gap-2 h-8 px-0 text-gray-400 hover:text-white hover:bg-transparent"
-                onClick={handleSignOut}
+                onClick={() => setIsSignOutDialogOpen(true)}
               >
                 <LogOut className="h-4 w-4" />
                 Sign out
@@ -299,6 +408,28 @@ export function AdminSidebar() {
           </div>
         </div>
       </div>
+
+      <AlertDialog open={isSignOutDialogOpen} onOpenChange={setIsSignOutDialogOpen}>
+        <AlertDialogContent className="bg-[#0a0a0a] border-[#1a1a1a] text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold">Sign Out</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-400">
+              Are you sure you want to sign out? You will need to log in again to access the admin dashboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-4">
+            <AlertDialogCancel className="bg-transparent border-[#1a1a1a] text-gray-400 hover:text-white hover:bg-[#111] hover:border-gray-700 transition-all">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleSignOut}
+              className="bg-red-600 hover:bg-red-700 text-white border-none transition-all"
+            >
+              Confirm Sign Out
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </TooltipProvider>
   )
 }

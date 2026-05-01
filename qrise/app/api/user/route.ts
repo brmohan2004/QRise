@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { ApiResponse } from "@/lib/api-response";
 import { sendWelcomeEmail } from "@/lib/resend";
+import { getPlanRateLimits } from "@/lib/api/rate-limit-config";
 
 export async function GET() {
   try {
@@ -42,6 +43,8 @@ export async function GET() {
       planData = freePlan;
     }
 
+    const planLimits = await getPlanRateLimits(userData.plan || 'free');
+
     // Ensure we have some plan object even if not in DB
     const plan = planData || {
       name: userData.plan || 'free',
@@ -54,6 +57,7 @@ export async function GET() {
 
     return ApiResponse.ok({
       ...userData,
+      planLimits,
       plan: {
          name: plan.name,
          has_api: 'hasApiAccess' in plan ? plan.hasApiAccess : (plan as any).hasApi,

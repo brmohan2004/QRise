@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+
+export const dynamic = 'force-dynamic';
+
 import { db } from "@/lib/db";
 import { bulkJobs, webhookDeliveries, scanEvents, scanDailyRollups } from "@/lib/db/schema";
 import { lt, sql, eq, and, isNotNull, inArray } from "drizzle-orm";

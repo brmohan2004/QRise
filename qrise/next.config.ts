@@ -21,6 +21,19 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: '/embed/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'ALLOWALL',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors *",
+          },
+        ],
+      },
+      {
         source: '/(.*)',
         headers: [
           {
@@ -67,7 +80,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  serverExternalPackages: ['bcryptjs', 'qrcode', 'sharp'],
+  serverExternalPackages: ['bcryptjs', 'qrcode', 'sharp', 'postgres', 'detect-libc', 'drizzle-orm'],
 };
 
 export default nextConfig;

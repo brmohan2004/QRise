@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate-sdk": "tsx scripts/generate-sdk.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",
@@ -74,7 +75,9 @@
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5",
-    "wrangler": "^4.85.0"
+    "wrangler": "^4.85.0",
+    "openapi-typescript": "^7.6.1",
+    "openapi-fetch": "^0.13.5"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

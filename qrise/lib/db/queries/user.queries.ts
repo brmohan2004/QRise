@@ -1,5 +1,5 @@
 import { db } from '../index';
-import { users, type User, type NewUser } from '../schema';
+import { users, type User } from '../schema';
 import { eq, sql } from 'drizzle-orm';
 
 export async function getUserById(id: string): Promise<User | undefined> {
@@ -29,7 +29,7 @@ export async function getUserStats(userId: string): Promise<{
   totalScans: number;
   activeQrs: number;
 }> {
-  const stats = await db
+  await db
     .select({
       totalQrs: sql<number>`count(*)`,
     })

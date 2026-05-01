@@ -42,8 +42,8 @@ export function UserActionsMenu({ userId, isSuspended }: UserActionsMenuProps) {
       } else {
         throw new Error(data.error || 'Failed to impersonate')
       }
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An unknown error occurred')
     } finally {
       setIsLoading(false)
       setActiveDialog(null)
@@ -66,8 +66,8 @@ export function UserActionsMenu({ userId, isSuspended }: UserActionsMenuProps) {
       toast.success(`User account ${isSuspended ? 'unsuspended' : 'suspended'} successfully`)
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
       router.refresh()
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An unknown error occurred')
     } finally {
       setIsLoading(false)
       setActiveDialog(null)
@@ -87,8 +87,8 @@ export function UserActionsMenu({ userId, isSuspended }: UserActionsMenuProps) {
       toast.success('User account deleted permanently')
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
       router.refresh()
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An unknown error occurred')
     } finally {
       setIsLoading(false)
       setActiveDialog(null)

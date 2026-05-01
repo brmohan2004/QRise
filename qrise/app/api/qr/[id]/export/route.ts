@@ -31,13 +31,13 @@ export async function GET(
     let buffer: Buffer;
     if (format === "svg") {
       const svg = await generateQRSVG({
-        data: targetUrl,
+        content: targetUrl,
         ...(qr.designConfig as object),
       });
       buffer = Buffer.from(svg);
     } else {
       buffer = await generateQRBuffer({
-        data: targetUrl,
+        content: targetUrl,
         size: dpi === 300 ? 1200 : 400,
         ...(qr.designConfig as object),
       });

@@ -7,65 +7,45 @@
         { "label": "Authentication", "href": "/docs/authentication" },
         { "label": "Quickstart", "href": "/docs/quickstart" },
         { "label": "Rate limits", "href": "/docs/rate-limits" },
-        { "label": "Errors", "href": "/docs/errors" }
+        { "label": "Response format", "href": "/docs/response-format" },
+        { "label": "Sandbox", "href": "/docs/sandbox" }
       ]
     },
     {
       "title": "QR codes",
       "items": [
-        { "label": "Overview", "href": "/docs/qr-codes" },
-        { "label": "Create QR", "href": "/docs/qr-codes/create", "method": "POST" },
-        { "label": "List QRs", "href": "/docs/qr-codes/list", "method": "GET" },
-        { "label": "Get QR", "href": "/docs/qr-codes/get", "method": "GET" },
-        { "label": "Update QR", "href": "/docs/qr-codes/update", "method": "PUT" },
-        { "label": "Delete QR", "href": "/docs/qr-codes/delete", "method": "DELETE" },
-        { "label": "Export QR image", "href": "/docs/qr-codes/export", "method": "GET" },
-        { "label": "Redirect history", "href": "/docs/qr-codes/history", "method": "GET" }
+        { "label": "Overview", "href": "/docs/qr-codes-overview" },
+        { "label": "Create QR", "href": "/docs/create-qr", "method": "POST" },
+        { "label": "Image & Embed", "href": "/docs/qr-image", "method": "GET" },
+        { "label": "Analytics", "href": "/docs/analytics-overview", "method": "GET" }
       ]
     },
     {
-      "title": "Smart routing",
+      "title": "Custom types",
       "items": [
-        { "label": "Overview", "href": "/docs/smart-routing" },
-        { "label": "Get rules", "href": "/docs/smart-routing/get-rules", "method": "GET" },
-        { "label": "Update rules", "href": "/docs/smart-routing/update-rules", "method": "PUT" }
-      ]
-    },
-    {
-      "title": "Analytics",
-      "items": [
-        { "label": "QR analytics", "href": "/docs/analytics", "method": "GET" }
-      ]
-    },
-    {
-      "title": "Bulk generation",
-      "items": [
-        { "label": "Overview", "href": "/docs/bulk" },
-        { "label": "Create job", "href": "/docs/bulk/create", "method": "POST" },
-        { "label": "Job status", "href": "/docs/bulk/status", "method": "GET" }
-      ]
-    },
-    {
-      "title": "Forms",
-      "items": [
-        { "label": "Overview", "href": "/docs/forms" },
-        { "label": "Create form", "href": "/docs/forms/create", "method": "POST" },
-        { "label": "Manage forms", "href": "/docs/forms/manage", "method": "GET" }
+        { "label": "Overview", "href": "/docs/custom-types-overview" },
+        { "label": "Field schema", "href": "/docs/custom-types-field-schema" },
+        { "label": "Resolver protocol", "href": "/docs/custom-types-resolver-protocol" },
+        { "label": "Marketplace", "href": "/docs/custom-types-marketplace" }
       ]
     },
     {
       "title": "Webhooks",
       "items": [
-        { "label": "Overview", "href": "/docs/webhooks" },
-        { "label": "Create webhook", "href": "/docs/webhooks/create", "method": "POST" },
-        { "label": "Event reference", "href": "/docs/webhooks/events" }
+        { "label": "Overview", "href": "/docs/webhooks-overview" },
+        { "label": "Test & replay", "href": "/docs/webhooks-test" },
+        { "label": "Verify signatures", "href": "/docs/webhooks-verify" }
       ]
     },
     {
-      "title": "Reference",
+      "title": "Usage & Reference",
       "items": [
-        { "label": "Changelog", "href": "/docs/changelog" }
+        { "label": "Usage & Billing", "href": "/docs/usage" },
+        { "label": "Usage Alerts", "href": "/docs/usage-alerts" },
+        { "label": "SDK", "href": "/docs/sdk" },
+        { "label": "Errors", "href": "/docs/errors" }
       ]
     }
   ]
 }
+

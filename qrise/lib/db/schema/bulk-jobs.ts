@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, boolean, jsonb, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, jsonb, integer } from 'drizzle-orm/pg-core';
 
 export const bulkJobs = pgTable('bulk_jobs', {
   id: uuid('id').primaryKey().defaultRandom(),

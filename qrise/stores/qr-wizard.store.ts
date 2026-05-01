@@ -20,7 +20,7 @@ interface WizardStore {
   setDynamic: (isDynamic: boolean) => void;
   setEditingQrId: (id: string | null) => void;
   setTempPassword: (password: string | null) => void;
-  loadQR: (qr: any) => void;
+  loadQR: (qr: Record<string, unknown>) => void;
   reset: () => void;
 }
 
@@ -51,18 +51,18 @@ export const useWizardStore = create<WizardStore>()(
       setDynamic: (isDynamic: boolean) => set({ isDynamic }),
       setEditingQrId: (editingQrId: string | null) => set({ editingQrId }),
       setTempPassword: (tempPassword: string | null) => set({ tempPassword }),
-      loadQR: (qr: any) => set({
-        editingQrId: qr.id,
-        name: qr.name,
-        qrType: qr.type,
-        isDynamic: qr.isDynamic,
-        design: qr.designConfig || {},
+      loadQR: (qr: Record<string, unknown>) => set({
+        editingQrId: qr.id as string,
+        name: qr.name as string,
+        qrType: qr.type as QRType,
+        isDynamic: qr.isDynamic as boolean,
+        design: (qr.designConfig as Partial<QRDesign>) || {},
         config: {
           ...qr,
-          targetUrl: qr.targetUrl,
-          rules: qr.routingRules,
-          actions: qr.qrActions,
-        },
+          targetUrl: qr.targetUrl as string,
+          rules: qr.routingRules as unknown as unknown[],
+          actions: qr.qrActions as unknown as unknown[],
+        } as Partial<QRConfig>,
         step: 2,
       }),
       reset: () => set(initialState),
@@ -85,10 +85,11 @@ export const useWizardStore = create<WizardStore>()(
       onRehydrateStorage: () => (state) => {
         // Clear logoPublicId on rehydration - it's derived from logoUrl, not user input
         if (state?.design) {
-          const { logoPublicId, logoUrl, ...rest } = state.design;
+          const { logoPublicId: _logoPublicId, logoUrl, ...rest } = state.design;
+          void _logoPublicId;
           const cleanDesign = { ...rest };
           if (logoUrl && !logoUrl.startsWith('blob:')) {
-            (cleanDesign as any).logoUrl = logoUrl;
+            (cleanDesign as Record<string, unknown>).logoUrl = logoUrl;
           }
           state.setDesign(cleanDesign);
         }

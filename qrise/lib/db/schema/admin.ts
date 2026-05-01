@@ -1,6 +1,5 @@
 
-import { pgTable, text, timestamp, uuid, boolean, jsonb, integer, decimal, varchar } from 'drizzle-orm/pg-core';
-import { users } from './users';
+import { pgTable, text, timestamp, uuid, boolean, jsonb, varchar } from 'drizzle-orm/pg-core';
 
 export const adminAuditLog = pgTable('admin_audit_log', {
   id: uuid('id').primaryKey().defaultRandom(),

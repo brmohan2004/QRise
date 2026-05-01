@@ -3,7 +3,7 @@
 
 import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { HardDrive, Share2, Table as TableIcon, Trash2, Loader2, Database, ChevronRight, X } from 'lucide-react'
+import { HardDrive, Share2, Table as TableIcon, Trash2, Loader2, Database, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 import { toast } from 'sonner'
@@ -13,7 +13,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 
 interface DBStatsProps {
@@ -46,8 +45,8 @@ export function DBStats({ stats }: DBStatsProps) {
 
       toast.success(`Table ${table} cleaned successfully`)
       queryClient.invalidateQueries({ queryKey: ['admin', 'system_health'] })
-    } catch (error: any) {
-      toast.error(error.message)
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'An unknown error occurred')
     } finally {
       setIsCleaning(null)
       setConfirmTable(null)

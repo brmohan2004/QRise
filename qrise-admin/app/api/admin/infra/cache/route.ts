@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Cloudflare usage stats (optional, depends on API access)
-    let kvStats = { size: 'Unknown' };
+    const kvStats = { size: 'Unknown' };
     try {
       const res = await fetch(
         `https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/storage/kv/namespaces/${process.env.CF_KV_NAMESPACE_ID}`,

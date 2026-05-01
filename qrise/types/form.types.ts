@@ -43,7 +43,7 @@ export interface FormSchema {
 export interface FormSubmission {
   id: string;
   formId: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   metadata: {
     ip?: string;
     userAgent?: string;

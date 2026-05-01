@@ -2,20 +2,16 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { usePathname } from "next/navigation"
-import { Menu } from "lucide-react"
+import { Menu, Search } from "lucide-react"
 import { Sheet, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { DocsSidebar, MobileSidebarContent } from "@/components/docs/docs-sidebar"
 import { SearchModal } from "@/components/docs/search-modal"
 import { OnThisPage } from "@/components/docs/on-this-page"
 import { DocsPageSkeleton } from "@/components/docs/docs-page-skeleton"
+import { NAV_SECTIONS } from "@/lib/docs"
 import "./docs-modern.css"
 
-interface Heading {
-  id: string
-  text: string
-  level: 2 | 3
-}
 
 export default function DocsLayoutClient({
   children,
@@ -25,7 +21,7 @@ export default function DocsLayoutClient({
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
-  const [headings, setHeadings] = useState<Heading[]>([])
+
 
   // Listen for Cmd+K
   useEffect(() => {
@@ -40,55 +36,38 @@ export default function DocsLayoutClient({
   }, [])
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
-      {/* Mobile header */}
-      <header className="lg:hidden sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm h-14 px-4">
-        <div className="flex items-center justify-between h-full">
-          <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+    <div className="h-[calc(100vh-4rem)] bg-white flex flex-col overflow-hidden relative">
+      {/* Mobile sub-header (optional, for docs specific actions) */}
+      <header className="lg:hidden shrink-0 bg-white border-b border-gray-100 h-12 px-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+           <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
             <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="md:hidden h-10 w-10"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Menu className="h-4 w-4" />
               </Button>
             </SheetTrigger>
             <MobileSidebarContent onOpenChange={setSidebarOpen} />
           </Sheet>
-          <span className="font-bold font-semibold">API Docs</span>
-          <Button
-            variant="ghost"
-            size="default"
-            className="h-10 px-4"
-            onClick={() => setSearchOpen(true)}
-          >
-            Search
-          </Button>
+          <span className="text-sm font-semibold">API Documentation</span>
         </div>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSearchOpen(true)}>
+          <Search className="h-4 w-4" />
+        </Button>
       </header>
 
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex flex-1 overflow-hidden">
         {/* Desktop sidebar */}
-        <div className="hidden lg:block">
+        <aside className="hidden lg:block w-64 border-r border-gray-100 bg-gray-50/30 overflow-y-auto shrink-0 scrollbar-hide">
           <DocsSidebar onSearchClick={() => setSearchOpen(true)} />
-        </div>
-
-        {/* Main content */}
-        <main className="flex-1 max-w-3xl mx-auto px-4 py-8 w-full overflow-x-hidden modern-docs">
-          <Suspense fallback={<DocsPageSkeleton />}>
-            {children}
-          </Suspense>
-        </main>
-
-        {/* On this page - XL screens only */}
-        <div className="hidden xl:block w-48 py-12 pr-4">
-          {headings.length > 0 && (
-            <div className="sticky top-16">
-              <OnThisPage headings={headings} />
-            </div>
-          )}
+        </aside>
+        
+        {/* Main content area that scrolls independently */}
+        <div className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar">
+          <main className="max-w-4xl mx-auto px-12 py-16 modern-docs">
+            <Suspense fallback={<DocsPageSkeleton />}>
+              {children}
+            </Suspense>
+          </main>
         </div>
       </div>
 

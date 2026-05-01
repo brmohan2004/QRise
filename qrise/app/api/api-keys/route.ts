@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+
+export const dynamic = 'force-dynamic';
+
 import { generateApiKey } from "@/lib/api-key";
 import { db } from "@/lib/db";
 import { apiKeys } from "@/lib/db/schema";

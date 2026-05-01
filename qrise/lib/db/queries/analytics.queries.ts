@@ -1,5 +1,5 @@
 import { db } from '../index';
-import { scanEvents, scanDailyRollups, type ScanEvent, type NewScanEvent, type ScanDailyRollup } from '../schema';
+import { scanEvents, type ScanEvent, type NewScanEvent } from '../schema';
 import { eq, gte, lte, desc, sql, and } from 'drizzle-orm';
 
 export async function logScanEvent(event: NewScanEvent): Promise<ScanEvent> {

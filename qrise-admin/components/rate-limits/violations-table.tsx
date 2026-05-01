@@ -44,7 +44,16 @@ export function ViolationsTable() {
   }
 
   useEffect(() => {
-    fetchViolations()
+    let isMounted = true;
+    const load = async () => {
+      if (isMounted) {
+        await fetchViolations();
+      }
+    };
+    load();
+    return () => {
+      isMounted = false;
+    };
   }, [])
 
   const getActionBadge = (action: string) => {

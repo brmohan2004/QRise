@@ -164,7 +164,7 @@ export function BackupDialog() {
                <AlertCircle className="h-8 w-8 md:h-10 md:w-10 text-slate-300 shrink-0" />
                <div className="space-y-1 md:space-y-2">
                  <p className="text-[9px] md:text-[10px] font-bold text-slate-900 uppercase tracking-[0.3em] mb-1">Large Datasets Note</p>
-                 <p className="text-[11px] md:text-xs text-slate-500 font-medium leading-relaxed">Exports containing more than 10,000 records or 500 assets are processed in the background. You'll receive a secure link via email once your download is ready.</p>
+                 <p className="text-[11px] md:text-xs text-slate-500 font-medium leading-relaxed">Exports containing more than 10,000 records or 500 assets are processed in the background. You&apos;ll receive a secure link via email once your download is ready.</p>
                </div>
             </div>
           </div>

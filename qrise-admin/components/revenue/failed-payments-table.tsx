@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { RefreshCw, Undo, MessageSquare, ArrowDownCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface FailedPayment {
   userId: string;
@@ -46,7 +45,7 @@ export function FailedPaymentsTable({ data, onRefresh }: FailedPaymentsTableProp
       } else {
         toast.error(result.error);
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to trigger retry');
     }
   };
@@ -77,7 +76,7 @@ export function FailedPaymentsTable({ data, onRefresh }: FailedPaymentsTableProp
       } else {
         toast.error(result.error);
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to issue refund');
     }
   };
@@ -98,7 +97,7 @@ export function FailedPaymentsTable({ data, onRefresh }: FailedPaymentsTableProp
       } else {
         toast.error(result.error);
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to downgrade user');
     }
   };

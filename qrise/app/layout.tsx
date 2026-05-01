@@ -42,6 +42,7 @@ export const metadata: Metadata = {
 
 import { ImpersonateBanner } from "@/components/auth/impersonate-banner";
 import { Toaster } from "sonner";
+import { UsageLimitModal } from "@/components/billing/usage-limit-modal";
 
 export default function RootLayout({
   children,
@@ -58,6 +59,7 @@ export default function RootLayout({
         <ImpersonateBanner />
         {children}
         <Toaster position="top-center" richColors />
+        <UsageLimitModal />
       </body>
     </html>
   );

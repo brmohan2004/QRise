@@ -40,8 +40,8 @@ export function JobQueueMonitor({ jobs }: JobQueueMonitorProps) {
       }
       
       queryClient.invalidateQueries({ queryKey: ['admin', 'system_health'] })
-    } catch (error: any) {
-      toast.error(error.message)
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'An unknown error occurred')
     } finally {
       setIsFlushing(false)
     }

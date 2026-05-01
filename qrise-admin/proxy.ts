@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import * as jose from "jose";
+import { User } from "@supabase/supabase-js";
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
@@ -36,7 +37,7 @@ export async function proxy(request: NextRequest) {
     data: { user: supabaseUser },
   } = await supabase.auth.getUser();
 
-  let user = supabaseUser;
+  let user = supabaseUser as User | null;
 
   // Check for .env admin session regardless of Supabase session
   const adminToken = request.cookies.get('admin_session')?.value;
@@ -51,8 +52,10 @@ export async function proxy(request: NextRequest) {
           email: payload.email as string,
           app_metadata: { is_admin: true },
           user_metadata: { is_admin: true },
-          last_sign_in_at: new Date().toISOString()
-        } as unknown as any;
+          last_sign_in_at: new Date().toISOString(),
+          aud: 'authenticated',
+          created_at: new Date().toISOString(),
+        } as unknown as User;
       }
     } catch {
       // Invalid token, fall back to supabaseUser if it exists

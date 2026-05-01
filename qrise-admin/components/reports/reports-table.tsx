@@ -13,7 +13,6 @@ import {
 } from 'lucide-react'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -93,8 +92,9 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
 
       toast.success(`Report ${status}`)
       onUpdate()
-    } catch (error: any) {
-      toast.error(error.message || 'Error updating status')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error updating status'
+      toast.error(message)
     }
   }
 
@@ -114,8 +114,9 @@ export function ReportsTable({ type, data, onUpdate }: ReportsTableProps) {
       toast.success('Report deleted successfully')
       setIsDeleteDialogOpen(false)
       onUpdate()
-    } catch (error: any) {
-      toast.error(error.message || 'Error deleting report')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error deleting report'
+      toast.error(message)
     } finally {
       setIsDeleting(false)
     }

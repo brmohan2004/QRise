@@ -82,7 +82,7 @@ export async function checkAdvancedRateLimit(
           .select('rate_limit_override')
           .eq('id', identifier)
           .single();
-        const castedData = data as any;
+        const castedData = data as { rate_limit_override: Partial<RateLimitConfig> } | null;
         if (castedData?.rate_limit_override) {
           override = castedData.rate_limit_override;
         }
@@ -248,7 +248,7 @@ export async function isIPBlocked(ip: string): Promise<{ blocked: boolean; reaso
   if (cached) return cached;
 
   // 1. Check for exact IP match
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('ip_blocks')
     .select('reason, cidr_range')
     .eq('ip_address', ip)

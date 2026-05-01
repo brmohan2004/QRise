@@ -1,11 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextRequest } from 'next/server'
+import { User } from '@supabase/supabase-js'
 
 export async function verifyAdmin(request: NextRequest) {
   const supabase = await createClient()
   const { data: { user: supabaseUser } } = await supabase.auth.getUser()
-  let user = supabaseUser;
+  let user = supabaseUser as User | null;
 
   // Check for .env admin session regardless of Supabase session
   const adminToken = request.cookies.get('admin_session')?.value;
@@ -21,8 +22,10 @@ export async function verifyAdmin(request: NextRequest) {
           email: payload.email as string,
           app_metadata: { is_admin: true },
           user_metadata: { is_admin: true },
-          last_sign_in_at: new Date().toISOString()
-        } as unknown as any;
+          last_sign_in_at: new Date().toISOString(),
+          aud: 'authenticated',
+          created_at: new Date().toISOString(),
+        } as unknown as User;
       }
     } catch {
       // Invalid token, fall back to supabaseUser

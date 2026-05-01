@@ -134,7 +134,7 @@ export function RevenueTrendChart({ data }: RevenueTrendChartProps) {
                 }}
                 itemStyle={{ color: '#3b82f6', fontWeight: 'bold' }}
                 labelStyle={{ color: '#999', marginBottom: '4px' }}
-                formatter={(value: any) => [`$${value.toLocaleString()}`, 'Revenue']}
+                formatter={(value: unknown) => [`$${Number(value || 0).toLocaleString()}`, 'Revenue']}
               />
               <Area 
                 type="monotone" 

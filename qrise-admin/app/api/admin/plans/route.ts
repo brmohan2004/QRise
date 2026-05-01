@@ -40,12 +40,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: admin.error }, { status: admin.status })
   }
 
-  const body = await request.json()
+  const { 
+    rpm, rpd, max_burst, 
+    image_renders_per_month, embed_renders_per_month, 
+    resolver_calls_per_month, api_calls_per_month,
+    max_webhooks, max_custom_types, max_resolver_timeout_ms,
+    ...planData 
+  } = await request.json()
+  
   const adminClient = createAdminClient()
 
-  const { data, error } = await adminClient
+  // 1. Create Plan
+  const { data: newPlan, error } = await adminClient
     .from('plans')
-    .insert([body])
+    .insert([planData])
     .select()
     .single()
 
@@ -53,15 +61,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  // 2. Create Rate Limits
+  const limitsData = {
+    rpm, rpd, max_burst,
+    image_renders_per_month, embed_renders_per_month,
+    resolver_calls_per_month, api_calls_per_month,
+    max_webhooks, max_custom_types, max_resolver_timeout_ms,
+    plan: newPlan.name.toLowerCase()
+  }
+
+  const { error: limitError } = await adminClient
+    .from('plan_rate_limits')
+    .upsert(limitsData, { onConflict: 'plan' })
+
+  if (limitError) {
+    console.error('Failed to initialize rate limits for new plan:', limitError)
+  }
+
   // Audit log
   await writeAuditLog({
     adminUserId: admin.adminId,
     action: 'plan.create',
     targetType: 'plan',
-    targetId: data.id,
-    details: body,
+    targetId: newPlan.id,
+    details: { ...planData, ...limitsData },
     ipAddress: admin.ipAddress
   })
 
-  return NextResponse.json(data)
+  return NextResponse.json({ ...newPlan, ...limitsData })
 }

@@ -66,7 +66,7 @@ export async function deleteCloudinaryFile(publicId: string): Promise<void> {
   }
 }
 
-export function getDownloadUrl(publicId: string, filename: string): string {
+export function getDownloadUrl(publicId: string, _filename: string): string {
   return cloudinary.url(publicId, {
     flags: 'attachment',
     type: 'upload',

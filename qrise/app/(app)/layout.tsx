@@ -14,12 +14,39 @@ import { cn } from "@/lib/utils";
 
 import { motion } from "framer-motion";
 
+import { useUsageLimit } from "@/lib/hooks/use-usage-limit";
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const { openModal } = useUsageLimit();
+
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 1000 * 60 * 5, // 5 minutes
+        retry: (failureCount, error: any) => {
+          if (error?.status === 429 || error?.message?.includes('429')) return false;
+          return failureCount < 3;
+        },
       },
+      mutations: {
+        onError: (error: any) => {
+          // Detect 429 Rate Limit Errors
+          if (error?.status === 429 || error?.message?.includes('429')) {
+            try {
+              // Try to extract metadata from error message if JSON
+              const message = error.message?.replace('Error: ', '') || '';
+              const data = JSON.parse(message);
+              if (data.error === 'QUOTA_EXCEEDED') {
+                openModal(data.plan || 'free', data.can_enable_overages || false);
+                return;
+              }
+            } catch (e) {
+              // Fallback to defaults
+              openModal('free', false);
+            }
+          }
+        }
+      }
     },
   }));
 

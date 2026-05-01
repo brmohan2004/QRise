@@ -8,6 +8,7 @@ import { UserActionsMenu } from './user-actions-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
+import { Copy, Check } from 'lucide-react'
 
 interface UserColumn {
   id: string
@@ -19,6 +20,35 @@ interface UserColumn {
   created_at: string
   is_suspended: boolean
   avatar_url: string | null
+}
+
+const CopyIdCell = ({ id }: { id: string }) => {
+  const [copied, setCopied] = React.useState(false)
+
+  const onCopy = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    navigator.clipboard.writeText(id)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="flex items-center gap-1.5 group">
+      <span className="text-[10px] font-mono text-gray-600 truncate max-w-[50px] uppercase" title={id}>
+        {id.split('-')[0]}...
+      </span>
+      <button 
+        onClick={onCopy}
+        className="p-1 rounded hover:bg-[#1a1a1a] opacity-0 group-hover:opacity-100 transition-all duration-200"
+      >
+        {copied ? (
+          <Check className="h-3 w-3 text-green-500" />
+        ) : (
+          <Copy className="h-3 w-3 text-gray-600 hover:text-gray-400" />
+        )}
+      </button>
+    </div>
+  )
 }
 
 const columns: ColumnDef<UserColumn>[] = [
@@ -42,6 +72,11 @@ const columns: ColumnDef<UserColumn>[] = [
         </div>
       )
     }
+  },
+  {
+    accessorKey: 'id',
+    header: 'ID',
+    cell: ({ row }) => <CopyIdCell id={row.original.id} />
   },
   {
     accessorKey: 'plan',

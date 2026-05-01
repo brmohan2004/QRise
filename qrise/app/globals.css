@@ -159,3 +159,27 @@ html {
     @apply font-sans;
   }
 }
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--foreground) 20%, transparent);
+}
+
+/* Bottom Sheet Handle */
+.bottom-sheet-handle {
+  width: 40px;
+  height: 4px;
+  background-color: color-mix(in srgb, var(--foreground) 10%, transparent);
+  border-radius: 9999px;
+  margin: 12px auto;
+}

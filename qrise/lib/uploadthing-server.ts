@@ -8,7 +8,7 @@ export async function uploadZipToUploadThing(
   zipBuffer: Uint8Array,
   filename: string
 ): Promise<{ url: string; key: string }> {
-  const blob = new Blob([zipBuffer as any], { type: 'application/zip' });
+  const blob = new Blob([zipBuffer as unknown as BlobPart], { type: 'application/zip' });
   const file = new File([blob], filename, { type: 'application/zip' });
 
   const response = await utapi.uploadFiles(file);
@@ -26,7 +26,7 @@ export async function uploadZipToUploadThing(
 export async function deleteZipFromUploadThing(key: string): Promise<void> {
   try {
     await utapi.deleteFiles(key);
-  } catch (err) {
-    console.error('[UploadThing] Failed to delete:', key, err);
+  } catch (_err) {
+    console.error('[UploadThing] Failed to delete:', key, _err);
   }
 }

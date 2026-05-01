@@ -2,23 +2,22 @@
 
 import { useWizardStore } from "@/stores/qr-wizard.store";
 import { AlertCircle, CheckCircle2, AlertTriangle } from "lucide-react";
-import { calculateScannabilityScore } from "@/lib/qr-generator";
+import { calculateScannabilityScore } from "@/lib/scannability";
 import { useEffect, useState } from "react";
 
 export function ScannabilityScore({ onWarning }: { onWarning?: (warn: boolean) => void }) {
   const { design } = useWizardStore();
   const [score, setScore] = useState(100);
 
-  useEffect(() => {
-    const dotColor = design.dotColor || "#000000";
-    const bgColor = design.bgColor || "#ffffff";
-    
-    // Estimate logo coverage (for a QR, logo typically takes 10-30% when added)
-    // This is an estimate since we don't have actual image dimensions
-    const logoCoverage = design.logoUrl ? 20 : 0;
-    
-    // Use the actual calculateScannabilityScore function from lib
-    const calculated = calculateScannabilityScore(dotColor, bgColor, logoCoverage);
+   useEffect(() => {
+     const dotColor = design.dotColor || "#000000";
+     const bgColor = design.bgColor || "#ffffff";
+     
+     // Estimate logo coverage (for a QR, logo typically takes 10-30% when added)
+     // This is an estimate since we don't have actual image dimensions
+     const logoCoverage = design.logoUrl ? 20 : 0;
+     
+     const calculated = calculateScannabilityScore(dotColor, bgColor, logoCoverage);
     
     setScore(calculated);
     

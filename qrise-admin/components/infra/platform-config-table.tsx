@@ -7,13 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, Save, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { Loader2, Save } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 
 interface ConfigItem {
   key: string;
-  value: any;
+  value: string;
   description: string;
   updated_at: string;
 }
@@ -23,23 +23,24 @@ export function PlatformConfigTable() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchConfigs();
-  }, []);
-
-  async function fetchConfigs() {
+  const fetchConfigs = async () => {
     try {
       const res = await fetch('/api/admin/infra/config');
       const data = await res.json();
       setConfigs(data);
     } catch (error) {
+      console.error('Failed to load platform config:', error);
       toast.error('Failed to load platform config');
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  async function updateConfig(key: string, value: any, reason: string = 'Manual update') {
+  useEffect(() => {
+    fetchConfigs();
+  }, []);
+
+  async function updateConfig(key: string, value: string | boolean, reason: string = 'Manual update') {
     setSaving(key);
     try {
       const res = await fetch('/api/admin/infra/config', {
@@ -53,6 +54,7 @@ export function PlatformConfigTable() {
       toast.success(`${key} updated successfully`);
       fetchConfigs();
     } catch (error) {
+      console.error(`Failed to update ${key}:`, error);
       toast.error(`Failed to update ${key}`);
     } finally {
       setSaving(null);

@@ -2,7 +2,6 @@
 
 import { useWizardStore } from "@/stores/qr-wizard.store";
 import { useRouter } from "next/navigation";
-import type { QRType } from "@/types/qr.types";
 
 export function useWizard() {
   const router = useRouter();
@@ -39,11 +38,18 @@ export function useWizard() {
   const canProceed = () => {
     if (step === 1) return !!qrType;
     if (step === 2) {
-      if (qrType === 'url') return !!(config as any)?.targetUrl;
-      if (qrType === 'smart_routing') return !!(config as any)?.defaultUrl;
-      if (qrType === 'password') return !!(config as any)?.targetUrl && !!(config as any)?.password;
-      if (qrType === 'multi_action') return (config as any)?.actions?.length > 0;
-      if (qrType === 'bulk') return (config as any)?.rows?.length > 0;
+      const c = config as { 
+        targetUrl?: string; 
+        defaultUrl?: string; 
+        password?: string; 
+        actions?: unknown[]; 
+        rows?: unknown[] 
+      };
+      if (qrType === 'url') return !!c.targetUrl;
+      if (qrType === 'smart_routing') return !!c.defaultUrl;
+      if (qrType === 'password') return !!c.targetUrl && !!c.password;
+      if (qrType === 'multi_action') return Array.isArray(c.actions) && c.actions.length > 0;
+      if (qrType === 'bulk') return Array.isArray(c.rows) && c.rows.length > 0;
       return true;
     }
     return true;

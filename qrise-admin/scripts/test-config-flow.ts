@@ -39,7 +39,7 @@ async function testConfigFlow() {
   // 1. Check and Seed Configs
   console.log('--- Step 1: Checking/Seeding Database ---');
   for (const config of DEFAULT_CONFIGS) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('platform_config')
       .select('key')
       .eq('key', config.key)
@@ -87,8 +87,8 @@ async function testConfigFlow() {
       } else {
         console.error(`❌ Redis key mismatch. Expected "true", got "${redisVal}"`);
       }
-    } catch (e: any) {
-      console.error('❌ Redis error:', e.message);
+    } catch (e: unknown) {
+      console.error('❌ Redis error:', e instanceof Error ? e.message : 'Unknown error');
     }
   }
 

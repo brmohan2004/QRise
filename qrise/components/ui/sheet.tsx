@@ -13,7 +13,7 @@ function Sheet({ ...props }: SheetPrimitive.Root.Props) {
 }
 
 function SheetTrigger({ asChild, ...props }: SheetPrimitive.Trigger.Props & { asChild?: boolean }) {
-  const Comp = (asChild ? Slot : SheetPrimitive.Trigger) as any
+  const Comp = (asChild ? Slot : SheetPrimitive.Trigger) as React.ElementType
   return <Comp data-slot="sheet-trigger" {...props} />
 }
 
@@ -30,7 +30,8 @@ function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
     <SheetPrimitive.Backdrop
       data-slot="sheet-overlay"
       className={cn(
-        "fixed inset-0 z-[90] bg-black/40 backdrop-blur-[2px] transition-opacity duration-300",
+        "fixed inset-0 z-[90] bg-black/40 backdrop-blur-[2px] transition-all duration-300",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         className
       )}
       {...props}
@@ -67,7 +68,12 @@ function SheetContent({
         data-slot="sheet-content"
         data-side={side}
         className={cn(
-          "fixed z-[100] bg-white p-0 shadow-2xl transition-transform duration-300",
+          "fixed z-[100] bg-white p-0 shadow-2xl transition-all duration-500 ease-out",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out",
+          side === "bottom" && "data-[state=open]:slide-in-from-bottom-full data-[state=closed]:slide-out-to-bottom-full",
+          side === "left" && "data-[state=open]:slide-in-from-left-full data-[state=closed]:slide-out-to-left-full",
+          side === "right" && "data-[state=open]:slide-in-from-right-full data-[state=closed]:slide-out-to-right-full",
+          side === "top" && "data-[state=open]:slide-in-from-top-full data-[state=closed]:slide-out-to-top-full",
           positionClass,
           sizeClass,
           className

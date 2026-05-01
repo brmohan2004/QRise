@@ -28,9 +28,9 @@ export function PublicHeader({
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-2">
-              <img 
-                src="/logo.png" 
-                alt="QRise Logo" 
+              <img
+                src="/logo.png"
+                alt="QRise Logo"
                 className="h-10 w-10 object-contain"
               />
               <span className="text-xl font-bold text-gray-900">QRise</span>
@@ -52,7 +52,7 @@ export function PublicHeader({
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
-            <button 
+            <button
               onClick={onOpenFeedback}
               className="p-2 text-gray-400 hover:text-gray-900 transition-colors"
               title="Send Feedback"
@@ -67,7 +67,7 @@ export function PublicHeader({
             </Link>
             <Link
               href="/register"
-              className="text-sm font-medium text-white bg-[#0F6E56] px-4 py-2 rounded-lg hover:bg-[#0d5c48] transition-colors"
+              className="text-sm font-medium text-white bg-[#0F6E56] px-4 py-2 rounded-full hover:bg-[#0d5c48] transition-colors"
             >
               Start free
             </Link>
@@ -75,13 +75,13 @@ export function PublicHeader({
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-2">
-            <button 
+            <button
               onClick={onOpenFeedback}
               className="p-2 text-gray-400 hover:text-gray-900 transition-colors"
             >
               <Flag className="h-5 w-5" />
             </button>
-            <button 
+            <button
               onClick={onOpenMobileMenu}
               className="p-2 text-gray-600 hover:text-gray-900"
             >

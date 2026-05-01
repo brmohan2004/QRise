@@ -9,7 +9,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, Save, Info } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Loader2, Save, Info, Zap, Monitor, Database } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -73,8 +74,19 @@ const planSchema = z.object({
   form_file_upload_limit: z.number().nullable(),
   form_submission_limit: z.number().nullable(),
 
-  csv_export_limit: z.number().nullable(),
   analytics_export_days: z.number(),
+  
+  // Infrastructure & API Quotas
+  rpm: z.number().min(1),
+  rpd: z.number().min(1),
+  max_burst: z.number().min(1),
+  image_renders_per_month: z.number().min(0),
+  embed_renders_per_month: z.number().min(0),
+  resolver_calls_per_month: z.number().min(0),
+  api_calls_per_month: z.number().min(0),
+  max_webhooks: z.number().min(0),
+  max_custom_types: z.number().min(0),
+  max_resolver_timeout_ms: z.number().min(0),
 })
 
 interface PlanEditorFormProps {
@@ -137,6 +149,16 @@ export function PlanEditorForm({ initialData, id }: PlanEditorFormProps) {
       form_submission_limit: null,
       csv_export_limit: null,
       analytics_export_days: 30,
+      rpm: 60,
+      rpd: 5000,
+      max_burst: 10,
+      image_renders_per_month: 1000,
+      embed_renders_per_month: 1000,
+      resolver_calls_per_month: 5000,
+      api_calls_per_month: 10000,
+      max_webhooks: 5,
+      max_custom_types: 10,
+      max_resolver_timeout_ms: 10000,
     },
   })
 
@@ -160,8 +182,8 @@ export function PlanEditorForm({ initialData, id }: PlanEditorFormProps) {
         const data = await res.json()
         throw new Error(data.error || 'Failed to save plan')
       }
-    } catch (err: any) {
-      toast.error(err.message || 'Error saving plan')
+    } catch (err: unknown) {
+      toast.error((err as Error).message || 'Error saving plan')
     } finally {
       setIsLoading(false)
     }
@@ -328,6 +350,84 @@ export function PlanEditorForm({ initialData, id }: PlanEditorFormProps) {
                   </div>
                 </div>
               )}
+
+              {/* Section 2.1: Infrastructure & API Quotas */}
+              <div className="p-4 bg-[#0a0a0a] rounded-lg border border-[#222] space-y-6">
+                <div className="flex items-center justify-between border-b border-[#222] pb-2">
+                  <h3 className="text-sm font-bold flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-amber-500" />
+                    Infrastructure & API Quotas
+                  </h3>
+                  <Badge variant="outline" className="text-[9px] uppercase border-[#333] text-gray-500">Technical Limits</Badge>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold text-gray-400">Requests Per Minute (RPM)</Label>
+                    <Input type="number" {...form.register('rpm', { valueAsNumber: true })} className="h-9 bg-black border-[#222] text-sm font-mono" />
+                    <p className="text-[10px] text-gray-500 italic">Global throttling per key</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold text-gray-400">Requests Per Day (RPD)</Label>
+                    <Input type="number" {...form.register('rpd', { valueAsNumber: true })} className="h-9 bg-black border-[#222] text-sm font-mono" />
+                    <p className="text-[10px] text-gray-500 italic">Daily cap for the tier</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold text-gray-400">Burst Limit</Label>
+                    <Input type="number" {...form.register('max_burst', { valueAsNumber: true })} className="h-9 bg-black border-[#222] text-sm font-mono" />
+                    <p className="text-[10px] text-gray-500 italic">Token bucket size</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 pt-4 border-t border-[#111]">
+                  <div className="space-y-4">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-600 flex items-center gap-2">
+                      <Monitor className="h-3 w-3" /> Rendering Quotas
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="text-[11px]">Image Renders/mo</Label>
+                        <Input type="number" {...form.register('image_renders_per_month', { valueAsNumber: true })} className="h-8 bg-black border-[#222] text-xs" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-[11px]">Embed Renders/mo</Label>
+                        <Input type="number" {...form.register('embed_renders_per_month', { valueAsNumber: true })} className="h-8 bg-black border-[#222] text-xs" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-600 flex items-center gap-2">
+                      <Database className="h-3 w-3" /> Backend Limits
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="text-[11px]">Resolver Calls/mo</Label>
+                        <Input type="number" {...form.register('resolver_calls_per_month', { valueAsNumber: true })} className="h-8 bg-black border-[#222] text-xs" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-[11px]">Resolver Timeout (ms)</Label>
+                        <Input type="number" {...form.register('max_resolver_timeout_ms', { valueAsNumber: true })} className="h-8 bg-black border-[#222] text-xs" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-[#111] grid grid-cols-3 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px]">API Calls/mo</Label>
+                    <Input type="number" {...form.register('api_calls_per_month', { valueAsNumber: true })} className="h-8 bg-black border-[#222] text-xs" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px]">Webhooks Max</Label>
+                    <Input type="number" {...form.register('max_webhooks', { valueAsNumber: true })} className="h-8 bg-black border-[#222] text-xs" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px]">Custom Types Max</Label>
+                    <Input type="number" {...form.register('max_custom_types', { valueAsNumber: true })} className="h-8 bg-black border-[#222] text-xs" />
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

@@ -10,7 +10,7 @@ export interface CloudinaryUploadResult {
 export async function uploadFileToCloudinary(
   file: File,
   folder: string,
-  onProgress?: (percent: number) => void
+  _onProgress?: (percent: number) => void
 ): Promise<CloudinaryUploadResult> {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   if (!cloudName) throw new Error('NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME not set');

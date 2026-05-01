@@ -24,6 +24,15 @@ export interface ResolvedQR {
   isActive: boolean;
   passwordHash?: string;
   label?: string;
+  // Custom type fields
+  customTypeSlug?: string;
+  customTypePayload?: Record<string, unknown>;
+  resolverId?: string;
+  resolverUrl?: string;
+  resolverSecret?: string;
+  timeoutMs?: number;
+  fallbackUrl?: string;
+  fallbackHtml?: string;
 }
 
 export interface RoutingRule {
@@ -116,4 +125,7 @@ export interface WorkerEnv {
   SUPABASE_URL: string;
   SUPABASE_SERVICE_KEY: string;
   APP_URL: string;
+  INTERNAL_API_URL: string;
+  INTERNAL_SECRET: string;
+  MAX_TIMEOUT_MS?: number;
 }

@@ -43,7 +43,13 @@ export function IPBlocksTable() {
   }
 
   useEffect(() => {
-    fetchBlocks()
+    let isMounted = true
+    const load = async () => {
+      await fetchBlocks()
+      if (!isMounted) return
+    }
+    load()
+    return () => { isMounted = false }
   }, [])
 
   const unblockIP = async (id: string, ip: string) => {
@@ -59,8 +65,8 @@ export function IPBlocksTable() {
       } else {
         toast.error('Failed to unblock IP')
       }
-    } catch (error) {
-      toast.error('An error occurred')
+    } catch (_error) {
+      toast.error('Failed to update webhook')
     }
   }
 
@@ -115,7 +121,7 @@ export function IPBlocksTable() {
                     )}
                   </TableCell>
                   <TableCell className="max-w-[300px] text-sm italic">
-                    "{b.reason}"
+                    &ldquo;{b.reason}&rdquo;
                   </TableCell>
                   <TableCell>
                     <Badge variant={b.block_type === 'permanent' ? 'destructive' : 'secondary'}>

@@ -18,6 +18,12 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from '@/components/ui/badge'
 
+interface Plan {
+  id: string
+  name: string
+  price_monthly: number
+}
+
 interface UserActionsPanelProps {
   userId: string
   isSuspended: boolean
@@ -29,7 +35,7 @@ export function UserActionsPanel({ userId, isSuspended, currentPlanName }: UserA
   const queryClient = useQueryClient()
   const [isLoading, setIsLoading] = useState(false)
   const [activeDialog, setActiveDialog] = useState<'suspend' | 'delete' | 'impersonate' | 'plan' | null>(null)
-  const [plans, setPlans] = useState<any[]>([])
+  const [plans, setPlans] = useState<Plan[]>([])
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -58,8 +64,8 @@ export function UserActionsPanel({ userId, isSuspended, currentPlanName }: UserA
       } else {
         throw new Error(data.error || 'Failed to impersonate')
       }
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Failed to impersonate')
     } finally {
       setIsLoading(false)
       setActiveDialog(null)
@@ -76,8 +82,8 @@ export function UserActionsPanel({ userId, isSuspended, currentPlanName }: UserA
       toast.success(`User account ${isSuspended ? 'unsuspended' : 'suspended'} successfully`)
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
       router.refresh()
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsLoading(false)
       setActiveDialog(null)
@@ -99,8 +105,8 @@ export function UserActionsPanel({ userId, isSuspended, currentPlanName }: UserA
       toast.success('User plan updated successfully')
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
       router.refresh()
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsLoading(false)
       setActiveDialog(null)
@@ -115,12 +121,12 @@ export function UserActionsPanel({ userId, isSuspended, currentPlanName }: UserA
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ confirm: true })
       })
-      if (!res.ok) throw new Error('Failed to delete user')
+      if (!res.ok) throw new Error('Failed to delete user&apos;s account')
       
       toast.success('User account deleted permanently')
       router.push('/users')
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Failed to delete user')
     } finally {
       setIsLoading(false)
       setActiveDialog(null)
@@ -193,7 +199,7 @@ export function UserActionsPanel({ userId, isSuspended, currentPlanName }: UserA
           <DialogHeader>
             <DialogTitle>Modify Subscription Plan</DialogTitle>
             <DialogDescription className="text-gray-400">
-              Change the user's current plan and associated limits.
+              Change the user&apos;s current plan and associated limits.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-2">

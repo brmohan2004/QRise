@@ -86,7 +86,7 @@ function DropdownMenuItem({
   variant?: "default" | "destructive"
   asChild?: boolean
 }) {
-  const Comp = (asChild ? Slot : MenuPrimitive.Item) as any
+  const Comp = (asChild ? Slot : MenuPrimitive.Item) as React.ElementType
   return (
     <Comp
       data-slot="dropdown-menu-item"

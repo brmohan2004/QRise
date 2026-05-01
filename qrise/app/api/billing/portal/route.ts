@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
+
 import { stripe } from '@/lib/stripe';
 import { createClient } from '@/lib/supabase/server';
 import { db } from '@/lib/db';

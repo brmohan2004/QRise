@@ -28,10 +28,16 @@ interface RefundManagerProps {
   onOpenChange: (open: boolean) => void;
 }
 
+interface PaymentData {
+  id: string;
+  amount_cents: number;
+  created_at: string;
+}
+
 export function RefundManager({ open, onOpenChange }: RefundManagerProps) {
   const [email, setEmail] = useState('');
   const [searching, setSearching] = useState(false);
-  const [userPayments, setUserPayments] = useState<any[] | null>(null);
+  const [userPayments, setUserPayments] = useState<PaymentData[] | null>(null);
   const [refunding, setRefunding] = useState<string | null>(null);
 
   const searchUser = async () => {
@@ -51,7 +57,7 @@ export function RefundManager({ open, onOpenChange }: RefundManagerProps) {
       const res = await fetch(`/api/admin/revenue/logs?userId=${user.id}&status=succeeded`);
       const data = await res.json();
       setUserPayments(data);
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to search for user');
     } finally {
       setSearching(false);
@@ -80,7 +86,7 @@ export function RefundManager({ open, onOpenChange }: RefundManagerProps) {
       } else {
         toast.error(result.error);
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to initialize refund');
     } finally {
       setRefunding(null);

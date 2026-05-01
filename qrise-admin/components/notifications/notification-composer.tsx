@@ -26,7 +26,7 @@ export function NotificationComposer() {
   const [targetType, setTargetType] = useState('all')
   const [targetId, setTargetId] = useState('')
   const [targetPlan, setTargetPlan] = useState('')
-  const [segment, setSegment] = useState<Record<string, any>>({ type: 'all' })
+  const [segment, setSegment] = useState<Record<string, unknown>>({ type: 'all' })
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
   const [estimate, setEstimate] = useState<number | null>(null)
@@ -116,7 +116,7 @@ export function NotificationComposer() {
           <div className="space-y-4 pt-4 border-t border-[#111]">
             <div className="space-y-2">
               <Label className="text-white">Communication Category</Label>
-              <Select value={category} onValueChange={(v: any) => setCategory(v)}>
+              <Select value={category} onValueChange={(v: string) => setCategory(v as 'alert' | 'broadcast')}>
                 <SelectTrigger className="bg-black border-[#222] text-white">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
