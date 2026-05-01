@@ -1,13 +1,12 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 
 const CATEGORIES = [
-  { value: 'all', label: 'All Categories' },
+  { value: 'all', label: 'Categories' },
   { value: 'healthcare', label: 'Healthcare' },
   { value: 'hospitality', label: 'Hospitality' },
   { value: 'retail', label: 'Retail' },
@@ -37,51 +36,53 @@ export function MarketplaceFilters() {
     router.push(`/marketplace?${createQueryString('search', term)}`);
   };
 
-  const handleCategoryChange = (category: string | null) => {
-    router.push(`/marketplace?${createQueryString('category', category || 'all')}`);
+  const handleCategoryChange = (category: string) => {
+    router.push(`/marketplace?${createQueryString('category', category)}`);
   };
 
-  const handleSortChange = (sort: string | null) => {
-    router.push(`/marketplace?${createQueryString('sort', sort || 'newest')}`);
+  const handleSortChange = (sort: string) => {
+    router.push(`/marketplace?${createQueryString('sort', sort)}`);
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50 p-5 rounded-2xl border border-gray-100 shadow-sm">
-      <div className="relative w-full md:max-w-md">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <Input 
-          placeholder="Search custom types..." 
-          className="pl-11 h-10 bg-white border-gray-100 text-gray-900 placeholder:text-gray-400 focus:ring-primary focus:border-primary rounded-xl shadow-sm transition-all text-xs"
-          onChange={(e) => handleSearch(e.target.value)}
-          defaultValue={searchParams.get('search') || ''}
-        />
-      </div>
-      
-      <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-        <div className="flex items-center gap-2 flex-1 md:flex-none">
-          <Select onValueChange={handleCategoryChange} defaultValue={searchParams.get('category') || 'all'}>
-            <SelectTrigger className="w-full md:w-[180px] h-10 bg-white border-gray-100 text-gray-900 rounded-xl shadow-sm focus:ring-primary text-xs">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border-gray-100 rounded-xl shadow-xl">
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-col md:flex-row gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+          <Input 
+            placeholder="Search custom types..." 
+            className="pl-8 h-7 sm:h-8 bg-white border-gray-100 rounded-xl text-[11px] font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
+            onChange={(e) => handleSearch(e.target.value)}
+            defaultValue={searchParams.get('search') || ''}
+          />
+        </div>
+        
+        <div className="flex flex-wrap sm:flex-nowrap gap-1.5 items-center">
+          <div className="flex-1 sm:flex-none">
+            <select 
+              value={searchParams.get('category') || 'all'}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              className="w-full sm:w-auto h-7 sm:h-8 bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none cursor-pointer shadow-sm"
+            >
               {CATEGORIES.map((cat) => (
-                <SelectItem key={cat.value} value={cat.value} className="text-[11px] font-bold py-2 rounded-lg">
+                <option key={cat.value} value={cat.value}>
                   {cat.label}
-                </SelectItem>
+                </option>
               ))}
-            </SelectContent>
-          </Select>
+            </select>
+          </div>
 
-          <Select onValueChange={handleSortChange} defaultValue={searchParams.get('sort') || 'newest'}>
-            <SelectTrigger className="w-full md:w-[140px] h-10 bg-white border-gray-100 text-gray-900 rounded-xl shadow-sm focus:ring-primary text-xs">
-              <SelectValue placeholder="Sort By" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border-gray-100 rounded-xl shadow-xl">
-              <SelectItem value="newest" className="text-[11px] font-bold py-2 rounded-lg">Newest</SelectItem>
-              <SelectItem value="most_used" className="text-[11px] font-bold py-2 rounded-lg">Most Used</SelectItem>
-              <SelectItem value="most_scans" className="text-[11px] font-bold py-2 rounded-lg">Most Scans</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex-1 sm:flex-none">
+            <select 
+              value={searchParams.get('sort') || 'newest'}
+              onChange={(e) => handleSortChange(e.target.value)}
+              className="w-full sm:w-auto h-7 sm:h-8 bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none cursor-pointer shadow-sm"
+            >
+              <option value="newest">Newest</option>
+              <option value="most_used">Most Used</option>
+              <option value="most_scans">Most Scans</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>

@@ -7,8 +7,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState, Suspense, useEffect } from "react";
 import { GeneralDialog } from "@/components/settings/general-dialog";
 import { BackupDialog } from "@/components/settings/backup-dialog";
-import { BillingDialog } from "@/components/settings/billing-dialog";
-import { UsageDialog } from "@/components/settings/usage-dialog";
+import { ManagementDialog } from "@/components/app/management-dialog";
 import { useSidebarStore } from "@/stores/sidebar.store";
 import { cn } from "@/lib/utils";
 
@@ -81,8 +80,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <Suspense fallback={null}>
         <GeneralDialog />
         <BackupDialog />
-        <BillingDialog />
-        <UsageDialog />
+        <ManagementDialog />
       </Suspense>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

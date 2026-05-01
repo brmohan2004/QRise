@@ -6,29 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-const PLANS = [
-  {
-    id: "free",
-    name: "Free",
-    price: "$0",
-    description: "For personal projects",
-    features: ["1k API Calls/mo", "No Custom Types", "Basic Analytics"],
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: "$29",
-    description: "For growing developers",
-    features: ["50k API Calls/mo", "25 Custom Types", "Webhooks", "Priority Support"],
-  },
-  {
-    id: "business",
-    name: "Business",
-    price: "$99",
-    description: "For scaling enterprises",
-    features: ["Unlimited API Calls", "Unlimited Custom Types", "Custom Domains", "SLA Guarantee"],
-  }
-];
 
 export function PlanSelector() {
   const { data: user } = useQuery({
@@ -39,15 +16,41 @@ export function PlanSelector() {
     }
   });
 
+  const { data: plansList, isLoading } = useQuery({
+    queryKey: ["available-plans"],
+    queryFn: async () => {
+      const res = await fetch("/api/plans");
+      return (await res.json()).data;
+    }
+  });
+
   const currentPlan = user?.plan?.name?.toLowerCase() || "free";
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-64 bg-slate-100 rounded-[2.5rem]" />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {PLANS.map((plan) => {
-        const isCurrent = plan.id === currentPlan;
+      {plansList?.map((plan: any) => {
+        const isCurrent = plan.name.toLowerCase() === currentPlan;
+        const features = [
+          plan.hasAnalytics && "Advanced Analytics",
+          plan.hasApiAccess && "API Access",
+          plan.hasBulkGenerator && "Bulk Generator",
+          plan.hasSmartRouting && "Smart Routing",
+          plan.monthlyScanLimit !== -1 ? `${plan.monthlyScanLimit.toLocaleString()} Scans` : "Unlimited Scans",
+          plan.dynamicQrLimit !== -1 ? `${plan.dynamicQrLimit.toLocaleString()} Dynamic QRs` : "Unlimited Dynamic QRs",
+        ].filter(Boolean);
         
         return (
-          <Card key={plan.name} className={cn(
+          <Card key={plan.id} className={cn(
             "p-8 rounded-[2.5rem] border transition-all",
             isCurrent ? "border-primary bg-primary/5 ring-1 ring-primary/20" : "border-gray-100 bg-white"
           )}>
@@ -55,22 +58,22 @@ export function PlanSelector() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-black text-gray-900">{plan.name}</h3>
-                  <p className="text-xs text-gray-500 font-medium">{plan.description}</p>
+                  <p className="text-xs text-gray-500 font-medium line-clamp-1">{plan.description}</p>
                 </div>
                 {isCurrent && (
                   <span className="px-3 py-1 bg-primary text-white rounded-full text-[8px] font-black uppercase tracking-widest">
-                    Current Plan
+                    Current
                   </span>
                 )}
               </div>
 
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-gray-900">{plan.price}</span>
+                <span className="text-3xl font-black text-gray-900">${plan.priceMonthly}</span>
                 <span className="text-xs font-bold text-gray-400">/mo</span>
               </div>
 
               <div className="space-y-3">
-                {plan.features.map((f) => (
+                {features.map((f: string) => (
                   <div key={f} className="flex items-center gap-3">
                     <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
                       <Check className="h-3 w-3 text-emerald-600" />
@@ -84,11 +87,11 @@ export function PlanSelector() {
                 variant={isCurrent ? "outline" : "default"}
                 className={cn(
                   "w-full h-12 rounded-xl font-black uppercase text-[10px] tracking-widest",
-                  isCurrent ? "border-primary text-primary hover:bg-primary/5" : ""
+                  isCurrent ? "border-primary text-primary hover:bg-primary/5" : "bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200"
                 )}
                 disabled={isCurrent}
               >
-                {isCurrent ? "Manage Subscription" : "Upgrade Now"}
+                {isCurrent ? "Active Plan" : "Upgrade Now"}
               </Button>
             </div>
           </Card>

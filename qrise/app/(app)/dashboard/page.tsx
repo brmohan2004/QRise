@@ -30,10 +30,13 @@ export default function DashboardPage() {
     },
   });
 
-  // Redirect to onboarding if user has no QRs
+  // Redirect to onboarding if user has no QRs and hasn't skipped
   useEffect(() => {
     if (qrData && qrData.total === 0) {
-      router.push("/onboarding");
+      const skipped = localStorage.getItem("skipped_onboarding");
+      if (!skipped) {
+        router.push("/onboarding");
+      }
     }
   }, [qrData, router]);
 

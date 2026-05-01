@@ -145,7 +145,7 @@ export default function QrCodesPage() {
     <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 leading-tight">My QR Codes</h1>
+          <h1 className="text-lg sm:text-2xl font-black tracking-tight text-gray-900 leading-tight">My QR Codes</h1>
           <p className="text-xs text-gray-500 mt-1 leading-relaxed">Manage and track your QR performance.</p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -161,7 +161,7 @@ export default function QrCodesPage() {
           </Button>
           <Link 
             href="/create" 
-            className="flex-1 sm:flex-none h-10 bg-gray-900 hover:bg-black text-white px-6 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm"
+            className="flex-1 sm:flex-none h-9 sm:h-10 bg-gray-900 hover:bg-black text-white px-4 sm:px-6 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm"
           >
             <Plus className="h-4 w-4" />
             Create QR
@@ -176,7 +176,7 @@ export default function QrCodesPage() {
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
               <Input 
                 placeholder="Search..." 
-                className="pl-8 h-8 bg-white border-gray-100 rounded-xl text-[11px] font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
+                className="pl-8 h-7 sm:h-8 bg-white border-gray-100 rounded-xl text-[11px] font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
@@ -185,7 +185,7 @@ export default function QrCodesPage() {
               variant="outline" 
               onClick={() => setIsSelectionMode(!isSelectionMode)}
               className={cn(
-                "md:hidden rounded-xl font-black text-[9px] uppercase tracking-widest transition-all h-8 px-3 gap-1.5 shadow-sm border-gray-100",
+                "md:hidden rounded-xl font-black text-[9px] uppercase tracking-widest transition-all h-7 px-3 gap-1.5 shadow-sm border-gray-100",
                 isSelectionMode 
                   ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
                   : "bg-white text-gray-500 hover:text-emerald-600 hover:bg-emerald-50"
@@ -201,7 +201,7 @@ export default function QrCodesPage() {
               <select 
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="w-full sm:w-auto h-8 bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none cursor-pointer shadow-sm"
+                className="w-full sm:w-auto h-7 sm:h-8 bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none cursor-pointer shadow-sm"
               >
                 <option value="all">Types</option>
                 <option value="url">URL</option>
@@ -213,7 +213,7 @@ export default function QrCodesPage() {
               <select 
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full sm:w-auto h-8 bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none cursor-pointer shadow-sm"
+                className="w-full sm:w-auto h-7 sm:h-8 bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none cursor-pointer shadow-sm"
               >
                 <option value="all">Status</option>
                 <option value="active">Active</option>
@@ -225,7 +225,7 @@ export default function QrCodesPage() {
               <select 
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-full sm:w-auto h-8 bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none cursor-pointer shadow-sm"
+                className="w-full sm:w-auto h-7 sm:h-8 bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none cursor-pointer shadow-sm"
               >
                 <option value="newest">Newest</option>
                 <option value="scans">Scans</option>
@@ -267,13 +267,13 @@ export default function QrCodesPage() {
           <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <Search className="h-8 w-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">You haven't created any QR codes yet</h3>
-          <p className="text-gray-500 mb-6 max-w-md mx-auto">
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">You haven't created any QR codes yet</h3>
+          <p className="text-gray-500 text-xs sm:text-sm mb-6 max-w-md mx-auto">
             Create your first dynamic QR code to start tracking scans and engaging your audience.
           </p>
           <Link 
             href="/create" 
-            className="inline-flex items-center gap-2 bg-[#0F6E56] hover:bg-[#0d5c48] text-white px-5 py-2.5 rounded-lg font-medium transition-colors"
+            className="inline-flex items-center gap-2 bg-[#0F6E56] hover:bg-[#0d5c48] text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-colors"
           >
             Create your first QR
           </Link>

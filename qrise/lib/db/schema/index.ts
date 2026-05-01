@@ -28,8 +28,24 @@ import { notifications, userNotifications } from './notifications';
 // Feedback
 import { platformFeedback, platformFeedbackRelations, type PlatformFeedback, type NewPlatformFeedback } from './platform-feedback';
 
-// Billing
-import { billingEvents, type BillingEvent, type NewBillingEvent } from './billing';
+// Billing & Usage (Unified)
+import { 
+  billingEvents, 
+  usageMonthlySnapshots, 
+  planRateLimits, 
+  usageAlertChannels,
+  userRateLimitOverrides,
+  type BillingEvent, 
+  type NewBillingEvent,
+  type UsageMonthlySnapshot,
+  type NewUsageMonthlySnapshot,
+  type PlanRateLimit,
+  type NewPlanRateLimit,
+  type UsageAlertChannel,
+  type NewUsageAlertChannel,
+  type UserRateLimitOverride,
+  type NewUserRateLimitOverride
+} from './billing';
 
 // Admin
 import { adminAuditLog, platformConfig, maintenanceWindows, announcements } from './admin';
@@ -44,16 +60,12 @@ import { ipBlocks, rateLimitViolations } from './security';
 // Features
 import { featuresQuiz, abuseReports } from './features';
 
-// NEW: Rate limits & custom types
-import { planRateLimits, type PlanRateLimit, type NewPlanRateLimit } from './plan-rate-limits';
+// NEW: Custom types
 import { customQrTypes, type CustomQrType, type NewCustomQrType } from './custom-qr-types';
 import { typeResolvers, type TypeResolver, type NewTypeResolver } from './type-resolvers';
 import { resolverCalls, type ResolverCall, type NewResolverCall } from './resolver-calls';
 import { typeTemplates, type TypeTemplate, type NewTypeTemplate } from './type-templates';
-import { usageMonthlySnapshots, type UsageMonthlySnapshot, type NewUsageMonthlySnapshot } from './usage-monthly-snapshots';
 import { typeMarketplaceSubmissions, type TypeMarketplaceSubmission, type NewTypeMarketplaceSubmission } from './type-marketplace-submissions';
-import { userRateLimitOverrides, type UserRateLimitOverride, type NewUserRateLimitOverride } from './user-rate-limit-overrides';
-import { usageAlertChannels, type UsageAlertChannel, type NewUsageAlertChannel } from './usage-alert-channels';
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({

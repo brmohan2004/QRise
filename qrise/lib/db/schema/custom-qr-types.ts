@@ -16,7 +16,7 @@ export const customQrTypes = pgTable(
     isVerified: boolean('is_verified').default(false),
     isSuspended: boolean('is_suspended').default(false),
     suspendReason: text('suspend_reason'),
-    scanCount: bigint('scan_count', { mode: 'bigint' }).default(0n),
+    scanCount: bigint('scan_count', { mode: 'number' }).default(0),
     version: integer('version').default(1),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),

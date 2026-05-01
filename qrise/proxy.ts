@@ -41,7 +41,8 @@ export default async function middleware(request: NextRequest) {
   const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
   const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-  if (redisUrl && redisToken) {
+  // Skip Redis check in development to avoid local timeouts and speed up page loads
+  if (process.env.NODE_ENV === 'production' && redisUrl && redisToken) {
     try {
       const redis = new Redis({
         url: redisUrl,
@@ -50,13 +51,13 @@ export default async function middleware(request: NextRequest) {
 
       // Use a short timeout to prevent hanging the entire request if Redis is unreachable
       const timeout = (ms: number) => new Promise((_, reject) => setTimeout(() => reject(new Error('Redis timeout')), ms));
-      
+
       const maintenancePromise = redis.get('platform:maintenance');
       const readOnlyPromise = redis.get('platform:read_only');
 
       const [maintenanceRes, readOnlyRes] = await Promise.race([
         Promise.all([maintenancePromise, readOnlyPromise]),
-        timeout(1000) // Reduced to 1s
+        timeout(4000) // Increased to 4s
       ]) as [string | null, string | null];
 
       isMaintenance = maintenanceRes === 'true';
@@ -89,6 +90,9 @@ export default async function middleware(request: NextRequest) {
     '/api/cron/',
     '/api/webhooks/deliver',
     '/api/bulk/process',
+    '/explore',
+    '/marketplace',
+    '/api/marketplace',
   ];
 
   // Essential paths that bypass maintenance mode even for non-admins (e.g., webhooks, cron, auth)
@@ -113,7 +117,7 @@ export default async function middleware(request: NextRequest) {
     '/api-manager',
     '/settings',
     '/onboarding',
-    '/marketplace',
+    '/developer',
   ];
   const isProtectedPath = protectedPaths.some((path) => pathname.startsWith(path));
 
@@ -123,6 +127,12 @@ export default async function middleware(request: NextRequest) {
 
   // ── API routes (non-public) require auth via header or session ──
   const isApiRoute = pathname.startsWith('/api/') && !isPublicPath;
+
+  // ── Public Marketplace Rewrite ──
+  // If guest visits /marketplace, show them the marketing page (/explore)
+  if (pathname === '/marketplace' && !user) {
+    return NextResponse.rewrite(new URL('/explore', request.url));
+  }
 
   if (isProtectedPath && !user) {
     const url = new URL('/login', request.url);

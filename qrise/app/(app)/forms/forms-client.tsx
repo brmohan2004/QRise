@@ -178,7 +178,7 @@ export default function FormsClient() {
     <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 leading-tight">Form Studio</h1>
+          <h1 className="text-lg sm:text-2xl font-black tracking-tight text-gray-900 leading-tight">Form Studio</h1>
           <p className="text-xs text-gray-500 mt-1 leading-relaxed">Create, manage, and analyze your lead capture forms.</p>
         </div>
 
@@ -194,7 +194,7 @@ export default function FormsClient() {
 
           <Button 
             onClick={handleCreateNew} 
-            className="flex-1 sm:flex-none bg-gray-900 hover:bg-gray-800 text-white h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm gap-2"
+            className="flex-1 sm:flex-none bg-gray-900 hover:bg-gray-800 text-white h-9 sm:h-10 px-4 sm:px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm gap-2"
           >
             <Plus className="h-4 w-4" />
             Create Form
@@ -209,7 +209,7 @@ export default function FormsClient() {
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
             <Input 
               placeholder="Search forms..." 
-              className="pl-8 h-8 rounded-xl border-gray-100 bg-white focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-[11px] font-medium"
+              className="pl-8 h-7 sm:h-8 rounded-xl border-gray-100 bg-white focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-[11px] font-medium"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -220,7 +220,7 @@ export default function FormsClient() {
             size="sm"
             onClick={() => setIsSelectionMode(!isSelectionMode)}
             className={cn(
-              "h-8 px-3 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all gap-1.5 border-gray-100 shadow-sm",
+              "h-7 sm:h-8 px-3 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all gap-1.5 border-gray-100 shadow-sm",
               isSelectionMode 
                 ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
                 : "bg-white text-gray-500 hover:text-emerald-600 hover:bg-emerald-50"
@@ -236,7 +236,7 @@ export default function FormsClient() {
             <select 
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-8 flex-1 sm:flex-none bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all shadow-sm"
+              className="h-7 sm:h-8 flex-1 sm:flex-none bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all shadow-sm"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -246,7 +246,7 @@ export default function FormsClient() {
             <select 
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="h-8 flex-1 sm:flex-none bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all shadow-sm"
+              className="h-7 sm:h-8 flex-1 sm:flex-none bg-white border border-gray-100 rounded-xl px-2.5 text-[9px] font-black uppercase tracking-widest text-gray-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all shadow-sm"
             >
               <option value="newest">Newest first</option>
               <option value="submissions">Most submissions</option>
@@ -287,11 +287,11 @@ export default function FormsClient() {
           <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <FileText className="h-8 w-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No forms found</h3>
-          <p className="text-gray-500 mb-6 max-w-md mx-auto">
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No forms found</h3>
+          <p className="text-gray-500 text-xs sm:text-sm mb-6 max-w-md mx-auto">
             Start collecting data by creating your first dynamic form.
           </p>
-          <Button onClick={handleCreateNew} className="bg-[#0F6E56] hover:bg-[#0d5c48] text-white px-5 py-2.5 rounded-lg font-medium transition-colors">
+          <Button onClick={handleCreateNew} className="bg-[#0F6E56] hover:bg-[#0d5c48] text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-colors">
             Create Form
           </Button>
         </div>

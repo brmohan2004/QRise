@@ -164,12 +164,12 @@ export function NotificationDropdown() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger
-          className="relative flex items-center justify-center h-10 w-10 rounded-xl hover:bg-muted/50 transition-all outline-none text-muted-foreground hover:text-foreground border border-transparent hover:border-muted-foreground/10 group"
+          className="relative flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-xl hover:bg-muted/50 transition-all outline-none text-muted-foreground hover:text-foreground border border-transparent hover:border-muted-foreground/10 group"
           aria-label={`View ${unreadCount} notifications`}
         >
-          <Bell className="h-5 w-5 group-hover:scale-110 transition-transform" />
+          <Bell className="h-4 w-4 sm:h-5 sm:w-5 group-hover:scale-110 transition-transform" />
           {unreadCount > 0 && (
-            <span className="absolute top-2.5 right-2.5 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-background animate-pulse" aria-hidden="true" />
+            <span className="absolute top-2 sm:top-2.5 right-2 sm:right-2.5 h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-primary ring-2 ring-background animate-pulse" aria-hidden="true" />
           )}
         </DropdownMenuTrigger>
         <DropdownMenuContent 

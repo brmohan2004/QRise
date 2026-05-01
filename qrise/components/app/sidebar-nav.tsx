@@ -51,7 +51,7 @@ export function SidebarNav({
   const resetWizard = useWizardStore((state) => state.reset);
   const { isCollapsed, toggle } = useSidebarStore();
 
-  const { data: userData } = useQuery({
+  const { data: userData, isLoading } = useQuery({
     queryKey: ["current-user"],
     queryFn: async () => {
       const res = await fetch("/api/user");
@@ -60,27 +60,19 @@ export function SidebarNav({
     }
   });
 
-  const { data: usageData } = useQuery({
-    queryKey: ["user-usage"],
-    queryFn: async () => {
-      const res = await fetch("/api/user/usage");
-      const json = await res.json();
-      return json.data;
-    }
-  });
 
   const collapsed = isCollapsed && !isMobile;
 
   const user = {
-    name: userData?.fullName || "Mohan",
-    email: userData?.email || "mohan@example.com",
-    plan: userData?.plan?.name || "Pro",
+    name: userData?.fullName || "",
+    email: userData?.email || "",
+    plan: userData?.plan?.name || "",
     avatar_url: userData?.avatarUrl
   };
 
   return (
     <TooltipProvider delay={0}>
-      <div className={cn("flex flex-col h-full bg-card relative", className)}>
+      <div className={cn("flex flex-col bg-card relative", isMobile ? "h-auto rounded-t-[32px] overflow-hidden" : "h-full", className)}>
         <motion.div 
           animate={{ 
             paddingLeft: isMobile ? 24 : (collapsed ? 16 : 24), 
@@ -279,41 +271,12 @@ export function SidebarNav({
         </nav>
 
         <div className="p-4 mt-auto border-t space-y-3">
-          {!collapsed && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="px-3 py-3 space-y-2.5 mb-2 bg-primary/5 rounded-2xl border border-primary/10"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-md bg-primary/10 flex items-center justify-center">
-                    <Zap className="w-3 h-3 text-primary" />
-                  </div>
-                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Plan Usage</span>
-                </div>
-                <span className="text-[11px] font-black text-primary">
-                  {usageData?.dynamicQrCount ?? 0} / {usageData?.planLimits?.dynamicQrLimit === -1 ? '∞' : (usageData?.planLimits?.dynamicQrLimit ?? 0)}
-                </span>
-              </div>
-              <div className="h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ 
-                    width: usageData?.planLimits?.dynamicQrLimit === -1 
-                      ? "100%" 
-                      : `${Math.min(100, ((usageData?.dynamicQrCount ?? 0) / (usageData?.planLimits?.dynamicQrLimit ?? 1)) * 100)}%` 
-                  }}
-                  className="h-full bg-primary rounded-full shadow-[0_0_10px_rgba(59,130,246,0.3)]" 
-                />
-              </div>
-            </motion.div>
-          )}
           <div className="flex items-center gap-2">
             <div className="flex-1 min-w-0">
               <UserMenu 
                 user={user} 
                 isCollapsed={collapsed}
+                isLoading={isLoading}
               />
             </div>
             {userData?.plan?.name === 'free' && !collapsed && (

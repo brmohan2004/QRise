@@ -1,0 +1,132 @@
+/* Developer Section Styles - Replicating Features Section Design */
+
+.developer-section {
+  padding: 4rem 0;
+  background-color: #f9fafb;
+  border-top: 1px solid #f3f4f6;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.developer-container {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.developer-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.developer-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.75rem;
+}
+
+.developer-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+.developer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.developer-card {
+  padding: 2rem;
+  border-radius: 1.5rem;
+  background-color: #ffffff;
+  border: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
+}
+
+.developer-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  border-color: #0F6E5630;
+}
+
+.developer-icon-wrapper {
+  width: 3rem;
+  height: 3rem;
+  background-color: #0F6E5610;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0F6E56;
+  margin-bottom: 1.5rem;
+}
+
+.developer-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.developer-card-description {
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.developer-footer {
+  text-align: center;
+  margin-top: 4rem;
+}
+
+.developer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #111827;
+  color: #ffffff;
+  padding: 0.875rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+}
+
+.developer-cta:hover {
+  background-color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 640px) {
+  .developer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .developer-title {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .developer-section {
+    padding: 6rem 0;
+  }
+
+  .developer-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem;
+  }
+}

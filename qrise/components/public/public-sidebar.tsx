@@ -34,7 +34,7 @@ export function PublicSidebar({
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className="h-[85vh] rounded-t-3xl overflow-hidden p-0 border-none shadow-[0_-12px_40px_-15px_rgba(0,0,0,0.15)] transition-all duration-500 ease-out"
+        className="rounded-t-[32px] overflow-hidden p-0 border-none shadow-[0_-12px_40px_-15px_rgba(0,0,0,0.15)] transition-all duration-500 ease-out"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
@@ -45,7 +45,7 @@ export function PublicSidebar({
         <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-gray-50/50 -z-10" />
         <div className="absolute top-0 right-0 -z-10 h-64 w-64 bg-[#0F6E56]/5 blur-[80px] rounded-full" />
 
-        <div className="flex flex-col h-full px-6 pt-2">
+        <div className="flex flex-col h-auto px-6 pt-2">
           {/* Header with Logo */}
 
           <div className="flex-1 py-8 overflow-y-auto custom-scrollbar">

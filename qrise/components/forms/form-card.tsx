@@ -88,7 +88,7 @@ export function FormCard({
     return (
       <>
         <div className={cn(
-          "group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all duration-300 flex items-center p-4 gap-4",
+          "group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all duration-300 flex items-center p-3 sm:p-4 gap-3 sm:gap-4",
           isSelected && "border-[#0F6E56] ring-1 ring-[#0F6E56]/10 bg-emerald-50/10"
         )}>
           {(selectionMode || isSelected) && (
@@ -107,7 +107,7 @@ export function FormCard({
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-gray-900 truncate group-hover:text-[#0F6E56] transition-colors">
+              <h3 className="font-bold text-gray-900 text-sm sm:text-base truncate group-hover:text-[#0F6E56] transition-colors">
                 {form.name}
               </h3>
               <div className={cn(
@@ -232,10 +232,10 @@ export function FormCard({
       </div>
 
       {/* Info Section */}
-      <div className="p-5">
+      <div className="p-3 sm:p-5">
         <div className="mb-4">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-bold text-gray-900 text-lg leading-tight group-hover:text-[#0F6E56] transition-colors line-clamp-1 flex-1">
+            <h3 className="font-bold text-gray-900 text-base sm:text-lg leading-tight group-hover:text-[#0F6E56] transition-colors line-clamp-1 flex-1">
               {form.name}
             </h3>
             <ActionMenu 
@@ -274,15 +274,15 @@ export function FormCard({
         </div>
 
         {/* Bottom Stats Section */}
-        <div className="pt-4 border-t border-gray-50 flex items-center justify-between">
+        <div className="pt-3 sm:pt-4 border-t border-gray-50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-[#0F6E56]/5 rounded-lg text-[#0F6E56]">
-                <MessageSquare className="h-4 w-4" />
+              <div className="p-1.5 sm:p-2 bg-[#0F6E56]/5 rounded-lg text-[#0F6E56]">
+                <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:h-4" />
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-bold text-gray-900 leading-none">{form.submissionCount || 0}</span>
-                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-tight">Submissions</span>
+                <span className="text-xs sm:text-sm font-bold text-gray-900 leading-none">{form.submissionCount || 0}</span>
+                <span className="text-[9px] sm:text-[10px] text-gray-400 font-medium uppercase tracking-tight">Submissions</span>
               </div>
             </div>
           </div>

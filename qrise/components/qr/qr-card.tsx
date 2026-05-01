@@ -172,7 +172,7 @@ export function QrCard({
     <>
       {view === "list" ? (
         <div className={cn(
-          "flex flex-col sm:flex-row sm:items-center gap-4 bg-white border rounded-2xl p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden group",
+          "flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 bg-white border rounded-2xl p-3 sm:p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden group",
           isSelected && "border-[#0F6E56] ring-1 ring-[#0F6E56]/10 bg-emerald-50/10",
           qr.isBulk && "border-l-4 border-l-[#0F6E56]"
         )}>
@@ -205,10 +205,10 @@ export function QrCard({
 
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
-                <h3 className="font-bold text-gray-900 truncate max-w-[150px] sm:max-w-none">
+                <h3 className="font-bold text-gray-900 text-sm sm:text-base truncate max-w-[150px] sm:max-w-none">
                   {qr.isBulk ? qr.name || 'Batch Upload' : qr.name || 'Untitled QR'}
                 </h3>
-                <DynamicBadge isDynamic={qr.isDynamic} />
+                <DynamicBadge isDynamic={qr.isDynamic} className="scale-90 origin-left" />
               </div>
               <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-[9px] font-black uppercase tracking-[0.15em] text-gray-400">
                 <span className="flex items-center gap-1.5 whitespace-nowrap">
@@ -332,9 +332,9 @@ export function QrCard({
               <Globe className="w-3 h-3" /> {qr.isBulk ? 'BULK' : (qr.type?.toUpperCase() || 'URL')}
             </div>
           </div>
-          <div className="p-4 flex-1 flex flex-col border-t">
+          <div className="p-3 sm:p-4 flex-1 flex flex-col border-t">
             <div className="flex justify-between items-start mb-2">
-              <h3 className="font-semibold line-clamp-1 flex-1">
+              <h3 className="font-semibold text-sm sm:text-base line-clamp-1 flex-1">
                 {qr.isBulk ? `[Batch] ${qr.name || 'Bulk Upload'}` : (qr.name || 'Untitled QR')}
               </h3>
               <div className="flex items-center gap-1.5 ml-2">
@@ -357,9 +357,9 @@ export function QrCard({
                 <ActionMenu onCopy={handleCopy} onDelete={handleDelete} qrId={qr.id} type={qr.type} isBulk={qr.isBulk} />
               </div>
             </div>
-            <div className="mt-auto flex justify-between text-sm">
-              <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{qr.scanCount || 0} total scans</span>
-              <DynamicBadge isDynamic={qr.isDynamic !== false} />
+            <div className="mt-auto flex justify-between text-[11px] sm:text-sm">
+              <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />{qr.scanCount || 0} total scans</span>
+              <DynamicBadge isDynamic={qr.isDynamic !== false} className="scale-90 origin-right" />
             </div>
           </div>
         </div>

@@ -30,7 +30,7 @@ export async function GET() {
       const [newUser] = await db.insert(users).values({
         id: user.id,
         email: user.email,
-        fullName: user.email.split('@')[0], // Fallback name
+        fullName: "", // Don't use email as name
         plan: 'free',
       }).returning();
       userData = newUser;

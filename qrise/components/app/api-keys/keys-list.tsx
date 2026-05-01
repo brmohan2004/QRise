@@ -63,11 +63,11 @@ export function KeysList() {
     <div className="space-y-3">
       {keys.map((k: any) => (
         <Card key={k.id} className="rounded-xl border-gray-100 shadow-sm overflow-hidden bg-white hover:border-primary/20 transition-all group">
-          <div className="p-5 flex flex-col lg:flex-row lg:items-center gap-6">
+          <div className="p-3 sm:p-5 flex flex-col lg:flex-row lg:items-center gap-4 sm:gap-6">
             <div className="flex-1 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-black text-sm text-gray-900">{k.name}</h3>
+                  <h3 className="font-black text-xs sm:text-sm text-gray-900">{k.name}</h3>
                   <span className={cn(
                     "px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider",
                     k.environment === "live" 
@@ -93,18 +93,18 @@ export function KeysList() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-3 items-center text-[10px] text-gray-500 font-bold">
-                <div className="flex items-center gap-2 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
-                  <Shield className="h-3 w-3 text-emerald-600" />
-                  <code className="text-[9px] font-mono text-emerald-600">{k.key_prefix}...</code>
+              <div className="flex flex-wrap gap-2 sm:gap-3 items-center text-[9px] sm:text-[10px] text-gray-500 font-bold">
+                <div className="flex items-center gap-1.5 sm:gap-2 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
+                  <Shield className="h-2.5 w-2.5 sm:h-3 sm:h-3 text-emerald-600" />
+                  <code className="text-[8px] sm:text-[9px] font-mono text-emerald-600">{k.key_prefix}...</code>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="h-3 w-3" />
+                <div className="flex items-center gap-1 sm:gap-1.5">
+                  <Calendar className="h-2.5 w-2.5 sm:h-3 sm:h-3" />
                   {format(new Date(k.created_at), "MMM d, yyyy")}
                 </div>
                 {k.last_used_at && (
-                  <div className="flex items-center gap-1.5 text-emerald-600">
-                    <Activity className="h-3 w-3" />
+                  <div className="flex items-center gap-1 sm:gap-1.5 text-emerald-600">
+                    <Activity className="h-2.5 w-2.5 sm:h-3 sm:h-3" />
                     Used {format(new Date(k.last_used_at), "MMM d, HH:mm")}
                   </div>
                 )}

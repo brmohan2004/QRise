@@ -35,7 +35,7 @@ export function TypeCard({ type, isLoggedIn }: TypeCardProps) {
 
   return (
     <Card className="flex flex-col bg-white border-gray-100 hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 group rounded-2xl overflow-hidden">
-      <CardHeader className="p-5 pb-3">
+      <CardHeader className="p-3 sm:p-5 pb-2 sm:pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center border border-primary/10 group-hover:scale-105 transition-transform duration-500 shrink-0">
@@ -46,10 +46,10 @@ export function TypeCard({ type, isLoggedIn }: TypeCardProps) {
               )}
             </div>
             <div className="space-y-0.5">
-              <h3 className="font-black text-base text-gray-900 leading-tight group-hover:text-primary transition-colors">
+              <h3 className="font-black text-sm sm:text-base text-gray-900 leading-tight group-hover:text-primary transition-colors">
                 {type.name}
               </h3>
-              <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">/{type.slug}</p>
+              <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-gray-400">/{type.slug}</p>
             </div>
           </div>
           {type.is_verified && (
@@ -61,7 +61,7 @@ export function TypeCard({ type, isLoggedIn }: TypeCardProps) {
         </div>
       </CardHeader>
       
-      <CardContent className="p-5 pt-0 flex-1 space-y-5">
+      <CardContent className="p-3 sm:p-5 pt-0 flex-1 space-y-4 sm:space-y-5">
         <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2">
           {type.description || 'No description provided.'}
         </p>
@@ -100,9 +100,9 @@ export function TypeCard({ type, isLoggedIn }: TypeCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="p-5 pt-0">
+      <CardFooter className="p-3 sm:p-5 pt-0">
         <Button 
-          className="w-full bg-primary hover:bg-primary/90 text-white font-black uppercase text-[10px] tracking-widest h-10 rounded-xl shadow-lg shadow-primary/10 transition-all active:scale-[0.98]"
+          className="w-full bg-primary hover:bg-primary/90 text-white font-black uppercase text-[9px] sm:text-[10px] tracking-widest h-9 sm:h-10 rounded-xl shadow-lg shadow-primary/10 transition-all active:scale-[0.98]"
           onClick={handleUseType}
         >
           Use this type

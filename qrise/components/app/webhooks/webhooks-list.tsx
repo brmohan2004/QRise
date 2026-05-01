@@ -80,7 +80,7 @@ export function WebhooksList() {
     <div className="space-y-3">
       {webhooks.map((w: any) => (
         <Card key={w.id} className="rounded-xl border-gray-100 shadow-sm overflow-hidden bg-white hover:border-primary/20 transition-all group">
-          <div className="p-5 flex flex-col lg:flex-row lg:items-center gap-6">
+          <div className="p-3 sm:p-5 flex flex-col lg:flex-row lg:items-center gap-4 sm:gap-6">
             <div className="flex-1 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -91,9 +91,9 @@ export function WebhooksList() {
                     <Activity className="h-5 w-5" />
                   </div>
                   <div className="space-y-0.5">
-                    <h3 className="font-black text-sm text-gray-900 leading-tight">{w.description || "Untitled Webhook"}</h3>
+                    <h3 className="font-black text-xs sm:text-sm text-gray-900 leading-tight">{w.description || "Untitled Webhook"}</h3>
                     <div className="flex items-center gap-2">
-                       <code className="text-[9px] font-mono text-gray-400 max-w-[150px] truncate">{w.endpoint_url}</code>
+                       <code className="text-[8px] sm:text-[9px] font-mono text-gray-400 max-w-[120px] sm:max-w-[150px] truncate">{w.endpoint_url}</code>
                        {w.is_active ? (
                          <span className="flex items-center gap-1 text-[8px] font-black uppercase text-emerald-600 tracking-widest">
                            <CheckCircle2 className="h-2 w-2" /> Active

@@ -4,6 +4,8 @@ import { DemoDashboard } from "@/components/landing/demo-dashboard";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { WhyQRise } from "@/components/landing/why-qrise";
 import { ReviewsCarousel } from "@/components/landing/reviews-carousel";
+import { MarketplaceSection } from "@/components/landing/marketplace-section";
+import { DeveloperSection } from "@/components/landing/developer-section";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { isFeatureEnabled } from "@/lib/feature-flags";
 
@@ -19,6 +21,8 @@ export default async function LandingPage() {
       <DemoDashboard />
       <FeaturesSection />
       <WhyQRise />
+      <MarketplaceSection />
+      <DeveloperSection />
       <ReviewsCarousel />
       <SiteFooter pricingEnabled={pricingEnabled} />
     </>

@@ -71,7 +71,7 @@ export function TypesGrid() {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {types.map((type: any) => (
         <Card key={type.id} className="rounded-xl border-gray-100 shadow-sm overflow-hidden bg-white hover:border-primary/20 transition-all group flex flex-col">
-          <div className="p-5 space-y-4 flex-1">
+          <div className="p-3 sm:p-5 space-y-3 sm:space-y-4 flex-1">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary/5 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-500 shrink-0">
@@ -83,7 +83,7 @@ export function TypesGrid() {
                 </div>
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5">
-                    <h3 className="font-black text-xs text-gray-900 leading-tight">{type.name}</h3>
+                    <h3 className="font-black text-[11px] sm:text-xs text-gray-900 leading-tight">{type.name}</h3>
                     {type.is_verified && <ShieldCheck className="h-3 w-3 text-emerald-500" />}
                   </div>
                   <code className="text-[9px] font-mono text-gray-400">/{type.slug}</code>
@@ -130,12 +130,12 @@ export function TypesGrid() {
             </p>
 
             <div className="grid grid-cols-2 gap-2 pt-1">
-              <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 flex flex-col items-center justify-center text-center">
-                 <span className="text-sm font-black text-gray-900 leading-none">{type.qr_count || 0}</span>
+              <div className="bg-gray-50 p-2 sm:p-3 rounded-xl border border-gray-100 flex flex-col items-center justify-center text-center">
+                 <span className="text-xs sm:text-sm font-black text-gray-900 leading-none">{type.qr_count || 0}</span>
                  <span className="text-[8px] font-black uppercase text-gray-400 mt-1 tracking-widest">QRs</span>
               </div>
-              <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 flex flex-col items-center justify-center text-center">
-                 <span className="text-sm font-black text-gray-900 leading-none">{type.scan_count || 0}</span>
+              <div className="bg-gray-50 p-2 sm:p-3 rounded-xl border border-gray-100 flex flex-col items-center justify-center text-center">
+                 <span className="text-xs sm:text-sm font-black text-gray-900 leading-none">{type.scan_count || 0}</span>
                  <span className="text-[8px] font-black uppercase text-gray-400 mt-1 tracking-widest">Scans</span>
               </div>
             </div>

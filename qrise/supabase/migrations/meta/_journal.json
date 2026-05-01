@@ -1,1 +1,13 @@
-{"version":"7","dialect":"postgresql","entries":[]}
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1777646753951,
+      "tag": "0000_consolidate_billing_usage_v2",
+      "breakpoints": true
+    }
+  ]
+}

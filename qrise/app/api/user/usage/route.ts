@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { users, plans, qrCodes, scanEvents, forms, formSubmissions, apiKeys, webhooks } from "@/lib/db/schema";
+import { users, plans, qrCodes, scanEvents, forms, formSubmissions, apiKeys, webhooks, customQrTypes, apiUsageEvents } from "@/lib/db/schema";
 import { eq, and, sql, gte, count } from "drizzle-orm";
 import { getAuthenticatedUser } from "@/lib/api-auth";
 import { ApiResponse } from "@/lib/api-response";
@@ -91,6 +91,32 @@ export async function GET() {
         )
       );
 
+    // f. Custom Types
+    const customTypesResult = await db
+      .select({
+        count: sql<number>`count(*)`,
+      })
+      .from(customQrTypes)
+      .where(
+        and(
+          eq(customQrTypes.userId, user.id),
+          eq(customQrTypes.isSuspended, false)
+        )
+      );
+
+    // g. Real API Calls (Current Month)
+    const apiCallsResultReal = await db
+      .select({
+        count: sql<number>`count(*)`,
+      })
+      .from(apiUsageEvents)
+      .where(
+        and(
+          eq(apiUsageEvents.userId, user.id),
+          gte(apiUsageEvents.calledAt, firstDayOfMonth)
+        )
+      );
+
     return ApiResponse.ok({
       plan: {
         name: planData?.name || userData.plan,
@@ -105,9 +131,10 @@ export async function GET() {
       usage: {
         monthlyScans: Number(scansResult[0]?.count || 0),
         dynamicQrs: Number(qrResult[0]?.count || 0),
-        apiCalls: Number(apiKeysResult[0]?.count || 0) * 15, 
+        apiCalls: Number(apiCallsResultReal[0]?.count || 0),
         formSubmissions: Number(submissionsResult[0]?.count || 0),
         activeForms: Number(activeFormsResult[0]?.count || 0),
+        customTypes: Number(customTypesResult[0]?.count || 0),
       }
     });
   } catch (error) {
