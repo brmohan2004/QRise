@@ -12,11 +12,18 @@ export async function isFeatureEnabled(
   planName?: string
 ): Promise<boolean> {
   try {
-    const [flag] = await db
+    // Add a local timeout for the DB query to prevent hanging the request
+    const dbPromise = db
       .select()
       .from(featureFlags)
       .where(eq(featureFlags.key, flagKey))
       .limit(1);
+
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Feature flag query timed out (3s)')), 3000)
+    );
+
+    const [flag] = (await Promise.race([dbPromise, timeoutPromise])) as any[];
 
     if (!flag) return true; // Default to true if flag doesn't exist
     
@@ -29,7 +36,7 @@ export async function isFeatureEnabled(
     return true;
   } catch (error) {
     console.error(`Error checking feature flag "${flagKey}":`, error);
-    // Fallback to true in case of DB error so the site doesn't crash
+    // Fallback to true in case of DB error or timeout so the site doesn't crash
     return true;
   }
 }

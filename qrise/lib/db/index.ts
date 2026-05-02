@@ -17,8 +17,9 @@ const globalForDb = global as unknown as {
 export const client = globalForDb.client ?? postgres(connectionString || '', { 
   max: 10,
   idle_timeout: 20,
-  connect_timeout: 10,
+  connect_timeout: 30,
   prepare: false, // Recommended for some poolers
+  ssl: 'require',
 });
 
 if (process.env.NODE_ENV !== 'production') globalForDb.client = client;

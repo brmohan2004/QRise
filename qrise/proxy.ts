@@ -69,9 +69,26 @@ export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // IMPORTANT: This refreshes the session cookie on every request (updateSession pattern)
+  // Added a timeout to prevent middleware from hanging if Supabase is unreachable
+  const getUserWithTimeout = async () => {
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Supabase auth timeout')), 5000)
+    );
+    try {
+      const result = await Promise.race([
+        supabase.auth.getUser(),
+        timeout
+      ]) as { data: { user: any } };
+      return result;
+    } catch (e) {
+      console.error('Middleware auth check failed or timed out:', e);
+      return { data: { user: null } };
+    }
+  };
+
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getUserWithTimeout();
 
   // ── Public routes — never require auth ──
   const publicPaths = [

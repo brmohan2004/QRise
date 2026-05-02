@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Check, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -33,6 +33,7 @@ interface Plan {
 }
 
 export function PricingContent({ initialPlans }: { initialPlans: any[] }) {
+  console.log('[PricingContent] initialPlans:', initialPlans);
   const [isAnnual, setIsAnnual] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
@@ -94,6 +95,8 @@ export function PricingContent({ initialPlans }: { initialPlans: any[] }) {
     if (plan.has_password_qr) features.push("Password Protection");
     if (plan.has_multi_action_qr) features.push("Multi-Action Menu");
     if (plan.has_form_builder) features.push("Custom Form Builder");
+    if (plan.rpm) features.push(`${plan.rpm} API Req/min`);
+    if (plan.design_studio_logo_limit) features.push(`${plan.design_studio_logo_limit} Logo Uploads`);
 
     return {
       ...plan,
@@ -222,25 +225,49 @@ export function PricingContent({ initialPlans }: { initialPlans: any[] }) {
                   { label: 'Password Protection', key: 'has_password_qr' },
                   { label: 'Multi-Action Menu', key: 'has_multi_action_qr' },
                   { label: 'Form Builder', key: 'has_form_builder' },
-                ].map((row) => (
-                  <tr key={row.label}>
-                    <td>{row.label}</td>
-                    {plans.map((plan: any) => (
-                      <td key={`${plan.id}-${row.key}`} className="text-center">
-                        {row.isLimit ? (
-                          <span className="feature-text">
-                            {plan[row.key] === -1 ? 'Unlimited' : plan[row.key]}
-                          </span>
-                        ) : (
-                          plan[row.key] ? (
-                            <Check className="feature-icon" style={{ margin: "auto" }} />
+                  
+                  // Design Studio Section
+                  { label: 'Design Studio: Color Limit', key: 'design_studio_color_limit', isLimit: true, section: 'Design Studio' },
+                  { label: 'Design Studio: Logo Limit', key: 'design_studio_logo_limit', isLimit: true },
+                  { label: 'Design Studio: Style Options', key: 'design_studio_style_limit', isLimit: true },
+                  
+                  // API Section
+                  { label: 'API Calls /mo', key: 'api_calls_per_month', isLimit: true, section: 'API & Webhooks' },
+                  { label: 'Webhook Endpoints', key: 'webhook_limit', isLimit: true },
+                  { label: 'Custom API Domain', key: 'custom_domain_api' },
+                  
+                  // Infrastructure Section
+                  { label: 'Requests Per Minute (RPM)', key: 'rpm', isLimit: true, section: 'Infrastructure' },
+                  { label: 'Requests Per Day (RPD)', key: 'rpd', isLimit: true },
+                  { label: 'Burst Limit', key: 'max_burst', isLimit: true },
+                ].map((row: any) => (
+                  <React.Fragment key={row.label}>
+                    {row.section && (
+                      <tr className="bg-gray-50">
+                        <td colSpan={plans.length + 1} className="py-2 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 bg-gray-50">
+                          {row.section}
+                        </td>
+                      </tr>
+                    )}
+                    <tr key={row.label}>
+                      <td>{row.label}</td>
+                      {plans.map((plan: any) => (
+                        <td key={`${plan.id}-${row.key}`} className="text-center">
+                          {row.isLimit ? (
+                            <span className="feature-text">
+                              {plan[row.key] === -1 || plan[row.key] === null ? 'Unlimited' : plan[row.key]}
+                            </span>
                           ) : (
-                            <span className="dash-icon">—</span>
-                          )
-                        )}
-                      </td>
-                    ))}
-                  </tr>
+                            plan[row.key] ? (
+                              <Check className="feature-icon" style={{ margin: "auto" }} />
+                            ) : (
+                              <span className="dash-icon">—</span>
+                            )
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
