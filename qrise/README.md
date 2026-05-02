@@ -55,6 +55,3 @@ To access the Admin Panel, navigate to your Supabase SQL Editor and run:
 ```sql
 UPDATE users SET is_admin = true WHERE email = 'your@email.com';
 ```
-
----
-© 2026 QRise Inc. Built for performance and reliability.
