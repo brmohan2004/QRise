@@ -10,7 +10,7 @@
     },
     {
       "path": "/api/cron/webhook-processor",
-      "schedule": "* * * * *"
+      "schedule": "0 1 * * *"
     }
   ],
   "rewrites": [
