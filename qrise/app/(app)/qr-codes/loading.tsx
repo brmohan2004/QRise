@@ -2,7 +2,7 @@ import { Plus, Search, LayoutGrid, List } from "lucide-react";
 
 export default function QrCodesLoading() {
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 animate-pulse">
+    <div className="space-y-4 sm:space-y-6 animate-pulse">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div className="space-y-2">
           <div className="h-8 w-48 bg-slate-200 rounded-lg" />

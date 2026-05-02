@@ -79,7 +79,7 @@ export function WizardShell({ children, showPreview = true }: WizardShellProps) 
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
+    <div className="flex flex-col lg:flex-row gap-8">
       <div className="flex-1">
         <div className="mb-6 sm:mb-8">
           {/* Progress Bar */}

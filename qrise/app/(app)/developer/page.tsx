@@ -71,7 +71,7 @@ export default function DeveloperHubPage() {
   const isCustomTypesLocked = maxCustomTypes === 0;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

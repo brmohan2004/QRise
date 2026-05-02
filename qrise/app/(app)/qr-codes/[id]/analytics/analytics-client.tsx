@@ -109,7 +109,7 @@ export function AnalyticsClient({ id, exportEnabled }: AnalyticsClientProps) {
 
   if (!exportEnabled) {
     return (
-      <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 sm:px-6">
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="flex items-center gap-4">
           <Link 
             href="/qr-codes" 
@@ -140,7 +140,7 @@ export function AnalyticsClient({ id, exportEnabled }: AnalyticsClientProps) {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 sm:px-6">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header Section */}
       <div className="space-y-6">
         <div className="flex items-center gap-4">

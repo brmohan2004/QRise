@@ -53,7 +53,7 @@ export default async function CreateTypePage({ params }: PageProps) {
   const config = configComponents[type as QRType];
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="">
       <WizardShell showPreview={type !== "bulk"}>
         <div className="mb-8">
           <Link 

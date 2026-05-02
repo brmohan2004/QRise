@@ -142,7 +142,7 @@ export default function QrCodesPage() {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-lg sm:text-2xl font-black tracking-tight text-gray-900 leading-tight">My QR Codes</h1>

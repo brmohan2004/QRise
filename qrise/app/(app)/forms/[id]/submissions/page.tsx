@@ -106,7 +106,7 @@ export default function FormSubmissionsPage({ params: paramsPromise }: PageProps
   }) || [];
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="space-y-6">
         <div className="flex items-center gap-2 mb-2">
           <Link href="/forms" className="w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-emerald-600 hover:border-emerald-100 transition-all shadow-sm group">
