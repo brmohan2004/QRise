@@ -1,0 +1,25 @@
+name: Frequent QRise Crons
+
+on:
+  schedule:
+    - cron: '*/5 * * * *' # Every 5 minutes
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  trigger-crons:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Webhook Processor
+        run: |
+          curl -X POST "${{ secrets.APP_URL }}/api/cron/webhook-processor" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+      
+      - name: Retry Webhooks
+        run: |
+          curl -X POST "${{ secrets.APP_URL }}/api/cron/retry-webhooks" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+      - name: System Health Check
+        run: |
+          curl -X POST "${{ secrets.APP_URL }}/api/cron/check-system-health" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

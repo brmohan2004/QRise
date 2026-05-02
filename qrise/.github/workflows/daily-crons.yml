@@ -1,0 +1,30 @@
+name: Daily QRise Maintenance
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Daily at 2:00 AM
+  workflow_dispatch:
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: System Cleanup
+        run: |
+          curl -X POST "${{ secrets.APP_URL }}/api/cron/cleanup" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+      - name: Generate Daily Reports
+        run: |
+          curl -X POST "${{ secrets.APP_URL }}/api/cron/generate-daily-reports" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+      - name: Sync Stripe Data
+        run: |
+          curl -X POST "${{ secrets.APP_URL }}/api/cron/sync-stripe" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+      - name: Verify Subscriptions
+        run: |
+          curl -X POST "${{ secrets.APP_URL }}/api/cron/verify-subscriptions" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
