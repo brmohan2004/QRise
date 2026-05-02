@@ -6,7 +6,7 @@ const comparison = (landingData as any).comparison;
 
 export function WhyQRise() {
   return (
-    <section className="why-section">
+    <section className="why-section" aria-label="Comparison">
       <div className="why-container">
         <div className="why-header">
           <h2 className="why-title">

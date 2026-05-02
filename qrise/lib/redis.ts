@@ -24,19 +24,30 @@ export const apiRequests = new Ratelimit({
   prefix: 'rl:api',
 });
 
+const rateLimiters = new Map<string, Ratelimit>();
+
 export async function rateLimitByIP(
   ip: string,
   action: string,
   limit: number,
   window: string
 ): Promise<{ success: boolean; remaining: number; reset: number }> {
-  const limiter = new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(limit, window as Duration),
-    prefix: `rl:${action}`,
-  });
-
+  const key = `${action}:${limit}:${window}`;
+  
+  if (!rateLimiters.has(key)) {
+    rateLimiters.set(
+      key,
+      new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(limit, window as Duration),
+        prefix: `rl:${action}`,
+      })
+    );
+  }
+  
+  const limiter = rateLimiters.get(key)!;
   const result = await limiter.limit(ip);
+  
   return {
     success: result.success,
     remaining: result.remaining,

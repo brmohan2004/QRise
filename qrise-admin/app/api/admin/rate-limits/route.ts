@@ -1,13 +1,13 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getAdminUser } from '@/lib/auth-utils'
+import { verifyAdmin } from '@/lib/admin-auth'
 
-export async function GET() {
-  const user = await getAdminUser()
+export async function GET(req: NextRequest) {
+  const admin = await verifyAdmin(req)
 
-  if (!user) {
+  if ('error' in admin) {
     console.log('[API] RateLimits: Unauthorized access attempt')
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: admin.error }, { status: admin.status })
   }
 
   const adminClient = createAdminClient()

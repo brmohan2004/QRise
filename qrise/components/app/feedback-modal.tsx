@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import {
   Sheet,
@@ -38,13 +41,30 @@ interface FeedbackModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const feedbackSchema = z.object({
+  type: z.string().min(1),
+  subject: z.string().min(1, "Subject is required"),
+  email: z.string().email("Invalid email format").or(z.literal("")),
+  content: z.string().min(10, "Please provide more details (min 10 chars)"),
+});
+
+type FeedbackFormData = z.infer<typeof feedbackSchema>;
+
 export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
-  const [type, setType] = useState<string>("suggestion");
-  const [subject, setSubject] = useState("");
-  const [content, setContent] = useState("");
-  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm<FeedbackFormData>({
+    resolver: zodResolver(feedbackSchema),
+    defaultValues: { type: "suggestion", subject: "", email: "", content: "" },
+  });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -61,22 +81,19 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setIsLoggedIn(true);
-        setEmail(user.email || "");
+        setValue("email", user.email || "");
       }
     };
     if (open) checkUser();
   }, [open]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!subject || !content) return;
-
+  const onSubmit = async (data: FeedbackFormData) => {
     setLoading(true);
     try {
       const response = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, subject, content, email }),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) throw new Error("Failed to submit feedback");
@@ -89,9 +106,7 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
         onOpenChange(false);
         setTimeout(() => {
           setSubmitted(false);
-          setSubject("");
-          setContent("");
-          setType("suggestion");
+          reset({ type: "suggestion", subject: "", email: "", content: "" });
         }, 300);
       }, 2000);
 
@@ -148,41 +163,47 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 pt-2">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6 pt-2">
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2 col-span-2 sm:col-span-1">
                 <Label htmlFor="type" className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-400">Feedback Type</Label>
-                <Select value={type} onValueChange={(v) => v && setType(v)}>
-                  <SelectTrigger id="type" className="bg-gray-50 border-gray-100 rounded-xl h-9 sm:h-11 focus:ring-emerald-500/20 text-xs sm:text-sm text-gray-900 shadow-sm">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white border-gray-100 text-gray-900">
-                    <SelectItem value="bug" className="focus:bg-gray-50 cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <Bug className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500" />
-                        <span className="text-xs sm:text-sm font-medium">Bug Report</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="enhancement" className="focus:bg-gray-50 cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-500" />
-                        <span className="text-xs sm:text-sm font-medium">Enhancement</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="suggestion" className="focus:bg-gray-50 cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <Lightbulb className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
-                        <span className="text-xs sm:text-sm font-medium">Suggestion</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="other" className="focus:bg-gray-50 cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500" />
-                        <span className="text-xs sm:text-sm font-medium">Other</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="type"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger id="type" className="bg-gray-50 border-gray-100 rounded-xl h-9 sm:h-11 focus:ring-emerald-500/20 text-xs sm:text-sm text-gray-900 shadow-sm">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border-gray-100 text-gray-900">
+                        <SelectItem value="bug" className="focus:bg-gray-50 cursor-pointer">
+                          <div className="flex items-center gap-2">
+                            <Bug className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500" />
+                            <span className="text-xs sm:text-sm font-medium">Bug Report</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="enhancement" className="focus:bg-gray-50 cursor-pointer">
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-500" />
+                            <span className="text-xs sm:text-sm font-medium">Enhancement</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="suggestion" className="focus:bg-gray-50 cursor-pointer">
+                          <div className="flex items-center gap-2">
+                            <Lightbulb className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
+                            <span className="text-xs sm:text-sm font-medium">Suggestion</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="other" className="focus:bg-gray-50 cursor-pointer">
+                          <div className="flex items-center gap-2">
+                            <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500" />
+                            <span className="text-xs sm:text-sm font-medium">Other</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
 
               <div className="space-y-2 col-span-2 sm:col-span-1">
@@ -190,11 +211,10 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
                 <Input 
                   id="subject"
                   placeholder="Brief summary..."
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  className="bg-gray-50 border-gray-100 rounded-xl h-9 sm:h-11 focus:ring-emerald-500/20 text-xs sm:text-sm text-gray-900 shadow-sm"
-                  required
+                  {...register("subject")}
+                  className={cn("bg-gray-50 border-gray-100 rounded-xl h-9 sm:h-11 focus:ring-emerald-500/20 text-xs sm:text-sm text-gray-900 shadow-sm", errors.subject && "border-red-500")}
                 />
+                {errors.subject && <p className="text-xs text-red-500 mt-1">{errors.subject.message}</p>}
               </div>
 
               {!isLoggedIn && (
@@ -204,10 +224,10 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
                     id="email"
                     type="email"
                     placeholder="how can we reach you?"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-gray-50 border-gray-100 rounded-xl h-9 sm:h-11 focus:ring-emerald-500/20 text-xs sm:text-sm text-gray-900 shadow-sm"
+                    {...register("email")}
+                    className={cn("bg-gray-50 border-gray-100 rounded-xl h-9 sm:h-11 focus:ring-emerald-500/20 text-xs sm:text-sm text-gray-900 shadow-sm", errors.email && "border-red-500")}
                   />
+                  {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
                 </div>
               )}
             </div>
@@ -217,11 +237,10 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
               <Textarea 
                 id="content"
                 placeholder="Tell us more about your feedback..."
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="bg-gray-50 border-gray-100 rounded-2xl min-h-[100px] sm:min-h-[120px] focus:ring-emerald-500/20 resize-none text-xs sm:text-sm text-gray-900 shadow-sm"
-                required
+                {...register("content")}
+                className={cn("bg-gray-50 border-gray-100 rounded-2xl min-h-[100px] sm:min-h-[120px] focus:ring-emerald-500/20 resize-none text-xs sm:text-sm text-gray-900 shadow-sm", errors.content && "border-red-500")}
               />
+              {errors.content && <p className="text-xs text-red-500 mt-1">{errors.content.message}</p>}
             </div>
 
             <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-2">
@@ -235,7 +254,7 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
               </Button>
               <Button 
                 type="submit" 
-                disabled={loading || !subject || !content}
+                disabled={loading}
                 className="w-full sm:w-auto bg-[#0F6E56] hover:bg-[#0d5c48] text-white rounded-xl h-10 sm:h-11 px-6 shadow-lg shadow-emerald-900/10 gap-2 min-w-[120px] font-black uppercase text-[10px] sm:text-xs tracking-widest transition-all hover:scale-[1.02] active:scale-95"
               >
                 {loading ? (

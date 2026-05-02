@@ -32,7 +32,7 @@ const features = landingData.features.map(f => ({
 
 export function FeaturesSection() {
   return (
-    <section className="features-section">
+    <section className="features-section" aria-label="Features">
       <div className="features-container">
         <div className="features-header">
           <h2 className="features-title">

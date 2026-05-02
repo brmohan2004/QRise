@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAdminUser } from '@/lib/auth-utils';
+import { verifyAdmin } from '@/lib/admin-auth';
 
-export async function GET() {
-  const user = await getAdminUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export async function GET(req: NextRequest) {
+  const admin = await verifyAdmin(req);
+  if ('error' in admin) return NextResponse.json({ error: admin.error }, { status: admin.status });
 
   const supabase = createAdminClient();
   const { data, error } = await supabase
@@ -31,8 +31,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getAdminUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const admin = await verifyAdmin(req);
+  if ('error' in admin) return NextResponse.json({ error: admin.error }, { status: admin.status });
 
   const { status } = await req.json();
   const supabase = createAdminClient();

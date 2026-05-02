@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAdminUser } from '@/lib/auth-utils';
+import { verifyAdmin } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit';
 
 export async function GET(req: NextRequest) {
-  const user = await getAdminUser();
-  if (!user) {
-    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+  const admin = await verifyAdmin(req);
+  if ('error' in admin) {
+    return NextResponse.json({ ok: false, error: admin.error }, { status: admin.status });
   }
 
   const supabase = createAdminClient();
@@ -28,9 +28,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const user = await getAdminUser();
-  if (!user) {
-    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+  const admin = await verifyAdmin(req);
+  if ('error' in admin) {
+    return NextResponse.json({ ok: false, error: admin.error }, { status: admin.status });
   }
 
   const supabase = createAdminClient();
@@ -47,7 +47,7 @@ export async function PATCH(req: NextRequest) {
     .update({ 
       status, 
       notes: notes || null,
-      reviewed_by: user.id,
+      reviewed_by: admin.adminId,
       reviewed_at: new Date().toISOString()
     })
     .eq('id', id)
@@ -66,7 +66,7 @@ export async function PATCH(req: NextRequest) {
 
   // 3. Audit log
   await writeAuditLog({
-    adminUserId: user.id,
+    adminUserId: admin.adminId,
     action: `marketplace.review.${status}`,
     targetType: 'marketplace',
     targetId: id,

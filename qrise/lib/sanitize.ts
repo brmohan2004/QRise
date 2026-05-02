@@ -45,12 +45,17 @@ export function sanitizeURL(url: string): string | null {
 
 /**
  * Strip HTML tags from a string to prevent basic XSS.
- * This is a simple fallback — use a proper sanitizer (DOMPurify) for rich text.
+ * NOTE: For rich text or complex DOM elements, use DOMPurify instead.
  */
 export function stripHTMLTags(str: string): string {
   if (!str) return '';
-  return str
-    .replace(/<[^>]*>/g, '')
+  
+  const stripped = str
+    .replace(/<!--[\s\S]*?-->/gi, '') // Remove HTML comments
+    .replace(/<\/?([a-z][a-z0-9]*)\b[^>]*>/gi, ''); // Remove all tags and their attributes
+
+  // Decode entities AFTER stripping tags to ensure we don't re-introduce tags
+  return stripped
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&')

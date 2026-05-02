@@ -26,6 +26,11 @@ export async function authenticateAPIKey(
   if (!result[0] || !result[0].isActive) {
     return null;
   }
+
+  // Check if expired
+  if (result[0].expiresAt && result[0].expiresAt < new Date()) {
+    return null;
+  }
   
   // Update last_used_at asynchronously
   db.update(apiKeys)

@@ -7,7 +7,7 @@ const companies = landingData.companies;
 
 export function TrustedBy() {
   return (
-    <section className="trusted-by-section">
+    <section className="trusted-by-section" aria-label="Trusted Companies">
       <div className="trusted-by-container">
         <div className="trusted-by-header">
           <div className="trusted-by-line" />

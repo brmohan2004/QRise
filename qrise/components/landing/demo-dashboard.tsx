@@ -1,6 +1,7 @@
 "use client";
 
 import { QrCode, Globe, MapPin, Smartphone, LayoutDashboard, Settings, User, Bell, Search, Plus, List, BarChart2, MoreVertical, ExternalLink } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import "./demo-dashboard.css";
@@ -17,7 +18,7 @@ const chartData = [
 
 export function DemoDashboard() {
   return (
-    <section id="demo" className="demo-section">
+    <section id="demo" className="demo-section" aria-label="Dashboard Demonstration">
       <div className="demo-container">
         <div className="demo-header">
           <h2 className="demo-title">
@@ -47,9 +48,11 @@ export function DemoDashboard() {
             {/* Sidebar Mockup */}
             <div className="dashboard-sidebar">
               <div className="sidebar-logo">
-                <img 
+                <Image 
                   src="/logo.png" 
                   alt="QRise Logo" 
+                  width={32}
+                  height={32}
                   className="h-8 w-8 object-contain"
                 />
                 <span className="logo-text">QRise Pro</span>

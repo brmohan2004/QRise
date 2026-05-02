@@ -42,7 +42,7 @@ const PREVIEW_TYPES = [
 
 export function MarketplaceSection() {
   return (
-    <section className="marketplace-section">
+    <section className="marketplace-section" aria-label="Marketplace">
       <div className="marketplace-container">
         <div className="marketplace-header">
           <h2 className="marketplace-title">

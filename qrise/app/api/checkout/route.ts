@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { createClient } from '@/lib/supabase/server';
 import { db } from '@/lib/db';
-import { plans } from '@/lib/db/schema';
+import { plans, users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import Stripe from 'stripe';
 
 export async function POST(req: Request) {
   try {
@@ -14,10 +15,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { planId, isAnnual } = await req.json();
+    const { planId, isAnnual, couponCode } = await req.json();
 
     if (!planId) {
       return NextResponse.json({ error: 'Plan ID is required' }, { status: 400 });
+    }
+
+    // Fetch user details from DB
+    const [dbUser] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+
+    if (dbUser?.stripeSubscriptionId && dbUser.billingStatus === 'active') {
+      return NextResponse.json({ error: 'You already have an active subscription. Please use the billing portal to manage it.' }, { status: 400 });
     }
 
     // Fetch plan details from DB
@@ -35,7 +43,7 @@ export async function POST(req: Request) {
     }
 
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
       line_items: [
         {
@@ -56,14 +64,25 @@ export async function POST(req: Request) {
       mode: 'subscription',
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancel`,
-      customer_email: user.email,
       metadata: {
         userId: user.id,
         planId: plan.id,
         plan: plan.name.toLowerCase(),
         isAnnual: String(isAnnual),
       },
-    });
+    };
+
+    if (dbUser?.stripeCustomerId) {
+      sessionParams.customer = dbUser.stripeCustomerId;
+    } else {
+      sessionParams.customer_email = user.email;
+    }
+
+    if (couponCode) {
+      sessionParams.discounts = [{ coupon: couponCode }];
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ url: session.url });
   } catch (error: any) {

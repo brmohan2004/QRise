@@ -32,7 +32,12 @@ export async function GET() {
     .where(and(eq(apiKeys.userId, user.id), eq(apiKeys.isActive, true)))
     .orderBy(desc(apiKeys.createdAt));
 
-    return ApiResponse.ok(keys);
+    const maskedKeys = keys.map(k => ({
+      ...k,
+      keyPrefix: k.keyPrefix ? k.keyPrefix.substring(0, 8) + '***' : '***', // Mask S4
+    }));
+
+    return ApiResponse.ok(maskedKeys);
   } catch (error) {
     return ApiResponse.error(ApiResponse.getErrorMessage(error));
   }
@@ -44,7 +49,7 @@ export async function POST(request: Request) {
     if (!user) return ApiResponse.unauthorized();
 
     // 1. Rate Limiting (REQ 3)
-    const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
+    const ip = request.headers.get("x-real-ip") || request.headers.get("x-forwarded-for") || "127.0.0.1";
     const rl = await rateLimitByIP(ip, "api-key-create", 10, "1h");
     if (!rl.success) {
       return ApiResponse.error("API key creation limit reached (Max 10/hr).", 429);

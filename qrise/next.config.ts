@@ -1,24 +1,30 @@
 import type { NextConfig } from 'next';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://*.supabase.co';
-const upstashUrl = process.env.UPSTASH_REDIS_REST_URL || 'https://*.upstash.io';
-const workerUrl = process.env.NEXT_PUBLIC_REDIRECT_BASE_URL || 'https://*.workers.dev';
-
-const cspHeader = `
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval';
-  style-src 'self' 'unsafe-inline';
-  img-src 'self' data: blob: https://*.supabase.co https://res.cloudinary.com;
-  font-src 'self';
-  connect-src 'self' ${supabaseUrl} ${upstashUrl} ${workerUrl} https://*.supabase.co https://api.cloudinary.com https://res.cloudinary.com blob:;
-  frame-ancestors 'none';
-  form-action 'self';
-  base-uri 'self';
-  object-src 'none';
-`.replace(/\n/g, ' ').trim();
-
 const nextConfig: NextConfig = {
+  // Enable gzip compression
+  compress: true,
+  
+  // Powered by header removal (security + slight perf)
+  poweredByHeader: false,
+  
   async headers() {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://*.supabase.co';
+    const upstashUrl = process.env.UPSTASH_REDIS_REST_URL || 'https://*.upstash.io';
+    const workerUrl = process.env.NEXT_PUBLIC_REDIRECT_BASE_URL || 'https://*.workers.dev';
+
+    const cspHeader = `
+      default-src 'self';
+      script-src 'self';
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: blob: https://*.supabase.co https://res.cloudinary.com;
+      font-src 'self';
+      connect-src 'self' ${supabaseUrl} ${upstashUrl} ${workerUrl} https://*.supabase.co https://api.cloudinary.com https://res.cloudinary.com blob:;
+      frame-ancestors 'none';
+      form-action 'self';
+      base-uri 'self';
+      object-src 'none';
+    `.replace(/\n/g, ' ').trim();
+
     return [
       {
         source: '/embed/(.*)',
@@ -30,6 +36,16 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value: "frame-ancestors *",
+          },
+        ],
+      },
+      {
+        // Cache static assets aggressively
+        source: '/:all*(svg|jpg|jpeg|png|gif|ico|webp|woff|woff2)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
@@ -64,6 +80,10 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: cspHeader,
           },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
         ],
       },
     ];
@@ -79,6 +99,7 @@ const nextConfig: NextConfig = {
         hostname: 'res.cloudinary.com',
       },
     ],
+    formats: ['image/avif', 'image/webp'],
   },
   serverExternalPackages: ['bcryptjs', 'qrcode', 'sharp', 'postgres', 'detect-libc', 'drizzle-orm'],
 };

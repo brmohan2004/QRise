@@ -44,6 +44,31 @@ export const PUT = withApiAuth(async (req, ctx) => {
     return apiError('VALIDATION_ERROR', 'resolver_url must be HTTPS.', 400);
   }
 
+  try {
+    const parsedUrl = new URL(resolver_url);
+    const host = parsedUrl.hostname;
+    
+    // SSRF protection
+    if (
+      host === 'localhost' ||
+      host === '127.0.0.1' ||
+      host === '0.0.0.0' ||
+      host === '::1' ||
+      host.startsWith('10.') ||
+      host.startsWith('192.168.') ||
+      host.startsWith('169.254.') ||
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(host) ||
+      /^fc00:/i.test(host) ||
+      /^fd00:/i.test(host) ||
+      /^fe80:/i.test(host) ||
+      host.endsWith('.internal')
+    ) {
+      return apiError('VALIDATION_ERROR', 'Invalid resolver destination URL.', 400);
+    }
+  } catch {
+    return apiError('VALIDATION_ERROR', 'Invalid URL format.', 400);
+  }
+
   const typeRecord = await db.select().from(customQrTypes).where(eq(customQrTypes.slug, slug)).limit(1);
   if (!typeRecord[0]) return apiError('TYPE_NOT_FOUND', 'Type not found.', 404);
   if (typeRecord[0].userId !== user.id) return apiError('FORBIDDEN', 'Not authorized.', 403);

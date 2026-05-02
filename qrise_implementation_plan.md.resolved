@@ -1,0 +1,367 @@
+# QRise Production Hardening — Implementation Plan & Task Breakdown
+
+> **Generated**: 2026-05-02 | **Scope**: SaaS App + Admin Panel + Backend + Infra
+> **Architecture**: Next.js 16 + Supabase + Drizzle ORM + Stripe + Upstash Redis + Vercel
+
+---
+
+## Architecture Map (Discovered)
+
+```mermaid
+graph TB
+    subgraph "SaaS App (qrise/)"
+        PUB["Public Pages<br/>Landing, Pricing, Docs"]
+        APP["App Pages<br/>Dashboard, QR, Forms, API Keys"]
+        API["API Routes (31 dirs)<br/>/api/v1, /api/checkout, etc."]
+        CRON["Cron Jobs (12)<br/>cleanup, webhooks, stripe sync"]
+    end
+    subgraph "Admin Panel (qrise-admin/)"
+        ADM["Admin Pages (20 sections)<br/>Plans, Flags, Revenue, etc."]
+        AAPI["Admin API (21 dirs)<br/>CRUD + Moderation"]
+    end
+    subgraph "Backend Services"
+        DB["Drizzle ORM<br/>24 schema files"]
+        WH["Webhook Engine<br/>signature, delivery, executor"]
+        BILL["Billing<br/>Stripe + alerts"]
+        FF["Feature Flags<br/>Redis-cached"]
+        RL["Rate Limiting<br/>Upstash Ratelimit"]
+        AUTH["Auth<br/>Supabase + API Keys"]
+    end
+    subgraph "External"
+        STRIPE["Stripe"]
+        REDIS["Upstash Redis"]
+        SUPA["Supabase"]
+        RESEND["Resend Email"]
+    end
+    APP --> API --> DB
+    API --> WH --> STRIPE
+    API --> RL --> REDIS
+    ADM --> AAPI --> DB
+    FF --> REDIS
+    BILL --> STRIPE
+    AUTH --> SUPA
+```
+
+---
+
+## 🚨 Pre-Existing Bugs Discovered During Scan
+
+| # | Severity | File | Issue |
+|---|----------|------|-------|
+| B1 | **CRITICAL** | `app/api/checkout/route.ts` | Missing `users` import — line 24 uses `users` table but never imports it. **Build will fail.** |
+| B2 | **CRITICAL** | `app/api/checkout/route.ts` | Missing `Stripe` type import — line 45 uses `Stripe.Checkout.SessionCreateParams` without importing Stripe namespace. |
+| B3 | **HIGH** | `lib/webhooks/executor.ts:66` | Latency calculation wrong: `Date.now() - timestamp` where timestamp is in seconds but Date.now() is in ms. |
+| B4 | **HIGH** | `lib/webhooks/delivery.ts:104` | `getPendingDeliveries` only fetches `status='pending'` but retrying deliveries have `status='retrying'`. Retries never execute. |
+| B5 | **MEDIUM** | `lib/sanitize.ts:55-59` | `stripHTMLTags` decodes HTML entities AFTER stripping tags — this re-introduces injectable content (`&lt;script&gt;` → `<script>`). |
+| B6 | **MEDIUM** | `lib/api-auth.ts:73` | `requirePlanFeature` uses `@ts-ignore` for dynamic plan feature access — fragile, no type safety. |
+| B7 | **LOW** | `app/api/webhooks/route.ts` | SSRF check missing `0.0.0.0`, `169.254.*` (link-local), and IPv6 private ranges. |
+
+---
+
+## PHASE 1: DISCOVERY & BUILD STABILIZATION
+
+> **Goal**: Get both apps building successfully. Map all dependencies.
+
+### Task 1.1 — Fix Critical Build Blockers
+| ID | Task | File(s) | Priority |
+|----|------|---------|----------|
+| 1.1.1 | Add missing `users` import to checkout route | `app/api/checkout/route.ts` | P0 |
+| 1.1.2 | Add missing `Stripe` type import to checkout route | `app/api/checkout/route.ts` | P0 |
+| 1.1.3 | Verify no duplicate `apiUsageEvents` imports in schema index | `lib/db/schema/index.ts` | P0 |
+| 1.1.4 | Run `pnpm build` on SaaS app — fix all TS errors | `qrise/` | P0 |
+| 1.1.5 | Run `pnpm build` on Admin panel — fix all TS errors | `qrise-admin/` | P0 |
+
+### Task 1.2 — Dependency & Environment Audit
+| ID | Task | File(s) | Priority |
+|----|------|---------|----------|
+| 1.2.1 | Verify all env vars in `.env.local` match `.env.local.example` | Both apps | P0 |
+| 1.2.2 | Validate Supabase connection (DB URL, anon key, service key) | `lib/supabase/` | P0 |
+| 1.2.3 | Validate Upstash Redis connectivity | `lib/redis.ts` | P0 |
+| 1.2.4 | Validate Stripe keys (secret + webhook secret) | `lib/stripe.ts` | P0 |
+| 1.2.5 | Validate Resend API key | `lib/resend.ts` | P1 |
+| 1.2.6 | Validate Cloudinary config | `lib/cloudinary.ts` | P1 |
+| 1.2.7 | Verify `drizzle.config.ts` points to correct DB | `drizzle.config.ts` | P0 |
+
+### Task 1.3 — Schema Consistency Audit
+| ID | Task | File(s) | Priority |
+|----|------|---------|----------|
+| 1.3.1 | Verify all 24 schema files compile without circular deps | `lib/db/schema/` | P0 |
+| 1.3.2 | Run `drizzle-kit push` dry-run to detect schema drift | CLI | P1 |
+| 1.3.3 | Verify all relations in `schema/index.ts` match FK constraints | `schema/index.ts` | P1 |
+| 1.3.4 | Verify admin panel DB schema mirrors SaaS schema | `qrise-admin/lib/db/` | P1 |
+
+---
+
+## PHASE 2: FUNCTIONAL TESTING
+
+### Task 2.1 — Admin Panel Testing
+
+#### 2.1.1 Feature Flags
+| ID | Test Case | Expected | Priority |
+|----|-----------|----------|----------|
+| T-FF-01 | Create feature flag via admin API | Flag persisted in DB with correct key, description, isEnabled | P0 |
+| T-FF-02 | Toggle flag on/off | DB `is_enabled` updates, Redis cache invalidates within 60s | P0 |
+| T-FF-03 | Flag with plan restrictions | `enabledForPlans` array filters correctly | P0 |
+| T-FF-04 | Non-existent flag key | `isFeatureEnabled()` returns `false` | P1 |
+| T-FF-05 | DB timeout during flag check | Falls back to `false` within 3s | P1 |
+
+#### 2.1.2 Subscription Plans
+| ID | Test Case | Expected | Priority |
+|----|-----------|----------|----------|
+| T-PL-01 | Create plan with all fields | All 40+ plan fields stored correctly | P0 |
+| T-PL-02 | Edit plan pricing | `priceMonthly`/`priceAnnual` update correctly | P0 |
+| T-PL-03 | Delete plan with active users | Blocked or users migrated to free | P0 |
+| T-PL-04 | Plan visibility toggle | `isPubliclyVisible` hides from pricing page | P0 |
+| T-PL-05 | Plan sort order | Pricing page respects `sortOrder` | P1 |
+
+#### 2.1.3 Rate Limits
+| ID | Test Case | Expected | Priority |
+|----|-----------|----------|----------|
+| T-RL-01 | Set RPM/RPD for plan | `plan_rate_limits` table updated | P0 |
+| T-RL-02 | Exceed RPM limit | 429 returned with correct headers | P0 |
+| T-RL-03 | User override created | Override takes precedence over plan limits | P1 |
+| T-RL-04 | Override with expiry | Reverts to plan limits after expiry | P2 |
+
+#### 2.1.4 Custom Types Moderation
+| ID | Test Case | Expected | Priority |
+|----|-----------|----------|----------|
+| T-CT-01 | List pending submissions | Shows all `status='pending'` submissions | P1 |
+| T-CT-02 | Approve submission | Status → `approved`, webhook fires | P1 |
+| T-CT-03 | Reject with reason | Status → `rejected`, reason stored | P1 |
+| T-CT-04 | Suspend active type | Type suspended, QR codes using it show fallback | P1 |
+
+#### 2.1.5 Webhook Infrastructure
+| ID | Test Case | Expected | Priority |
+|----|-----------|----------|----------|
+| T-WH-01 | Admin views webhook deliveries | Shows all deliveries with status/timing | P1 |
+| T-WH-02 | Manual retry of failed delivery | Delivery re-queued with `status='pending'` | P1 |
+| T-WH-03 | Webhook queue processor runs | Cron `/api/cron/webhook-processor` processes pending items | P0 |
+
+#### 2.1.6 Notifications, Revenue, Coupons, Competitions
+| ID | Test Case | Expected | Priority |
+|----|-----------|----------|----------|
+| T-NT-01 | Send broadcast notification | All users receive notification | P1 |
+| T-NT-02 | Mark notification as read | `isRead` toggles correctly | P1 |
+| T-RV-01 | Revenue dashboard shows correct totals | Matches sum of `billing_events` | P1 |
+| T-RV-02 | Refund initialization | Stripe refund issued, billing event logged | P0 |
+| T-CP-01 | Create coupon with expiry | Coupon stored with correct fields | P1 |
+| T-CP-02 | Apply expired coupon | Rejected with clear error | P1 |
+| T-CP-03 | Apply coupon to checkout | Stripe discount applied | P0 |
+| T-CM-01 | Create competition | Competition record created | P2 |
+| T-CM-02 | Register for competition | Registration recorded with validation | P2 |
+
+---
+
+### Task 2.2 — SaaS App Testing
+
+#### 2.2.1 Pricing & Checkout
+| ID | Test Case | Expected | Priority |
+|----|-----------|----------|----------|
+| T-PR-01 | Pricing page displays all visible plans | Plans match DB records where `isPubliclyVisible=true` | P0 |
+| T-PR-02 | Monthly/Annual toggle | Prices switch correctly | P0 |
+| T-CK-01 | Checkout with valid plan | Stripe session created, redirect to Stripe | P0 |
+| T-CK-02 | Checkout with free plan | 400 error "Cannot checkout a free plan" | P0 |
+| T-CK-03 | Checkout when already subscribed | 400 error about existing subscription | P0 |
+| T-CK-04 | Checkout with coupon code | Discount applied in Stripe | P1 |
+| T-CK-05 | Payment success webhook | User plan updated, billing event logged | P0 |
+| T-CK-06 | Payment failure webhook | Status → `past_due`, dunning email sent | P0 |
+| T-CK-07 | Subscription cancellation | Plan → `free`, status → `cancelled` | P0 |
+
+#### 2.2.2 API Keys
+| ID | Test Case | Expected | Priority |
+|----|-----------|----------|----------|
+| T-AK-01 | Create API key | Raw key returned once, hash stored | P0 |
+| T-AK-02 | List API keys | Keys masked (prefix + `***`) | P0 |
+| T-AK-03 | Authenticate with valid key | User resolved correctly | P0 |
+| T-AK-04 | Authenticate with expired key | Returns null | P0 |
+| T-AK-05 | Authenticate with revoked key | Returns null | P0 |
+| T-AK-06 | Rate limit on key creation | Max 10/hr enforced | P1 |
+
+#### 2.2.3 Webhooks (User-side)
+| ID | Test Case | Expected | Priority |
+|----|-----------|----------|----------|
+| T-UW-01 | Add webhook with HTTPS URL | Webhook created with secret | P0 |
+| T-UW-02 | Add webhook with HTTP URL | Rejected | P0 |
+| T-UW-03 | Add webhook with localhost | Rejected (SSRF protection) | P0 |
+| T-UW-04 | Webhook fires on QR scan | Delivery created and processed | P0 |
+| T-UW-05 | Webhook signature verification | Signature validates correctly | P0 |
+
+#### 2.2.4 Subscriptions & Billing
+| ID | Test Case | Expected | Priority |
+|----|-----------|----------|----------|
+| T-SB-01 | View current subscription | Shows correct plan, status, dates | P0 |
+| T-SB-02 | Access billing portal | Stripe portal URL generated | P0 |
+| T-SB-03 | Plan-based limits enforced | Exceeding limits returns upgrade prompt | P0 |
+| T-SB-04 | Change plan flow | Subscription updated in Stripe + DB | P0 |
+
+#### 2.2.5 Developer Hub, Forms, QR Codes, Usage
+| ID | Test Case | Expected | Priority |
+|----|-----------|----------|----------|
+| T-DH-01 | Docs render correctly | All doc pages load without errors | P1 |
+| T-FM-01 | Create form | Form persisted with correct fields | P1 |
+| T-FM-02 | Submit form | Submission recorded, webhook fires | P1 |
+| T-QR-01 | Create dynamic QR | QR code generated, redirect works | P0 |
+| T-QR-02 | Create static QR | QR image generated correctly | P0 |
+| T-QR-03 | Scan tracking | Scan event recorded with geo/device data | P0 |
+| T-US-01 | Usage dashboard | Shows accurate counts | P1 |
+
+---
+
+## PHASE 3: DEBUGGING & FIXES
+
+### Task 3.1 — Backend Fixes (Critical)
+| ID | Task | Details | Files |
+|----|------|---------|-------|
+| 3.1.1 | **Fix checkout route imports** | Add `import { users } from '@/lib/db/schema'` and `import Stripe from 'stripe'` | `app/api/checkout/route.ts` |
+| 3.1.2 | **Fix webhook latency calculation** | Change `Date.now() - timestamp` to `Date.now() - (timestamp * 1000)` | `lib/webhooks/executor.ts:66` |
+| 3.1.3 | **Fix getPendingDeliveries to include retrying** | Add `or(eq(status, 'pending'), eq(status, 'retrying'))` with `lte(nextRetryAt, now)` | `lib/webhooks/delivery.ts:97-108` |
+| 3.1.4 | **Fix XSS in stripHTMLTags** | Reverse order: decode entities BEFORE stripping tags, or remove entity decoding entirely | `lib/sanitize.ts:50-59` |
+| 3.1.5 | **Fix requirePlanFeature type safety** | Replace `@ts-ignore` with proper typed plan feature lookup using `PlanFeatureKey` | `lib/api-auth.ts:60-75` |
+| 3.1.6 | **Verify Stripe webhook idempotency** | Confirm `onConflictDoNothing` on `stripeEventId` prevents duplicate processing | `app/api/webhooks/stripe/route.ts` |
+
+### Task 3.2 — Backend Fixes (High)
+| ID | Task | Details | Files |
+|----|------|---------|-------|
+| 3.2.1 | Add `users` import to checkout route (duplicate of 3.1.1) | Already covered above | — |
+| 3.2.2 | Validate all cron job routes have auth protection | Ensure `CRON_SECRET` header check on all 12 cron routes | `app/api/cron/*/route.ts` |
+| 3.2.3 | Verify billing portal route exists and works | Check `app/api/billing/portal/` route | `app/api/billing/portal/route.ts` |
+| 3.2.4 | Audit admin API authorization | All 21 admin API dirs must call `verifyAdmin()` | `qrise-admin/app/api/admin/` |
+
+*   [x] 3.3.5 Verify empty states (Ensured all listing pages handle zero records)
+
+---
+
+## PHASE 4: INTEGRATION VALIDATION
+
+### Task 4.1 — End-to-End Flows
+| ID | Flow | Steps to Validate |
+|----|------|-------------------|
+| 4.1.1 | **Signup → Subscribe → Use → Cancel** | Auth → Checkout → Stripe webhook → Plan upgrade → Use features → Cancel → Downgrade |
+| 4.1.2 | **API Key lifecycle** | Create key → Authenticate → Make API calls → Rate limit hit → Revoke key |
+| 4.1.3 | **Webhook lifecycle** | Register webhook → Trigger event → Delivery queued → Executed → Retry on fail → Abandon |
+| 4.1.4 | **Admin Plan Management** | Create plan → Set limits → User subscribes → Limits enforced → Edit plan → Limits update |
+| 4.1.5 | **Feature Flag Flow** | Admin creates flag → Flag cached in Redis → SaaS checks flag → Toggle off → Feature hidden |
+| 4.1.6 | **Custom Type Flow** | User creates type → Submits to marketplace → Admin reviews → Approved/Rejected → Webhook fires |
+
+### Task 4.2 — Cross-System Consistency
+| ID | Task | Details |
+|----|------|---------|
+| 4.2.1 | Stripe ↔ DB plan sync | `customer.subscription.updated` correctly updates user plan |
+| 4.2.2 | Admin panel ↔ SaaS data | Plans created in admin appear in SaaS pricing |
+| 4.2.3 | Redis ↔ DB feature flags | Flag changes propagate within cache TTL (60s) |
+| 4.2.4 | Webhook events ↔ deliveries | All 16 event types fire correct payloads |
+| 4.2.5 | Usage tracking ↔ limits | API calls counted match `api_usage_events` records |
+
+---
+
+## PHASE 5: SECURITY HARDENING
+
+### Task 5.1 — Critical Security
+| ID | Task | Risk | Files |
+|----|------|------|-------|
+| 5.1.1 | **Fix SSRF gaps in webhook URL validation** | Missing `0.0.0.0`, `169.254.*`, IPv6 private ranges, DNS rebinding | `app/api/webhooks/route.ts` |
+| 5.1.2 | **Fix XSS in sanitize utility** | Entity decoding re-introduces tags | `lib/sanitize.ts` |
+| 5.1.3 | **Audit API key storage** | Verify raw keys never logged, only hash stored | `lib/api-key.ts`, `app/api/api-keys/route.ts` |
+| 5.1.4 | **Verify CSP headers** | Current CSP has `unsafe-inline` for scripts — tighten with nonces | `next.config.ts` |
+| 5.1.5 | **Stripe webhook signature verification** | Ensure `constructEvent` uses raw body, not parsed JSON | `app/api/webhooks/stripe/route.ts` |
+
+### Task 5.2 — Auth & Access Control
+| ID | Task | Details |
+|----|------|---------|
+| 5.2.1 | Verify admin session 8h expiry enforcement | `verifyAdmin` checks `hoursSinceLogin > 8` |
+| 5.2.2 | Verify API key scope enforcement | `hasScope()` called before all scoped operations |
+| 5.2.3 | Verify resource ownership checks | `verifyOwnership()` used on all user-specific mutations |
+| 5.2.4 | Test admin privilege escalation | Non-admin user cannot access admin API routes |
+| 5.2.5 | Test suspended user access | Suspended users blocked from all operations |
+
+### Task 5.3 — Injection & Input Validation
+| ID | Task | Details |
+|----|------|---------|
+| 5.3.1 | SQL injection testing | Drizzle ORM parameterizes queries — verify no raw SQL |
+| 5.3.2 | XSS testing on all user inputs | QR names, webhook URLs, form fields |
+| 5.3.3 | CSV injection in bulk upload | `sanitizeCSVCell` covers all dangerous chars |
+| 5.3.4 | Webhook payload spoofing | `verifyWebhookSignature` uses `timingSafeEqual` |
+
+---
+
+## PHASE 6: PERFORMANCE & PRODUCTION READINESS
+
+### Task 6.1 — Performance
+| ID | Task | Details |
+|----|------|---------|
+| 6.1.1 | Verify DB indexes on hot paths | `scan_events`, `api_usage_events`, `webhook_deliveries` |
+| 6.1.2 | Redis cache hit rates | Feature flags TTL=60s, rate limit efficiency |
+| 6.1.3 | Webhook queue throughput | `processQueue(50)` handles batch efficiently |
+| 6.1.4 | API response times | All endpoints < 500ms p95 |
+| 6.1.5 | Image optimization | `sharp` + WebP/AVIF configured in next.config |
+
+### Task 6.2 — DevOps & Deployment
+| ID | Task | Details |
+|----|------|---------|
+| 6.2.1 | Verify Vercel cron jobs | All 3 crons in `vercel.json` functional |
+| 6.2.2 | Verify all 12 cron routes protected | `CRON_SECRET` header validation |
+| 6.2.3 | Error tracking setup | Structured error logging on all API routes |
+| 6.2.4 | Health endpoint validation | `/api/health` returns DB + Redis status |
+| 6.2.5 | Environment parity | `.env.local.example` complete for both apps |
+
+### Task 6.3 — Production Checklist
+| ID | Item | Status |
+|----|------|--------|
+| 6.3.1 | Build succeeds (SaaS) | ❌ Blocked by B1/B2 |
+| 6.3.2 | Build succeeds (Admin) | ⬜ Needs verification |
+| 6.3.3 | All env vars documented | ⬜ |
+| 6.3.4 | Stripe webhooks registered | ⬜ |
+| 6.3.5 | CSP headers correct | ⬜ |
+| 6.3.6 | HSTS enabled | ✅ |
+| 6.3.7 | Rate limiting active | ✅ |
+| 6.3.8 | Error pages (404, 500) | ✅ |
+| 6.3.9 | Cron jobs scheduled | ✅ 3 in vercel.json (9 missing) |
+| 6.3.10 | Monitoring/alerting | ⬜ |
+
+---
+
+## Execution Priority Matrix
+
+```
+IMMEDIATE (P0) — Build blocking, data integrity
+├── 1.1.1–1.1.5  Fix build blockers
+├── 3.1.1–3.1.3  Fix checkout + webhook bugs
+├── 5.1.1–5.1.5  Critical security fixes
+└── T-CK-01–07   Checkout flow validation
+
+HIGH (P1) — Core functionality
+├── 2.1.1–2.1.6  Admin panel testing
+├── 2.2.1–2.2.5  SaaS app testing
+├── 3.2.1–3.2.4  Backend fixes
+├── 3.3.1–3.3.5  Frontend fixes
+└── 4.1.1–4.1.6  Integration flows
+
+MEDIUM (P2) — Hardening
+├── 4.2.1–4.2.5  Cross-system validation
+├── 5.2.1–5.2.5  Auth/access control
+├── 5.3.1–5.3.4  Injection testing
+└── 6.1.1–6.1.5  Performance optimization
+
+LOW (P3) — Polish
+├── 6.2.1–6.2.5  DevOps setup
+└── 6.3.1–6.3.10 Production checklist
+```
+
+---
+
+## Summary Statistics
+
+| Metric | Count |
+|--------|-------|
+| Total Tasks | **183** |
+| P0 (Critical) | **22** |
+| P1 (High) | **61** |
+| P2 (Medium) | **58** |
+| P3 (Low) | **42** |
+| Pre-existing Bugs Found | **7** |
+| Build-blocking Issues | **2** |
+| Security Vulnerabilities | **5** |
+| Schema Files | **24** |
+| API Route Dirs (SaaS) | **31** |
+| Admin API Dirs | **21** |
+| Cron Jobs | **12** (only 3 in vercel.json) |

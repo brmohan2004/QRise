@@ -22,7 +22,7 @@ export function ReviewsCarousel() {
   }, [isPaused]);
 
   return (
-    <section className="reviews-section">
+    <section className="reviews-section" aria-label="Customer Reviews">
       <div className="reviews-container">
         <div className="reviews-header">
           <h2 className="reviews-title">

@@ -22,11 +22,9 @@ export function hashApiKey(raw: string): string {
  */
 export async function verifyApiKey(raw: string, storedHash: string): Promise<boolean> {
   const hash = hashApiKey(raw);
-  // Constant-time comparison
-  if (hash.length !== storedHash.length) return false;
-  let result = 0;
-  for (let i = 0; i < hash.length; i++) {
-    result |= hash.charCodeAt(i) ^ storedHash.charCodeAt(i);
+  try {
+    return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(storedHash));
+  } catch {
+    return false;
   }
-  return result === 0;
 }

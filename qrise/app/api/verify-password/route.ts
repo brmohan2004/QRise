@@ -4,7 +4,7 @@ import { qrCodes } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
-import { rateLimitByIP } from '@/lib/rate-limit';
+import { rateLimitByIP } from '@/lib/redis';
 import { sendPasswordBruteForceAlert } from '@/lib/resend';
 import { users } from '@/lib/db/schema';
 

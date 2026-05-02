@@ -35,7 +35,7 @@ export async function executeDelivery(deliveryId: string): Promise<DeliveryResul
   const { delivery: d, webhook: wh } = records[0];
 
   const body = JSON.stringify(d.payload);
-  const timestamp = Date.now();
+  const timestamp = Math.floor(Date.now() / 1000); // Use seconds to match verification
 
   try {
     const signature = await signPayload({
@@ -63,7 +63,7 @@ export async function executeDelivery(deliveryId: string): Promise<DeliveryResul
     clearTimeout(timeout);
 
     const text = await res.text();
-    const latencyMs = Date.now() - timestamp;
+    const latencyMs = Date.now() - (timestamp * 1000);
 
     if (res.ok) {
       await db
@@ -83,7 +83,7 @@ export async function executeDelivery(deliveryId: string): Promise<DeliveryResul
     const errorMsg = err instanceof Error ? err.message : 'Unknown error';
     const attempts = (d.attempts as number) + 1;
 
-    if (attempts >= RETRY_SCHEDULE_MINUTES.length) {
+    if (attempts > RETRY_SCHEDULE_MINUTES.length) {
       // Abandon after final attempt
       await db
         .update(webhookDeliveries)
@@ -93,17 +93,20 @@ export async function executeDelivery(deliveryId: string): Promise<DeliveryResul
         })
         .where(eq(webhookDeliveries.id, deliveryId));
 
-      // Fire notification for failure
-      await fireWebhookEvent({
-        userId: wh.userId,
-        event: 'resolver.failed',
-        payload: {
-          resolver_id: wh.id,
-          type: 'webhook',
-          error: errorMsg,
-          endpoint: wh.endpointUrl,
-        },
-      });
+      // Fire notification for failure, but prevent infinite loops
+      // If a webhook listening to resolver.failed fails, do NOT fire another resolver.failed event
+      if (d.eventType !== 'resolver.failed') {
+        await fireWebhookEvent({
+          userId: wh.userId,
+          event: 'resolver.failed',
+          payload: {
+            resolver_id: wh.id,
+            type: 'webhook',
+            error: errorMsg,
+            endpoint: wh.endpointUrl,
+          },
+        });
+      }
 
       return { success: false, error: errorMsg };
     } else {

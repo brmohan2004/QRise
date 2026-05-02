@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { webhooks, webhookDeliveries } from '@/lib/db/schema';
-import { eq, and, lte } from 'drizzle-orm';
+import { eq, and, lte, or } from 'drizzle-orm';
 import { WebhookEventType } from './events';
 
 /**
@@ -101,7 +101,7 @@ export async function getPendingDeliveries(limit: number = 50) {
     .from(webhookDeliveries)
     .where(
       and(
-        eq(webhookDeliveries.status, 'pending'),
+        or(eq(webhookDeliveries.status, 'pending'), eq(webhookDeliveries.status, 'retrying')),
         lte(webhookDeliveries.nextRetryAt, now)
       )
     )

@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAdminUser } from '@/lib/auth-utils';
+import { verifyAdmin } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit';
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getAdminUser();
-  if (!admin) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const authResult = await verifyAdmin(request);
+  if ('error' in authResult) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.status });
   }
 
   const { id } = await params;
@@ -37,7 +37,7 @@ export async function PATCH(
 
     // Audit log
     await writeAuditLog({
-      adminUserId: admin.id,
+      adminUserId: authResult.adminId,
       action: `custom_type.${action}`,
       targetType: 'custom_type',
       targetId: id,
@@ -57,9 +57,9 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getAdminUser();
-  if (!admin) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const authResult = await verifyAdmin(request);
+  if ('error' in authResult) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.status });
   }
 
   const { id } = await params;
@@ -75,7 +75,7 @@ export async function DELETE(
 
     // Audit log
     await writeAuditLog({
-      adminUserId: admin.id,
+      adminUserId: authResult.adminId,
       action: 'custom_type.delete',
       targetType: 'custom_type',
       targetId: id,

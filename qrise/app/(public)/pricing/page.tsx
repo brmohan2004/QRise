@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { plans as plansTable, planRateLimits } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export default async function PricingPage() {
   const isEnabled = await isFeatureEnabled("pricing_page_enabled");

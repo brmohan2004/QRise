@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, boolean, jsonb, integer, inet } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, boolean, jsonb, integer, inet, index } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 export const apiKeys = pgTable('api_keys', {
@@ -20,7 +20,9 @@ export const apiKeys = pgTable('api_keys', {
   lastUsedAt: timestamp('last_used_at'),
   isActive: boolean('is_active').default(true),
   adminCallLimitOverride: jsonb('admin_call_limit_override'), // { minute, hour, day }
-});
+}, (table) => ({
+  userIdIdx: index('idx_api_keys_user_id').on(table.userId),
+}));
 
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type NewApiKey = typeof apiKeys.$inferInsert;
@@ -34,7 +36,9 @@ export const webhooks = pgTable('webhooks', {
   filterConfig: jsonb('filter_config'),
   isActive: boolean('is_active').default(true),
   createdAt: timestamp('created_at').defaultNow(),
-});
+}, (table) => ({
+  userIdIdx: index('idx_webhooks_user_id').on(table.userId),
+}));
 
 export const webhookDeliveries = pgTable('webhook_deliveries', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -49,7 +53,11 @@ export const webhookDeliveries = pgTable('webhook_deliveries', {
   durationMs: integer('duration_ms'),
   status: text('status', { enum: ['pending', 'delivered', 'failed', 'retrying', 'abandoned'] }).default('pending'),
   filterConfig: jsonb('filter_config'),
-});
+}, (table) => ({
+  webhookIdIdx: index('idx_webhook_del_webhook_id').on(table.webhookId),
+  statusIdx: index('idx_webhook_del_status').on(table.status),
+  nextRetryIdx: index('idx_webhook_del_next_retry').on(table.nextRetryAt),
+}));
 
 export type Webhook = typeof webhooks.$inferSelect;
 export type NewWebhook = typeof webhooks.$inferInsert;

@@ -10,23 +10,26 @@ const footerLinks: Record<string, FooterLink[]> = {
   Product: [
     { name: "Features", href: "/features" },
     { name: "Pricing", href: "/pricing" },
+    { name: "Explore Templates", href: "/explore" },
     { name: "Docs", href: "/docs" },
-    { name: "API", href: "/docs" },
+    { name: "API Reference", href: "/docs" },
   ],
-  Resources: [
-    { name: "Blog", href: "#" },
-    { name: "Changelog", href: "#" },
-    { name: "Status", href: "#" },
+  "Use Cases": [
+    { name: "Marketing Campaigns", href: "/features" },
+    { name: "Event Management", href: "/explore" },
+    { name: "Product Packaging", href: "/features" },
+    { name: "Business Cards", href: "/features" },
+    { name: "Retail & Logistics", href: "/explore" },
   ],
   Company: [
-    { name: "About", href: "#" },
-    { name: "Privacy", href: "#" },
-    { name: "Terms", href: "#" },
+    { name: "About", href: "/about" },
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Terms of Service", href: "/terms" },
   ],
   Connect: [
-    { name: "Twitter", href: "#", icon: Share2 },
-    { name: "GitHub", href: "#", icon: Globe },
-    { name: "Discord", href: "#", icon: MessageCircle },
+    { name: "Twitter", href: "https://twitter.com/QRiseApp", icon: Share2 },
+    { name: "GitHub", href: "https://github.com/qrise", icon: Globe },
+    { name: "Discord", href: "https://discord.gg/qrise", icon: MessageCircle },
   ],
 };
 
@@ -66,7 +69,7 @@ export function SiteFooter({ pricingEnabled = true }: { pricingEnabled?: boolean
   };
 
   return (
-    <footer className="site-footer">
+    <footer className="site-footer" role="contentinfo">
       <div className="footer-container">
         {/* Newsletter section */}
         <div className="footer-newsletter">
@@ -75,26 +78,30 @@ export function SiteFooter({ pricingEnabled = true }: { pricingEnabled?: boolean
               Stay up to date
             </h3>
             <p className="newsletter-subtitle">
-              Get the latest news and updates delivered to your inbox.
+              Get the latest QR code tips, product updates, and industry news delivered to your inbox.
             </p>
-            <form onSubmit={handleSubmit} className="newsletter-form">
+            <form onSubmit={handleSubmit} className="newsletter-form" aria-label="Newsletter signup">
+              <label htmlFor="newsletter-email" className="sr-only">Email address</label>
               <input
+                id="newsletter-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 className="newsletter-input"
                 required
+                autoComplete="email"
               />
               <button
                 type="submit"
                 disabled={status !== "idle"}
                 className="newsletter-btn"
+                aria-label="Subscribe to newsletter"
               >
                 {status === "loading" ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
                 ) : status === "success" ? (
-                  <CheckCircle className="h-5 w-5" />
+                  <CheckCircle className="h-5 w-5" aria-hidden="true" />
                 ) : (
                   "Subscribe"
                 )}
@@ -104,7 +111,7 @@ export function SiteFooter({ pricingEnabled = true }: { pricingEnabled?: boolean
         </div>
 
         {/* Links */}
-        <div className="footer-links-grid">
+        <nav className="footer-links-grid" aria-label="Footer navigation">
           {Object.entries(filteredFooterLinks).map(([category, links]) => (
             <div key={category}>
               <h4 className="footer-col-title">{category}</h4>
@@ -114,9 +121,10 @@ export function SiteFooter({ pricingEnabled = true }: { pricingEnabled?: boolean
                     <Link
                       href={link.href}
                       className="footer-link"
+                      {...(link.href.startsWith("http") ? { rel: "noopener noreferrer", target: "_blank" } : {})}
                     >
                       {link.icon && (
-                        <link.icon className="h-4 w-4" />
+                        <link.icon className="h-4 w-4" aria-hidden="true" />
                       )}
                       {link.name}
                     </Link>
@@ -125,16 +133,16 @@ export function SiteFooter({ pricingEnabled = true }: { pricingEnabled?: boolean
               </ul>
             </div>
           ))}
-        </div>
+        </nav>
 
         {/* Bottom bar */}
         <div className="footer-bottom">
           <div className="footer-brand">
-            <QrCode className="brand-icon h-6 w-6" />
+            <QrCode className="brand-icon h-6 w-6" aria-hidden="true" />
             <span className="brand-name">QRise</span>
           </div>
           <p className="footer-copyright">
-            Built with love for QR enthusiasts
+            &copy; {new Date().getFullYear()} QRise Inc. All rights reserved.
           </p>
         </div>
       </div>

@@ -27,7 +27,7 @@ export function DeveloperSection() {
   ];
 
   return (
-    <section className="developer-section">
+    <section className="developer-section" aria-label="Developer API">
       <div className="developer-container">
         <div className="developer-header">
           <h2 className="developer-title">

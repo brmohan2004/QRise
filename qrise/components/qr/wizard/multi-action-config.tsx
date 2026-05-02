@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { useWizardStore } from "@/stores/qr-wizard.store";
 import { Plus, Trash2, GripVertical, Globe, Phone, Mail, MapPin, Download, MessageCircle, Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { cn } from "@/lib/utils";
 import type { QRAction } from "@/types/qr.types";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +19,16 @@ const actionTypes = [
   { value: "download", label: "Download", icon: Download },
   { value: "whatsapp", label: "WhatsApp", icon: MessageCircle },
 ];
+const actionSchema = z.object({
+  type: z.enum(["url", "phone", "email", "map", "download", "whatsapp"]),
+  label: z.string().min(1, "Label is required"),
+  value: z.string().min(1, "Value is required").refine((val) => {
+    // Basic structural validation, more complex logic can go here
+    return true; 
+  }, "Invalid format"),
+});
+
+type ActionFormData = z.infer<typeof actionSchema>;
 
 export function MultiActionConfig() {
   const { config, name: wizardName, setName: setWizardName, setConfig, editingQrId, setEditingQrId } = useWizardStore();
@@ -174,16 +187,23 @@ export function MultiActionConfig() {
 }
 
 function ActionModal({ onClose, onSave }: { onClose: () => void; onSave: (action: QRAction) => void }) {
-  const [type, setType] = useState("url");
-  const [label, setLabel] = useState("");
-  const [value, setValue] = useState("");
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<ActionFormData>({
+    resolver: zodResolver(actionSchema),
+    defaultValues: { type: "url", label: "", value: "" },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const watchType = watch("type");
+
+  const onSubmit = (data: ActionFormData) => {
     onSave({
-      label,
-      actionType: type as any,
-      actionValue: value,
+      label: data.label,
+      actionType: data.type as any,
+      actionValue: data.value,
       displayOrder: 0,
     });
   };
@@ -192,13 +212,12 @@ function ActionModal({ onClose, onSave }: { onClose: () => void; onSave: (action
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <h3 className="text-lg font-semibold mb-4">Add Action</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="block text-sm font-medium">Type</label>
             <select
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg"
+              {...register("type")}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               {actionTypes.map((t) => (
                 <option key={t.value} value={t.value}>
@@ -211,23 +230,21 @@ function ActionModal({ onClose, onSave }: { onClose: () => void; onSave: (action
             <label className="block text-sm font-medium">Label</label>
             <input
               type="text"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg"
+              {...register("label")}
+              className={cn("mt-1 block w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500", errors.label ? "border-red-500" : "border-gray-300")}
               placeholder="Visit Website"
-              required
             />
+            {errors.label && <p className="text-xs text-red-500 mt-1">{errors.label.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium">Value</label>
             <input
               type="text"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg"
-              placeholder={type === "url" ? "https://example.com" : type === "phone" ? "+1234567890" : "email@example.com"}
-              required
+              {...register("value")}
+              className={cn("mt-1 block w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500", errors.value ? "border-red-500" : "border-gray-300")}
+              placeholder={watchType === "url" ? "https://example.com" : watchType === "phone" ? "+1234567890" : "email@example.com"}
             />
+            {errors.value && <p className="text-xs text-red-500 mt-1">{errors.value.message}</p>}
           </div>
           <div className="flex gap-3">
             <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border rounded-lg">

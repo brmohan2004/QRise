@@ -2,11 +2,20 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+
+const passwordSchema = z.object({
+  password: z.string().min(1, 'Password is required'),
+});
+
+type PasswordFormData = z.infer<typeof passwordSchema>;
 
 interface PasswordEntryFormProps {
   qrId: string;
@@ -14,38 +23,37 @@ interface PasswordEntryFormProps {
 }
 
 export function PasswordEntryForm({ qrId, label }: PasswordEntryFormProps) {
-  const [password, setPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<PasswordFormData>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: { password: '' },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!password) return;
-
-    setIsSubmitting(true);
+  const onSubmit = async (data: PasswordFormData) => {
     try {
       const response = await fetch('/api/verify-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ password, qrId }),
+        body: JSON.stringify({ password: data.password, qrId }),
       });
 
-      const data = await response.json();
+      const resData = await response.json();
 
-      if (response.ok && data.valid) {
+      if (response.ok && resData.valid) {
         toast.success('Password verified! Redirecting...');
         // Redirect to the target URL
-        window.location.href = data.redirectUrl;
+        window.location.href = resData.redirectUrl;
       } else {
-        toast.error(data.error || 'Invalid password');
+        toast.error(resData.error || 'Invalid password');
       }
     } catch (error) {
       console.error('Error verifying password:', error);
       toast.error('Something went wrong. Please try again.');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -62,18 +70,17 @@ export function PasswordEntryForm({ qrId, label }: PasswordEntryFormProps) {
             Please enter the password to proceed.
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Input
                 type="password"
                 placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...register("password")}
                 className="h-11"
                 autoFocus
-                required
               />
+              {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
             </div>
           </CardContent>
           <CardFooter>

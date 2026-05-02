@@ -1,37 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import "./hero.css";
 
 export function Hero() {
   return (
-    <section className="hero-section">
+    <section className="hero-section" aria-label="Dynamic QR Code Generator">
       <div className="hero-container">
         <div className="hero-grid">
           {/* Text content */}
           <div className="hero-content">
             <h1 className="hero-title">
-              The QR platform built for{" "}
+              The <strong>QR code platform</strong> built for{" "}
               <span>real results</span>
             </h1>
             <p className="hero-description">
-              Create dynamic QR codes that track every scan — change destinations anytime without
-              reprinting. Powerful analytics, design tools, and integrations for modern
-              teams.
+              Create <strong>dynamic QR codes</strong> that track every scan — change destinations anytime without
+              reprinting. Powerful <strong>analytics</strong>, design tools, and integrations for modern
+              teams. Free to start.
             </p>
             <div className="hero-actions">
-              <Link href="/register" className="hero-btn-primary">
+              <Link href="/register" className="hero-btn-primary" aria-label="Create your free QR code — sign up for QRise">
                 Start for free
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
-              <a href="#demo" className="hero-btn-secondary">
+              <a href="#demo" className="hero-btn-secondary" aria-label="See the QRise analytics dashboard demo">
                 See it live
               </a>
             </div>
 
             {/* Stats */}
-            <div className="hero-stats">
+            <div className="hero-stats" role="group" aria-label="QRise platform statistics">
               <div className="stat-item">
                 <p className="stat-value">10,000+</p>
                 <p className="stat-label">QR codes created</p>
@@ -50,7 +50,7 @@ export function Hero() {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="hero-scroll-indicator">
+      <div className="hero-scroll-indicator" aria-hidden="true">
         <div className="mouse">
           <div className="wheel"></div>
         </div>

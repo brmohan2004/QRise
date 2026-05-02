@@ -251,7 +251,14 @@ export function ResolverConfigDialog({
                   {previewHtml && (
                     <div className="border-2 border-dashed border-gray-100 rounded-2xl p-4 animate-in zoom-in-95">
                       <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Live Preview</p>
-                      <div className="bg-white rounded-lg p-4 border shadow-sm max-h-[300px] overflow-auto" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                      <div className="bg-white rounded-lg p-0 border shadow-sm max-h-[400px] overflow-hidden aspect-[16/9]">
+                        <iframe 
+                          srcDoc={previewHtml} 
+                          title="Template Preview"
+                          className="w-full h-full border-none"
+                          sandbox="allow-same-origin"
+                        />
+                      </div>
                     </div>
                   )}
 

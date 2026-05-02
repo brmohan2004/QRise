@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, boolean, integer, date } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, boolean, integer, date, index } from 'drizzle-orm/pg-core';
 
 export const scanEvents = pgTable('scan_events', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -13,7 +13,10 @@ export const scanEvents = pgTable('scan_events', {
   isBot: boolean('is_bot').default(false),
   isUnique: boolean('is_unique').default(true),
   matchedRuleId: uuid('matched_rule_id'),
-});
+}, (table) => ({
+  qrIdIdx: index('idx_scan_qr_id').on(table.qrId),
+  scannedAtIdx: index('idx_scan_scanned_at').on(table.scannedAt),
+}));
 
 export type ScanEvent = typeof scanEvents.$inferSelect;
 export type NewScanEvent = typeof scanEvents.$inferInsert;

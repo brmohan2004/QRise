@@ -58,6 +58,9 @@ export function withApiAuth(handler: ApiHandler, options?: ApiScope | WithApiAut
         try {
           const userRec = await db.select().from(users).where(eq(users.id, sessionUser.id)).limit(1);
           user = userRec[0];
+          if (user?.isSuspended) {
+            return apiError('ACCOUNT_SUSPENDED', 'Your account has been suspended.', 403);
+          }
           plan = user?.plan || 'free';
         } catch (e) {
           console.error('Failed to fetch user from DB in auth-middleware:', e);
@@ -188,6 +191,10 @@ export function withApiAuth(handler: ApiHandler, options?: ApiScope | WithApiAut
 
     const user = userRecords[0].user;
     const plan = userRecords[0].plan?.name || 'free';
+
+    if (user.isSuspended) {
+      return trackAndReturn(apiError('ACCOUNT_SUSPENDED', 'Your account has been suspended.', 403));
+    }
 
     // Load rate limits (plan + user overrides)
     const planLimits = await getPlanRateLimits(plan);

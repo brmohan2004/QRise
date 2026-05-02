@@ -18,7 +18,7 @@ export async function verifyAdmin(request: NextRequest) {
       if (payload.is_admin && payload.email === process.env.ADMIN_EMAIL) {
         // Prioritize the admin user from the JWT
         user = {
-          id: 'admin_env_user',
+          id: '00000000-0000-0000-0000-000000000000',
           email: payload.email as string,
           app_metadata: { is_admin: true },
           user_metadata: { is_admin: true },
@@ -43,7 +43,7 @@ export async function verifyAdmin(request: NextRequest) {
   }
 
   // Check DB for admin flag (Skip for hardcoded env user)
-  if (user.id !== 'admin_env_user') {
+  if (user.id !== '00000000-0000-0000-0000-000000000000') {
     const adminClient = createAdminClient()
     const { data: profile } = await adminClient
       .from('users')
