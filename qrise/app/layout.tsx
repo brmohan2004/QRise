@@ -69,20 +69,20 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://qrise.app"),
   openGraph: {
     title: "QRise - Dynamic QR Code Generator with Analytics & Tracking",
     description: "Create dynamic QR codes that track every scan. Edit destinations anytime without reprinting. Free to start.",
-    url: "https://qrise.app",
+    url: "/",
     siteName: "QRise",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "https://qrise.app/og-image.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "QRise - Dynamic QR Code Generator with Powerful Analytics Dashboard",
-        type: "image/png",
+        alt: "QRise - Dynamic QR Code Generator with Analytics",
       },
     ],
   },
@@ -90,17 +90,13 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "QRise - Dynamic QR Code Generator with Analytics",
     description: "Create dynamic QR codes that track every scan. Edit destinations anytime without reprinting. Free to start.",
-    images: ["https://qrise.app/og-image.png"],
+    images: ["/og-image.png"],
     creator: "@QRiseApp",
-    site: "@QRiseApp",
   },
-  metadataBase: new URL("https://qrise.app"),
   verification: {
-    // Add your verification codes here:
-    // google: "your-google-verification-code",
-    // yandex: "your-yandex-verification-code",
+    google: "", // Add verification code
     other: {
-      "msvalidate.01": "", // Add Bing verification code
+      "msvalidate.01": "",
     },
   },
   other: {
@@ -116,11 +112,15 @@ import { UsageLimitModal } from "@/components/billing/usage-limit-modal";
 
 import { OrganizationSchema, WebApplicationSchema, SoftwareApplicationSchema, HowToSchema, ReviewSchema } from "@/components/seo/json-ld";
 
-export default function RootLayout({
+import { headers } from "next/headers";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get('x-nonce') || undefined;
+
   return (
     <html
       lang="en"
@@ -128,11 +128,11 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <head>
-        <OrganizationSchema />
-        <WebApplicationSchema />
-        <SoftwareApplicationSchema />
-        <HowToSchema />
-        <ReviewSchema />
+        <OrganizationSchema nonce={nonce} />
+        <WebApplicationSchema nonce={nonce} />
+        <SoftwareApplicationSchema nonce={nonce} />
+        <HowToSchema nonce={nonce} />
+        <ReviewSchema nonce={nonce} />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

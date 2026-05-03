@@ -192,13 +192,41 @@ export default async function middleware(request: NextRequest) {
 
 
 
+  // ── High Security Nonce Generation ──
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+  const upstashUrl = process.env.UPSTASH_REDIS_REST_URL || 'https://*.upstash.io';
+  const workerUrl = process.env.NEXT_PUBLIC_REDIRECT_BASE_URL || 'https://*.workers.dev';
+
+  const cspHeader = `
+    default-src 'self';
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' https: http:;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    img-src 'self' data: blob: https://*.supabase.co https://res.cloudinary.com https://*.googleusercontent.com;
+    font-src 'self' https://fonts.gstatic.com data:;
+    connect-src 'self' ${supabaseUrl} ${upstashUrl} ${workerUrl} https://*.supabase.co https://api.cloudinary.com https://res.cloudinary.com blob:;
+    frame-ancestors 'none';
+    form-action 'self';
+    base-uri 'self';
+    object-src 'none';
+  `.replace(/\s{2,}/g, ' ').trim();
+
+  // Apply headers to the initial response
+  supabaseResponse.headers.set('x-nonce', nonce);
+  supabaseResponse.headers.set('Content-Security-Policy', cspHeader);
+
   if (isAuthPath && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    const response = NextResponse.redirect(new URL('/dashboard', request.url));
+    response.headers.set('x-nonce', nonce);
+    response.headers.set('Content-Security-Policy', cspHeader);
+    return response;
   }
 
   // For protected API routes without a session, return 401
   if (isApiRoute && !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    response.headers.set('x-nonce', nonce);
+    response.headers.set('Content-Security-Policy', cspHeader);
+    return response;
   }
 
   return supabaseResponse;

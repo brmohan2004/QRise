@@ -1,16 +1,19 @@
-export function JsonLd({ data }: { data: Record<string, unknown> }) {
+export function JsonLd({ data, nonce }: { data: Record<string, unknown>; nonce?: string }) {
   return (
     <script
       type="application/ld+json"
+      nonce={nonce}
+      suppressHydrationWarning={true}
       dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
     />
   );
 }
 
 // Pre-built schemas for common page types
-export function OrganizationSchema() {
+export function OrganizationSchema({ nonce }: { nonce?: string }) {
   return (
     <JsonLd
+      nonce={nonce}
       data={{
         "@context": "https://schema.org",
         "@type": "Organization",
@@ -34,9 +37,10 @@ export function OrganizationSchema() {
   );
 }
 
-export function WebApplicationSchema() {
+export function WebApplicationSchema({ nonce }: { nonce?: string }) {
   return (
     <JsonLd
+      nonce={nonce}
       data={{
         "@context": "https://schema.org",
         "@type": "WebApplication",
@@ -100,9 +104,10 @@ export function WebApplicationSchema() {
   );
 }
 
-export function SoftwareApplicationSchema() {
+export function SoftwareApplicationSchema({ nonce }: { nonce?: string }) {
   return (
     <JsonLd
+      nonce={nonce}
       data={{
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
@@ -127,9 +132,10 @@ export function SoftwareApplicationSchema() {
   );
 }
 
-export function FAQSchema({ faqs }: { faqs: { question: string; answer: string }[] }) {
+export function FAQSchema({ faqs, nonce }: { faqs: { question: string; answer: string }[]; nonce?: string }) {
   return (
     <JsonLd
+      nonce={nonce}
       data={{
         "@context": "https://schema.org",
         "@type": "FAQPage",
@@ -146,9 +152,10 @@ export function FAQSchema({ faqs }: { faqs: { question: string; answer: string }
   );
 }
 
-export function BreadcrumbSchema({ items }: { items: { name: string; url: string }[] }) {
+export function BreadcrumbSchema({ items, nonce }: { items: { name: string; url: string }[]; nonce?: string }) {
   return (
     <JsonLd
+      nonce={nonce}
       data={{
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
@@ -163,9 +170,10 @@ export function BreadcrumbSchema({ items }: { items: { name: string; url: string
   );
 }
 
-export function HowToSchema() {
+export function HowToSchema({ nonce }: { nonce?: string }) {
   return (
     <JsonLd
+      nonce={nonce}
       data={{
         "@context": "https://schema.org",
         "@type": "HowTo",
@@ -207,7 +215,7 @@ export function HowToSchema() {
   );
 }
 
-export function ReviewSchema() {
+export function ReviewSchema({ nonce }: { nonce?: string }) {
   const reviews = [
     {
       author: "John D.",
@@ -243,6 +251,7 @@ export function ReviewSchema() {
 
   return (
     <JsonLd
+      nonce={nonce}
       data={{
         "@context": "https://schema.org",
         "@type": "Product",

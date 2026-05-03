@@ -14,10 +14,10 @@ const nextConfig: NextConfig = {
 
     const cspHeader = `
       default-src 'self';
-      script-src 'self';
-      style-src 'self' 'unsafe-inline';
-      img-src 'self' data: blob: https://*.supabase.co https://res.cloudinary.com;
-      font-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      img-src 'self' data: blob: https://*.supabase.co https://res.cloudinary.com https://*.googleusercontent.com;
+      font-src 'self' https://fonts.gstatic.com data:;
       connect-src 'self' ${supabaseUrl} ${upstashUrl} ${workerUrl} https://*.supabase.co https://api.cloudinary.com https://res.cloudinary.com blob:;
       frame-ancestors 'none';
       form-action 'self';
@@ -75,10 +75,6 @@ const nextConfig: NextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
-          },
-          {
-            key: 'Content-Security-Policy',
-            value: cspHeader,
           },
           {
             key: 'X-XSS-Protection',
