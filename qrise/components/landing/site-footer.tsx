@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { QrCode, MessageCircle, Loader2, CheckCircle, Globe, Share2 } from "lucide-react";
 
@@ -38,6 +38,12 @@ import "./site-footer.css";
 export function SiteFooter({ pricingEnabled = true }: { pricingEnabled?: boolean }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
+  // Use useEffect to update year on client side to avoid hydration mismatch
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   const filteredFooterLinks = {
     ...footerLinks,
@@ -142,7 +148,7 @@ export function SiteFooter({ pricingEnabled = true }: { pricingEnabled?: boolean
             <span className="brand-name">QRise</span>
           </div>
           <p className="footer-copyright">
-            &copy; {new Date().getFullYear()} QRise Inc. All rights reserved.
+            &copy; {currentYear} QRise Inc. All rights reserved.
           </p>
         </div>
       </div>
