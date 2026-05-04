@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useRef } from 'react';
 import { QrCode, Globe, MapPin, Smartphone, LayoutDashboard, Settings, User, Bell, Search, Plus, List, BarChart2, MoreVertical, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,19 +18,42 @@ const chartData = [
 ];
 
 export function DemoDashboard() {
-  return (
-    <section id="demo" className="demo-section" aria-label="Dashboard Demonstration">
-      <div className="demo-container">
-        <div className="demo-header">
-          <h2 className="demo-title">
-            The power you need, <span>all in one place</span>
-          </h2>
-          <p className="demo-description">
-            Experience a professional dashboard designed for growth. Monitor scans, manage dynamic content, and gain deep insights instantly.
-          </p>
-        </div>
+  const sectionRef = useRef<HTMLElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
-        {/* Browser chrome mockup */}
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current || !bodyRef.current || window.innerWidth < 1024) return;
+
+      const rect = sectionRef.current.getBoundingClientRect();
+      const sectionHeight = sectionRef.current.offsetHeight;
+      const windowHeight = window.innerHeight;
+
+      // Calculate how far we are into the section
+      const scrollStart = 0; // Relative to the top of the viewport
+      const progress = Math.max(0, Math.min(1, -rect.top / (sectionHeight - windowHeight)));
+
+      const scrollableHeight = bodyRef.current.scrollHeight - bodyRef.current.clientHeight;
+      bodyRef.current.scrollTop = progress * scrollableHeight;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <section id="demo" ref={sectionRef} className="demo-section" aria-label="Dashboard Demonstration">
+      <div className="demo-header">
+        <h2 className="demo-title">
+          The power you need, <span>all in one place</span>
+        </h2>
+        <p className="demo-description">
+          Experience a professional dashboard designed for growth. Monitor scans, manage dynamic content, and gain deep insights instantly.
+        </p>
+      </div>
+      <div className="demo-sticky-wrapper">
+        <div className="demo-container">
+          {/* Browser chrome mockup */}
         <div className="browser-mockup">
           {/* Address bar */}
           <div className="browser-header">
@@ -108,7 +132,7 @@ export function DemoDashboard() {
               </div>
 
               {/* Scrollable Content */}
-              <div className="dashboard-body">
+              <div ref={bodyRef} className="dashboard-body">
                 {/* Header Section */}
                 <div className="content-heading">
                   <div>
@@ -237,6 +261,7 @@ export function DemoDashboard() {
           </Link>
         </div>
       </div>
+    </div>
     </section>
   );
 }
