@@ -15,10 +15,12 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "QRise - Free Dynamic QR Code Generator with Analytics & Tracking",
-  description: "Create free dynamic QR codes that track every scan. Edit destinations anytime without reprinting. Powerful analytics dashboard, custom design studio, form builder, bulk generation, and REST API for marketing teams and developers.",
+  description: "Create free dynamic QR codes, multiple action menus, and password protected links. Track every scan with a powerful analytics dashboard. Edit destinations anytime without reprinting. Includes custom design studio, form builder, and REST API.",
   keywords: [
     "free QR code generator",
     "dynamic QR code",
+    "multiple action QR",
+    "password protected QR",
     "QR code tracker",
     "QR code analytics",
     "custom QR code design",

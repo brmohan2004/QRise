@@ -16,8 +16,8 @@ export function Hero() {
               <span>real results</span>
             </h1>
             <p className="hero-description">
-              Create <strong>dynamic QR codes</strong> that track every scan — change destinations anytime without
-              reprinting. Powerful <strong>analytics</strong>, design tools, and integrations for modern
+              Create <strong>dynamic QR codes</strong>, <strong>multiple action menus</strong>, and <strong>password protected</strong> links that track every scan. Change destinations anytime without
+              reprinting. Powerful <strong>analytics</strong>, <strong>design studio</strong>, and integrations for modern
               teams. Free to start.
             </p>
             <div className="hero-actions">

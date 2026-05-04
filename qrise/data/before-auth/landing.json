@@ -1,34 +1,40 @@
 {
   "features": [
     {
+      "id": "dynamic",
       "icon": "QrCode",
       "name": "Dynamic QR",
-      "description": "Edit your destination URL anytime without reprinting"
+      "description": "Make every QR type dynamic. Edit destination URLs or display custom text anytime without reprinting."
     },
     {
+      "id": "multi-action",
+      "icon": "Layers",
+      "name": "Multiple Action",
+      "description": "One QR, many destinations. Let users choose from a list of actions including URLs, Phone, and Text."
+    },
+    {
+      "id": "password-protected",
+      "icon": "Lock",
+      "name": "Password Protected",
+      "description": "Secure your content. Require a password before redirecting to the URL."
+    },
+    {
+      "id": "smart-routing",
       "icon": "GitBranch",
       "name": "Smart Routing",
-      "description": "Route scans by device, location, or time"
+      "description": "Intelligent redirection based on device, location, or time of scan."
     },
     {
-      "icon": "BarChart3",
-      "name": "Deep Analytics",
-      "description": "Track every scan with detailed insights"
-    },
-    {
+      "id": "design-studio",
       "icon": "Palette",
       "name": "Design Studio",
-      "description": "Full branding control for your QR codes"
+      "description": "Full branding control. Customize colors, add logos, and select frames."
     },
     {
-      "icon": "FileText",
-      "name": "Form Builder",
-      "description": "Collect data with drag-and-drop forms"
-    },
-    {
-      "icon": "Layers",
-      "name": "Bulk Generator",
-      "description": "Create hundreds of QR codes from CSV"
+      "id": "analytics",
+      "icon": "BarChart3",
+      "name": "Deep Analytics",
+      "description": "Track every scan with detailed insights into user behavior and location."
     }
   ],
   "companies": [

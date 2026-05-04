@@ -3,37 +3,55 @@
     {
       "id": "dynamic",
       "name": "Dynamic QR",
-      "description": "Edit destination URLs without reprinting",
+      "description": "Make every QR type dynamic. Edit destination URLs anytime without reprinting.",
+      "isNew": false
+    },
+    {
+      "id": "multi-action",
+      "name": "Multiple Action",
+      "description": "One QR, many destinations. Let users choose from a list of actions.",
+      "isNew": false
+    },
+    {
+      "id": "password-protected",
+      "name": "Password Protected",
+      "description": "Secure your content. Require a password before redirecting to the URL.",
       "isNew": false
     },
     {
       "id": "smart-routing",
       "name": "Smart Routing",
-      "description": "Route scans by device, location, or time",
-      "isNew": false
-    },
-    {
-      "id": "analytics",
-      "name": "Deep Analytics",
-      "description": "Track every scan with detailed insights",
+      "description": "Intelligent redirection based on device, location, or time of scan.",
       "isNew": false
     },
     {
       "id": "design-studio",
       "name": "Design Studio",
-      "description": "Full customization with logos and colors",
+      "description": "Full branding control. Customize colors, add logos, and select frames.",
+      "isNew": false
+    },
+    {
+      "id": "analytics",
+      "name": "Deep Analytics",
+      "description": "Track every scan with detailed insights into user behavior and location.",
       "isNew": false
     },
     {
       "id": "form-builder",
       "name": "Form Builder",
-      "description": "Collect data with drag-and-drop forms",
+      "description": "Collect data with drag-and-drop forms.",
       "isNew": false
     },
     {
       "id": "bulk-generator",
       "name": "Bulk Generator",
-      "description": "Create hundreds of QR codes from CSV",
+      "description": "Create hundreds of QR codes from CSV.",
+      "isNew": false
+    },
+    {
+      "id": "custom-types",
+      "name": "Custom QR Types",
+      "description": "Developers can build and deploy their own QR logic and schemas.",
       "isNew": false
     },
     { "id": "upcoming-1", "name": "NFC Tags", "description": "Manage NFC-enabled tags", "isNew": true, "hint": "Physical tags" },

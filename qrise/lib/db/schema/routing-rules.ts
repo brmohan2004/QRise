@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, jsonb, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, jsonb, integer, varchar } from 'drizzle-orm/pg-core';
 
 export const routingRules = pgTable('routing_rules', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -6,6 +6,7 @@ export const routingRules = pgTable('routing_rules', {
   priority: integer('priority').default(0),
   conditions: jsonb('conditions').notNull(),
   targetUrl: text('target_url').notNull(),
+  destinationType: varchar('destination_type', { length: 10 }).default('url'),
   label: text('label'),
   createdAt: timestamp('created_at').defaultNow(),
 });

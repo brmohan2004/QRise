@@ -120,6 +120,7 @@ export async function POST(request: Request) {
         name: name || config?.name || "Untitled QR",
         type: type || config?.type || "url",
         targetUrl: targetUrl || config?.targetUrl || config?.defaultUrl || "",
+        destinationType: config?.destinationType || config?.defaultDestinationType,
         isDynamic: isDynamic ?? true,
         rules: config?.rules,
         actions: config?.actions,

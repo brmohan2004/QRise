@@ -4,9 +4,10 @@ import { eq, sql } from 'drizzle-orm';
 import { redirect, notFound } from 'next/navigation';
 import { headers } from 'next/headers';
 import { PasswordEntryForm } from '@/components/qr/password-entry-form';
-import { Globe, Phone, Mail, MapPin, Download, MessageCircle, AlertTriangle } from 'lucide-react';
+import { Globe, Phone, Mail, MapPin, Download, MessageCircle, AlertTriangle, Type } from 'lucide-react';
 import { fireWebhookEvent } from '@/lib/webhooks/delivery';
 import { executeResolver } from '@/lib/resolvers/executor';
+import { TextDisplay } from '../../../components/qr/text-display';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -36,10 +37,13 @@ function parseUA(ua: string | null) {
 
 export default async function ShortCodePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ code: string }>;
+  searchParams: Promise<{ actionId?: string }>;
 }) {
   const { code } = await params;
+  const { actionId } = await searchParams;
 
   // 1. Fetch QR code
   let qr;
@@ -126,6 +130,19 @@ export default async function ShortCodePage({
     return <PasswordEntryForm qrId={qr.id} label={qr.name} />;
   }
 
+  // 3.2 Handle specific text action from Multi-Action
+  if (actionId && qr.qrActions) {
+    const action = qr.qrActions.find(a => a.id === actionId);
+    if (action && action.actionType === 'text') {
+      return <TextDisplay name={action.label || qr.name} content={action.actionValue || ""} />;
+    }
+  }
+
+  // 3.5 Handle Direct Text QR (for 'url' and 'password' types if configured as text)
+  if (qr.destinationType === 'text' && qr.type !== 'smart_routing' && qr.type !== 'multi_action') {
+    return <TextDisplay name={qr.name} content={qr.targetUrl || ""} />;
+  }
+
   // 4. Handle Multi Action QRs
   if (qr.type === 'multi_action' && qr.qrActions && qr.qrActions.length > 0) {
     const sortedActions = [...qr.qrActions].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
@@ -148,6 +165,10 @@ export default async function ShortCodePage({
               }
               else if (action.actionType === 'map') { href = `https://maps.google.com/?q=${encodeURIComponent(action.actionValue || '')}`; Icon = MapPin; }
               else if (action.actionType === 'download') { Icon = Download; }
+              else if (action.actionType === 'text') { 
+                href = `/s/${code}?actionId=${action.id}`;
+                Icon = Type;
+              }
 
               return (
                 <a key={action.id} href={href} className="flex items-center p-4 border border-gray-200 rounded-xl hover:border-[#0F6E56] hover:bg-emerald-50 transition-colors group">
@@ -156,7 +177,6 @@ export default async function ShortCodePage({
                   </div>
                   <div className="ml-4 flex-1 overflow-hidden">
                     <p className="text-lg font-semibold text-gray-900 group-hover:text-[#0F6E56] transition-colors truncate">{action.label}</p>
-                    <p className="text-sm text-gray-500 truncate">{action.actionValue}</p>
                   </div>
                 </a>
               );
@@ -169,6 +189,8 @@ export default async function ShortCodePage({
 
   // 5. Evaluate Smart Routing Rules
   let finalTargetUrl = qr.targetUrl;
+  let finalDestinationType = qr.destinationType || 'url';
+
   if (qr.type === 'smart_routing' && qr.routingRules && qr.routingRules.length > 0) {
     const country = headerList.get('x-vercel-ip-country') || 'unknown';
     const language = headerList.get('accept-language')?.split(',')[0] || 'unknown';
@@ -189,6 +211,7 @@ export default async function ShortCodePage({
       });
       if (isMatch && rule.targetUrl) {
         finalTargetUrl = rule.targetUrl;
+        finalDestinationType = rule.destinationType || 'url';
         break;
       }
     }
@@ -262,7 +285,11 @@ export default async function ShortCodePage({
     }
   }
 
-  // 7. Final Redirect
+  // 7. Final Redirect or Display Text
+  if (finalDestinationType === 'text') {
+    return <TextDisplay name={qr.name} content={finalTargetUrl || ""} />;
+  }
+
   if (!finalTargetUrl) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50 px-4">

@@ -46,17 +46,49 @@
 }
 
 .feature-card {
-  padding: 1.25rem; /* Reduced for mobile */
+  padding: 1.25rem;
   border-radius: 1.25rem;
   background-color: #f9fafb;
   border: 1px solid #f1f5f9;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  background-size: 140px;
+  background-repeat: no-repeat;
+  background-position: bottom right;
 }
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(249, 250, 251, 0.95) 0%, rgba(249, 250, 251, 0.5) 100%);
+  z-index: 1;
+}
+
+.feature-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+.feature-card[data-feature="dynamic"] { background-image: url('/images/features/dynamic.png'); }
+.feature-card[data-feature="multi-action"] { background-image: url('/images/features/multi-action.png'); }
+.feature-card[data-feature="password-protected"] { background-image: url('/images/features/password-protected.png'); }
+.feature-card[data-feature="smart-routing"] { background-image: url('/images/features/smart-routing.png'); }
+.feature-card[data-feature="design-studio"] { background-image: url('/images/features/design-studio.png'); }
+.feature-card[data-feature="analytics"] { background-image: url('/images/features/analytics.png'); }
 
 .feature-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-  border-color: #0F6E5630;
+  border-color: #0F6E56;
+}
+
+.feature-card:hover::before {
+  background: linear-gradient(135deg, rgba(249, 250, 251, 0.8) 0%, rgba(249, 250, 251, 0.2) 100%);
 }
 
 .feature-icon-wrapper {

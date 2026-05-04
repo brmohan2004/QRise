@@ -12,7 +12,8 @@ import { useUsageStats } from "@/lib/hooks/use-usage-stats";
 
 const PasswordSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  targetUrl: z.string().url("Please enter a valid URL"),
+  targetUrl: z.string().min(1, "Destination is required"),
+  destinationType: z.enum(["url", "text"]),
   password: z.string().min(4, "Password must be at least 4 characters"),
   confirmPassword: z.string().min(1, "Please confirm your password"),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -20,7 +21,13 @@ const PasswordSchema = z.object({
   path: ["confirmPassword"],
 });
 
-type PasswordFormData = z.infer<typeof PasswordSchema>;
+interface PasswordFormData {
+  name: string;
+  targetUrl: string;
+  destinationType: 'url' | 'text';
+  password: string;
+  confirmPassword: string;
+}
 
 function getPasswordStrength(password: string): { label: string; color: "red" | "amber" | "green" | "gray"; score: number } {
   if (!password) return { label: "None", color: "gray", score: 0 };
@@ -58,12 +65,14 @@ export function PasswordConfig() {
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<PasswordFormData>({
-    resolver: zodResolver(PasswordSchema),
+    resolver: zodResolver(PasswordSchema) as any,
     defaultValues: {
       name: name || "",
       targetUrl: (config as any)?.targetUrl || "",
+      destinationType: (config as any)?.destinationType || "url",
       password: tempPassword || "",
       confirmPassword: tempPassword || "",
     },
@@ -75,6 +84,7 @@ export function PasswordConfig() {
       reset({
         name: name || "",
         targetUrl: (config as any)?.targetUrl || "",
+        destinationType: (config as any)?.destinationType || "url",
         password: tempPassword || "",
         confirmPassword: tempPassword || "",
       });
@@ -83,6 +93,7 @@ export function PasswordConfig() {
 
   const password = watch("password", "");
   const confirmPassword = watch("confirmPassword", "");
+  const destinationType = watch("destinationType");
   const strength = getPasswordStrength(password);
 
   const onSubmit = async (data: PasswordFormData) => {
@@ -92,6 +103,7 @@ export function PasswordConfig() {
     const configWithoutPassword = {
       type: "password" as const,
       targetUrl: data.targetUrl,
+      destinationType: data.destinationType,
     };
     setConfig(configWithoutPassword);
     // Store password in temp field (NOT persisted to localStorage)
@@ -118,7 +130,7 @@ export function PasswordConfig() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to save to storage");
+        throw new Error(errorData.error || errorData.message || "Failed to save to storage");
       }
 
       const resData = await response.json();
@@ -156,12 +168,38 @@ export function PasswordConfig() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Protected URL</label>
-        <input
-          {...register("targetUrl")}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F6E56]"
-          placeholder="https://example.com"
-        />
+        <div className="flex items-center justify-between mb-1">
+          <label className="block text-sm font-medium text-gray-700">
+            {destinationType === 'url' ? "Protected URL" : "Protected Text"}
+          </label>
+          <div className="flex bg-gray-100 p-0.5 rounded-lg">
+            <button 
+              type="button"
+              onClick={() => setValue('destinationType', 'url')}
+              className={cn("px-3 py-1 text-xs rounded-md transition-all", destinationType === 'url' ? "bg-white shadow-sm text-[#0F6E56] font-medium" : "text-gray-500")}
+            >URL</button>
+            <button 
+              type="button"
+              onClick={() => setValue('destinationType', 'text')}
+              className={cn("px-3 py-1 text-xs rounded-md transition-all", destinationType === 'text' ? "bg-white shadow-sm text-[#0F6E56] font-medium" : "text-gray-500")}
+            >Text</button>
+          </div>
+        </div>
+        
+        {destinationType === 'url' ? (
+          <input
+            {...register("targetUrl")}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F6E56]"
+            placeholder="https://example.com"
+          />
+        ) : (
+          <textarea
+            {...register("targetUrl")}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F6E56]"
+            placeholder="Enter text to display after password..."
+            rows={3}
+          />
+        )}
         {errors.targetUrl && <p className="text-sm text-red-600">{errors.targetUrl.message}</p>}
       </div>
 

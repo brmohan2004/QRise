@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useWizardStore } from "@/stores/qr-wizard.store";
-import { Plus, Trash2, GripVertical, Globe, Phone, Mail, MapPin, Download, MessageCircle, Loader2 } from "lucide-react";
+import { Plus, Trash2, GripVertical, Globe, Phone, Mail, MapPin, Download, MessageCircle, Loader2, Type } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -18,9 +18,10 @@ const actionTypes = [
   { value: "map", label: "Map", icon: MapPin },
   { value: "download", label: "Download", icon: Download },
   { value: "whatsapp", label: "WhatsApp", icon: MessageCircle },
+  { value: "text", label: "Text", icon: Type },
 ];
 const actionSchema = z.object({
-  type: z.enum(["url", "phone", "email", "map", "download", "whatsapp"]),
+  type: z.enum(["url", "phone", "email", "map", "download", "whatsapp", "text"]),
   label: z.string().min(1, "Label is required"),
   value: z.string().min(1, "Value is required").refine((val) => {
     // Basic structural validation, more complex logic can go here
@@ -87,7 +88,7 @@ export function MultiActionConfig() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to save to storage");
+        throw new Error(errorData.error || errorData.message || "Failed to save to storage");
       }
 
       const data = await response.json();
@@ -238,12 +239,21 @@ function ActionModal({ onClose, onSave }: { onClose: () => void; onSave: (action
           </div>
           <div>
             <label className="block text-sm font-medium">Value</label>
-            <input
-              type="text"
-              {...register("value")}
-              className={cn("mt-1 block w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500", errors.value ? "border-red-500" : "border-gray-300")}
-              placeholder={watchType === "url" ? "https://example.com" : watchType === "phone" ? "+1234567890" : "email@example.com"}
-            />
+            {watchType === 'text' ? (
+              <textarea
+                {...register("value")}
+                className={cn("mt-1 block w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500", errors.value ? "border-red-500" : "border-gray-300")}
+                placeholder="Enter text to display..."
+                rows={3}
+              />
+            ) : (
+              <input
+                type="text"
+                {...register("value")}
+                className={cn("mt-1 block w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500", errors.value ? "border-red-500" : "border-gray-300")}
+                placeholder={watchType === "url" ? "https://example.com" : watchType === "phone" ? "+1234567890" : "email@example.com"}
+              />
+            )}
             {errors.value && <p className="text-xs text-red-500 mt-1">{errors.value.message}</p>}
           </div>
           <div className="flex gap-3">

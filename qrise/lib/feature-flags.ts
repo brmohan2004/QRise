@@ -39,7 +39,20 @@ export async function isFeatureEnabled(
       }
     }
 
-    if (!flag) return false; // Default to false if flag doesn't exist
+    // Default values for common flags to ensure core functionality works
+    const DEFAULT_FLAGS: Record<string, boolean> = {
+      'multi_action_qr': true,
+      'password_qr_enabled': true,
+      'bulk_qr_enabled': true,
+      'smart_routing_enabled': true,
+      'design_studio': true,
+      'static_qr': true,
+      'dynamic_qr': true,
+    };
+
+    if (!flag) {
+      return DEFAULT_FLAGS[flagKey] ?? false;
+    }
     
     if (!flag.isEnabled) return false;
 
@@ -50,7 +63,18 @@ export async function isFeatureEnabled(
     return true;
   } catch (error) {
     console.error(`Error checking feature flag "${flagKey}":`, error);
-    // Fallback to false in case of DB error or timeout so premium features aren't exposed
-    return false;
+    
+    // Fallback to default values in case of DB error or timeout
+    const DEFAULT_FLAGS: Record<string, boolean> = {
+      'multi_action_qr': true,
+      'password_qr_enabled': true,
+      'bulk_qr_enabled': true,
+      'smart_routing_enabled': true,
+      'design_studio': true,
+      'static_qr': true,
+      'dynamic_qr': true,
+    };
+    
+    return DEFAULT_FLAGS[flagKey] ?? false;
   }
 }

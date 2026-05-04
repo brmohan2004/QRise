@@ -25,13 +25,14 @@ export interface RoutingRule {
   priority: number;
   conditions: RoutingCondition[];
   targetUrl: string;
+  destinationType?: 'url' | 'text';
   label?: string;
 }
 
 export interface QRAction {
   id?: string;
   label: string;
-  actionType: 'url' | 'phone' | 'email' | 'map' | 'download' | 'whatsapp';
+  actionType: 'url' | 'phone' | 'email' | 'map' | 'download' | 'whatsapp' | 'text';
   actionValue: string;
   icon?: string;
   displayOrder: number;
@@ -55,9 +56,9 @@ export interface BulkRow {
 }
 
 export type QRConfig = 
-  | { type: 'url'; targetUrl: string; bulkJobId?: string; rows?: BulkRow[] }
-  | { type: 'smart_routing'; defaultUrl: string; rules: RoutingRule[]; bulkJobId?: string; rows?: BulkRow[] }
-  | { type: 'password'; targetUrl: string; password: string; bulkJobId?: string; rows?: BulkRow[] }
+  | { type: 'url'; targetUrl: string; destinationType?: 'url' | 'text'; bulkJobId?: string; rows?: BulkRow[] }
+  | { type: 'smart_routing'; defaultUrl: string; defaultDestinationType?: 'url' | 'text'; rules: RoutingRule[]; bulkJobId?: string; rows?: BulkRow[] }
+  | { type: 'password'; targetUrl: string; password: string; destinationType?: 'url' | 'text'; bulkJobId?: string; rows?: BulkRow[] }
   | { type: 'multi_action'; actions: QRAction[]; bulkJobId?: string; rows?: BulkRow[] }
   | { type: 'bulk'; totalRows: number; rows: BulkRow[]; bulkJobId?: string; bulkType?: 'url' | 'multi_action' | 'password' | 'smart_routing' };
 

@@ -7,12 +7,15 @@ const staticFeatures = featuresData.allFeatures.filter(f => !f.isNew);
 
 // Extended feature descriptions for SEO content depth
 const featureDetails: Record<string, string> = {
-  "dynamic": "Change where your QR code points at any time. No need to reprint physical materials — just update the destination URL from your dashboard and the same printed QR code will redirect to the new location instantly.",
+  "dynamic": "Make every QR type dynamic. Change where your QR code points at any time — either a URL or a custom formatted text display. No need to reprint physical materials — just update the content from your dashboard instantly.",
+  "multi-action": "Create a landing page for your QR code that lets users choose from multiple actions like visiting a website, viewing important text, calling a number, sending an email, or finding a location on a map.",
+  "password-protected": "Add a layer of security to your QR codes. Require scanners to enter a password before they can access the destination URL, perfect for sensitive information or exclusive content.",
   "smart-routing": "Automatically direct scanners to different destinations based on their device type (iOS vs Android), geographic location, or time of day. Perfect for location-specific promotions and app download links.",
   "analytics": "Get real-time visibility into every scan. Track device types, geographic locations, referral sources, scan times, and unique vs repeat scans with QRise's powerful analytics dashboard.",
   "design-studio": "Customize every aspect of your QR code appearance. Choose colors, add your company logo, select corner styles and dot patterns, and apply branded frames — all while maintaining scan reliability.",
   "form-builder": "Attach drag-and-drop forms directly to your QR codes. Collect contact information, feedback, registrations, and survey responses without needing a separate form tool.",
   "bulk-generator": "Upload a CSV file and generate hundreds or thousands of unique QR codes in minutes. Each code gets its own destination URL and analytics. Perfect for product packaging, event badges, and asset tracking.",
+  "custom-types": "A powerful toolkit for developers. Define your own JSON schemas, build custom resolvers, and deploy unique QR types to our marketplace. Fully integrated with our API and webhook system.",
 };
 
 export default function FeaturesPage() {
@@ -40,6 +43,7 @@ export default function FeaturesPage() {
               <article
                 key={feature.id}
                 className="feature-card"
+                data-feature={feature.id}
               >
                 <h2 className="feature-card-title">
                   {feature.name}

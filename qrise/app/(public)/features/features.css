@@ -56,12 +56,47 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background-size: 200px;
+  background-repeat: no-repeat;
+  background-position: bottom right;
 }
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 100%);
+  z-index: 1;
+}
+
+.feature-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+.feature-card[data-feature="dynamic"] { background-image: url('/images/features/dynamic.png'); }
+.feature-card[data-feature="multi-action"] { background-image: url('/images/features/multi-action.png'); }
+.feature-card[data-feature="password-protected"] { background-image: url('/images/features/password-protected.png'); }
+.feature-card[data-feature="smart-routing"] { background-image: url('/images/features/smart-routing.png'); }
+.feature-card[data-feature="analytics"] { background-image: url('/images/features/analytics.png'); }
+.feature-card[data-feature="design-studio"] { background-image: url('/images/features/design-studio.png'); }
+.feature-card[data-feature="form-builder"] { background-image: url('/images/features/form-builder.png'); }
+.feature-card[data-feature="bulk-generator"] { background-image: url('/images/features/bulk-generator.png'); }
+.feature-card[data-feature="custom-types"] { background-image: url('/images/features/custom-types.png'); }
 
 .feature-card:hover {
   border-color: #0F6E56;
   box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.08);
   transform: translateY(-4px);
+}
+
+.feature-card:hover::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.3) 100%);
 }
 
 .feature-card-title {

@@ -11,6 +11,7 @@ export async function createQR(
     name: string;
     type: 'url' | 'smart_routing' | 'password' | 'multi_action' | 'bulk';
     targetUrl?: string;
+    destinationType?: 'url' | 'text';
     isDynamic?: boolean;
     password?: string;
     rules?: Partial<TypeRoutingRule>[];
@@ -30,6 +31,7 @@ export async function createQR(
     type: data.type,
     shortCode,
     targetUrl: data.targetUrl,
+    destinationType: data.destinationType || 'url',
     isDynamic: data.isDynamic ?? true,
     passwordHash,
   } as NewQRCode).returning();
@@ -43,6 +45,7 @@ export async function createQR(
       priority: rule.priority ?? index,
       conditions: rule.conditions!,
       targetUrl: rule.targetUrl!,
+      destinationType: rule.destinationType || 'url',
       label: rule.label,
     }));
     
@@ -106,6 +109,7 @@ export async function createBulkQR(
       type: data.bulkType || "url",
       shortCode,
       targetUrl: (data.bulkType === "url" || data.bulkType === "password" || data.bulkType === "smart_routing") ? row.url : undefined,
+      destinationType: (row.destinationType as 'url' | 'text') || 'url',
       isDynamic,
       passwordHash,
       designConfig: data.designConfig || {},
@@ -150,6 +154,7 @@ export async function createBulkQR(
             priority: rIndex,
             conditions: rule.conditions,
             targetUrl: rule.targetUrl,
+            destinationType: rule.destinationType || 'url',
           } as NewRoutingRule);
         });
       }
@@ -178,6 +183,7 @@ export async function updateQR(
     rules?: Partial<TypeRoutingRule>[];
     actions?: Partial<TypeQRAction>[];
     password?: string;
+    destinationType?: 'url' | 'text';
   }
 ): Promise<QRCode> {
   const existing = await db.select().from(qrCodes).where(eq(qrCodes.id, id)).limit(1);
@@ -217,6 +223,7 @@ export async function updateQR(
         priority: rule.priority ?? index,
         conditions: rule.conditions!,
         targetUrl: rule.targetUrl!,
+        destinationType: rule.destinationType || 'url',
         label: rule.label,
       }));
       await db.insert(routingRules).values(rulesToInsert);

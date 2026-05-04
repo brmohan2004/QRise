@@ -52,6 +52,7 @@ export function SmartRoutingConfig() {
   
   const [rules, setRules] = useState<RoutingRule[]>(existingConfig?.rules || []);
   const [defaultUrl, setDefaultUrl] = useState(existingConfig?.defaultUrl || "");
+  const [defaultDestinationType, setDefaultDestinationType] = useState<'url' | 'text'>(existingConfig?.defaultDestinationType || "url");
   const [localName, setLocalName] = useState(wizardName || "");
   const [loading, setLoading] = useState(false);
   const { data: usage } = useUsageStats();
@@ -62,6 +63,7 @@ export function SmartRoutingConfig() {
     if (editingQrId) {
       setRules(existingConfig?.rules || []);
       setDefaultUrl(existingConfig?.defaultUrl || "");
+      setDefaultDestinationType(existingConfig?.defaultDestinationType || "url");
       setLocalName(wizardName || "");
     }
   }, [editingQrId, wizardName, existingConfig]);
@@ -98,6 +100,7 @@ export function SmartRoutingConfig() {
       priority: rules.length,
       conditions: [{ field: "device", op: "eq", value: "mobile" }],
       targetUrl: "",
+      destinationType: "url",
       label: `Rule ${rules.length + 1}`,
     };
     setRules([...rules, newRule]);
@@ -118,6 +121,7 @@ export function SmartRoutingConfig() {
     const newConfig = {
       type: "smart_routing" as const,
       defaultUrl,
+      defaultDestinationType,
       rules,
     };
     setConfig(newConfig);
@@ -139,7 +143,7 @@ export function SmartRoutingConfig() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to save to storage");
+        throw new Error(errorData.error || errorData.message || "Failed to save to storage");
       }
 
       const data = await response.json();
@@ -178,14 +182,38 @@ export function SmartRoutingConfig() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Default URL (fallback)</label>
-        <input
-          type="url"
-          value={defaultUrl}
-          onChange={(e) => setDefaultUrl(e.target.value)}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg"
-          placeholder="https://default.com"
-        />
+        <div className="flex items-center justify-between mb-1">
+          <label className="block text-sm font-medium text-gray-700">Default Destination (fallback)</label>
+          <div className="flex bg-gray-100 p-0.5 rounded-lg">
+            <button 
+              type="button"
+              onClick={() => setDefaultDestinationType('url')}
+              className={cn("px-3 py-1 text-xs rounded-md transition-all", defaultDestinationType === 'url' ? "bg-white shadow-sm text-[#0F6E56] font-medium" : "text-gray-500")}
+            >URL</button>
+            <button 
+              type="button"
+              onClick={() => setDefaultDestinationType('text')}
+              className={cn("px-3 py-1 text-xs rounded-md transition-all", defaultDestinationType === 'text' ? "bg-white shadow-sm text-[#0F6E56] font-medium" : "text-gray-500")}
+            >Text</button>
+          </div>
+        </div>
+        {defaultDestinationType === 'url' ? (
+          <input
+            type="url"
+            value={defaultUrl}
+            onChange={(e) => setDefaultUrl(e.target.value)}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg"
+            placeholder="https://default.com"
+          />
+        ) : (
+          <textarea
+            value={defaultUrl}
+            onChange={(e) => setDefaultUrl(e.target.value)}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg"
+            placeholder="Enter text to display..."
+            rows={3}
+          />
+        )}
       </div>
 
       <div className="space-y-4">
@@ -333,16 +361,44 @@ function SortableRule({ rule, index, onUpdate, onDelete }: SortableRuleProps) {
         />
       </div>
 
-      <div>
-        <input
-          type="url"
-          value={rule.targetUrl}
-          onChange={(e) => {
-            onUpdate(rule.id, { targetUrl: e.target.value });
-          }}
-          placeholder="Target URL for this rule"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-        />
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</label>
+          <div className="flex bg-gray-100 p-0.5 rounded-lg">
+            <button 
+              type="button"
+              onClick={() => onUpdate(rule.id, { destinationType: 'url' })}
+              className={cn("px-2 py-1 text-[10px] rounded-md transition-all", rule.destinationType === 'url' || !rule.destinationType ? "bg-white shadow-sm text-[#0F6E56] font-medium" : "text-gray-500")}
+            >URL</button>
+            <button 
+              type="button"
+              onClick={() => onUpdate(rule.id, { destinationType: 'text' })}
+              className={cn("px-2 py-1 text-[10px] rounded-md transition-all", rule.destinationType === 'text' ? "bg-white shadow-sm text-[#0F6E56] font-medium" : "text-gray-500")}
+            >Text</button>
+          </div>
+        </div>
+        
+        {rule.destinationType === 'text' ? (
+          <textarea
+            value={rule.targetUrl}
+            onChange={(e) => {
+              onUpdate(rule.id, { targetUrl: e.target.value });
+            }}
+            placeholder="Enter text to display..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            rows={2}
+          />
+        ) : (
+          <input
+            type="url"
+            value={rule.targetUrl}
+            onChange={(e) => {
+              onUpdate(rule.id, { targetUrl: e.target.value });
+            }}
+            placeholder="Target URL for this rule"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+        )}
       </div>
     </div>
   );

@@ -63,6 +63,7 @@ export async function PUT(
       rules: rules || config?.rules,
       actions: config?.actions,
       password: config?.password,
+      destinationType: config?.destinationType || config?.defaultDestinationType,
     });
 
     return ApiResponse.ok(updated);

@@ -25,6 +25,7 @@ export const qrCodes = pgTable('qr_codes', {
   scanCount: integer('scan_count').default(0),
   customTypeId: uuid('custom_type_id').references(() => customQrTypes.id),
   customTypePayload: jsonb('custom_type_payload'),
+  destinationType: varchar('destination_type', { length: 10 }).default('url'),
   tags: text('tags').array().default([]),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),

@@ -113,6 +113,7 @@ import { UsageLimitModal } from "@/components/billing/usage-limit-modal";
 import { OrganizationSchema, WebApplicationSchema, SoftwareApplicationSchema, HowToSchema, ReviewSchema } from "@/components/seo/json-ld";
 
 import { headers } from "next/headers";
+import { QRScannerOverlay } from "@/components/scanner/qr-scanner";
 
 export default async function RootLayout({
   children,
@@ -143,6 +144,7 @@ export default async function RootLayout({
         {children}
         <Toaster position="top-center" richColors />
         <UsageLimitModal />
+        <QRScannerOverlay />
       </body>
     </html>
   );

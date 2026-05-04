@@ -8,7 +8,8 @@ import {
   FileText, 
   Layers,
   Smartphone,
-  MapPin
+  MapPin,
+  Lock
 } from "lucide-react";
 
 import landingData from "@/data/before-auth/landing.json";
@@ -22,7 +23,8 @@ const iconMap = {
   FileText,
   Layers,
   Smartphone,
-  MapPin
+  MapPin,
+  Lock
 };
 
 const features = landingData.features.map(f => ({
@@ -45,7 +47,7 @@ export function FeaturesSection() {
 
         <div className="features-grid">
           {features.map((feature) => (
-            <div key={feature.name} className="feature-card">
+            <div key={feature.name} className="feature-card" data-feature={(feature as any).id}>
               <div className="feature-icon-wrapper">
                 <feature.icon className="h-6 w-6" />
               </div>

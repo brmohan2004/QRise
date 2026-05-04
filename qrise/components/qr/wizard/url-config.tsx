@@ -14,12 +14,15 @@ import { AlertCircle } from "lucide-react";
 
 const URLSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  targetUrl: z.string().url("Please enter a valid URL").refine((url) => {
-    return url.startsWith("http://") || url.startsWith("https://");
-  }, "URL must start with http:// or https://"),
+  targetUrl: z.string().min(1, "Target is required"),
+  destinationType: z.enum(["url", "text"]),
 });
 
-type URLFormData = z.infer<typeof URLSchema>;
+interface URLFormData {
+  name: string;
+  targetUrl: string;
+  destinationType: 'url' | 'text';
+}
 
 export function URLConfig() {
   const { config, name: wizardName, setName, setConfig, editingQrId, setEditingQrId } = useWizardStore();
@@ -34,16 +37,19 @@ export function URLConfig() {
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<URLFormData>({
-    resolver: zodResolver(URLSchema),
+    resolver: zodResolver(URLSchema) as any,
     defaultValues: {
       name: wizardName || "",
       targetUrl: (config as any)?.targetUrl || "",
+      destinationType: (config as any)?.destinationType || "url",
     },
   });
 
   const targetUrl = watch("targetUrl");
+  const destinationType = watch("destinationType");
 
   // Build UTM appends
   const [utmSource, setUtmSource] = useState("");
@@ -60,9 +66,12 @@ export function URLConfig() {
   // Sync form to store for live preview
   useEffect(() => {
     if (targetUrl) {
-      setConfig({ targetUrl: finalUrl || targetUrl });
+      setConfig({ 
+        targetUrl: destinationType === 'url' ? (finalUrl || targetUrl) : targetUrl,
+        destinationType 
+      });
     }
-  }, [targetUrl, finalUrl, setConfig]);
+  }, [targetUrl, finalUrl, destinationType, setConfig]);
 
   // Sync store to form (for editing)
   useEffect(() => {
@@ -70,6 +79,7 @@ export function URLConfig() {
       reset({
         name: wizardName || "",
         targetUrl: (config as any)?.targetUrl || "",
+        destinationType: (config as any)?.destinationType || "url",
       });
     }
   }, [editingQrId, wizardName, config, reset]);
@@ -79,7 +89,8 @@ export function URLConfig() {
     setName(data.name);
     const newConfig = {
       type: "url" as const,
-      targetUrl: finalUrl || data.targetUrl,
+      targetUrl: destinationType === 'url' ? (finalUrl || data.targetUrl) : data.targetUrl,
+      destinationType: data.destinationType,
     };
     setConfig(newConfig);
 
@@ -100,7 +111,7 @@ export function URLConfig() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to save to storage");
+        throw new Error(errorData.error || errorData.message || "Failed to save to storage");
       }
 
       const resData = await response.json();
@@ -148,19 +159,47 @@ export function URLConfig() {
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="targetUrl" className="text-[10px] uppercase font-black tracking-widest text-gray-400 ml-1">
-            Destination URL
-          </label>
-          <input
-            id="targetUrl"
-            type="url"
-            {...register("targetUrl")}
-            className={cn(
-              "block w-full px-4 py-3 bg-gray-50 border border-transparent rounded-xl transition-all outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500",
-              errors.targetUrl ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : ""
-            )}
-            placeholder="https://example.com"
-          />
+          <div className="flex items-center justify-between mb-1">
+            <label htmlFor="targetUrl" className="text-[10px] uppercase font-black tracking-widest text-gray-400 ml-1">
+              {destinationType === 'url' ? "Destination URL" : "Text Content"}
+            </label>
+            <div className="flex bg-gray-100 p-0.5 rounded-lg">
+              <button 
+                type="button"
+                onClick={() => setValue('destinationType', 'url')}
+                className={cn("px-3 py-1 text-[10px] rounded-md transition-all font-black uppercase tracking-widest", destinationType === 'url' ? "bg-white shadow-sm text-emerald-600" : "text-gray-400")}
+              >URL</button>
+              <button 
+                type="button"
+                onClick={() => setValue('destinationType', 'text')}
+                className={cn("px-3 py-1 text-[10px] rounded-md transition-all font-black uppercase tracking-widest", destinationType === 'text' ? "bg-white shadow-sm text-emerald-600" : "text-gray-400")}
+              >Text</button>
+            </div>
+          </div>
+          
+          {destinationType === 'url' ? (
+            <input
+              id="targetUrl"
+              type="url"
+              {...register("targetUrl")}
+              className={cn(
+                "block w-full px-4 py-3 bg-gray-50 border border-transparent rounded-xl transition-all outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500",
+                errors.targetUrl ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : ""
+              )}
+              placeholder="https://example.com"
+            />
+          ) : (
+            <textarea
+              id="targetUrl"
+              {...register("targetUrl")}
+              className={cn(
+                "block w-full px-4 py-3 bg-gray-50 border border-transparent rounded-xl transition-all outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500",
+                errors.targetUrl ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : ""
+              )}
+              placeholder="Enter text to display when scanned..."
+              rows={4}
+            />
+          )}
           {errors.targetUrl && (
             <p className="text-xs font-bold text-red-500 mt-1 ml-1">{errors.targetUrl.message}</p>
           )}
