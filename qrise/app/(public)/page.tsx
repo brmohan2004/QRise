@@ -14,7 +14,7 @@ import { FAQSchema, BreadcrumbSchema } from "@/components/seo/json-ld";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "QRise - Free Dynamic QR Code Generator with Analytics & Tracking",
+  title: "QRise | Free Dynamic QR Code Generator with Analytics & Tracking",
   description: "Create free dynamic QR codes, multiple action menus, and password protected links. Track every scan with a powerful analytics dashboard. Edit destinations anytime without reprinting. Includes custom design studio, form builder, and REST API.",
   keywords: [
     "free QR code generator",
@@ -32,6 +32,19 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "https://qrise.app",
+  },
+  openGraph: {
+    title: "QRise | Free Dynamic QR Codes with Deep Analytics",
+    description: "The all-in-one platform for professional QR code management. Create, track, and manage dynamic QR codes for free.",
+    url: "https://qrise.app",
+    type: "website",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "QRise Dynamic QR Codes" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "QRise - Advanced Dynamic QR Code Management",
+    description: "Track scans, update URLs anytime, and build custom QR experiences with QRise. Start for free.",
+    images: ["/og-image.png"],
   },
 };
 

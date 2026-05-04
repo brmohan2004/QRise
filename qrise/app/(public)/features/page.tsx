@@ -2,6 +2,25 @@ import featuresData from "@/data/before-auth/features.json";
 import { BreadcrumbSchema } from "@/components/seo/json-ld";
 import { FeaturesQuizSection } from "./features-quiz-section";
 import "./features.css";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Powerful QR Code Features for Modern Teams",
+  description: "Explore our comprehensive suite of QR features: Dynamic QR codes, real-time analytics, smart routing, custom design studio, bulk generation, and more.",
+  keywords: [
+    "dynamic QR features",
+    "QR code analytics features",
+    "smart QR routing",
+    "QR design studio",
+    "bulk QR generator features",
+    "password protected QR",
+  ],
+  openGraph: {
+    title: "QRise Features - Everything You Need for QR Management",
+    description: "From dynamic URLs to deep analytics, discover why QRise is the ultimate platform for QR code management.",
+    images: [{ url: "/og-features.png", width: 1200, height: 630, alt: "QRise Features" }],
+  },
+};
 
 const staticFeatures = featuresData.allFeatures.filter(f => !f.isNew);
 

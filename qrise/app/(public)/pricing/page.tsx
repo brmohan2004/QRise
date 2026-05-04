@@ -4,6 +4,25 @@ import { PricingComingSoon } from "@/components/pricing/pricing-coming-soon";
 import { db } from "@/lib/db";
 import { plans as plansTable, planRateLimits } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Simple, Transparent Pricing for Teams of All Sizes",
+  description: "Start for free and scale as you grow. Choose the plan that fits your QR code needs, from personal projects to enterprise-grade analytics and API access.",
+  keywords: [
+    "QRise pricing",
+    "QR code generator cost",
+    "free dynamic QR codes",
+    "enterprise QR solutions",
+    "QR code API pricing",
+    "bulk QR code generation cost",
+  ],
+  openGraph: {
+    title: "QRise Pricing - Flexible Plans for Everyone",
+    description: "Get started with professional QR code management today. Free tier available.",
+    images: [{ url: "/og-pricing.png", width: 1200, height: 630, alt: "QRise Pricing" }],
+  },
+};
 
 export const revalidate = 3600;
 

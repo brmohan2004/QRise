@@ -97,7 +97,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 270px;
+  height: 300px;
   /* Reduced for better fit on mobile */
 }
 
