@@ -13,7 +13,7 @@ export default async function AnalyticsPage({ params: paramsPromise }: PageProps
   
   const analyticsEnabled = await isFeatureEnabled("analytics_dashboard_enabled");
   if (!analyticsEnabled) {
-    redirect(`/qr-codes/${params.id}`);
+    redirect(`/qr-codes`);
   }
 
   const exportEnabled = await isFeatureEnabled("analytics_export_enabled");

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
-import { Maximize, X, ExternalLink, Camera, QrCode, Copy, Check, Loader2 } from "lucide-react";
+import { Maximize, X, ExternalLink, Camera, QrCode, Copy, Check, Loader2, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -12,6 +12,34 @@ export function QRScannerOverlay() {
   const [isInitializing, setIsInitializing] = useState(false);
   const [scannedResult, setScannedResult] = useState<string | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      if (scannerRef.current && scannerRef.current.isScanning) {
+        await scannerRef.current.stop();
+        setIsCameraReady(false);
+      }
+
+      if (!scannerRef.current) {
+        scannerRef.current = new Html5Qrcode("reader");
+      }
+      setIsInitializing(true);
+      const decodedText = await scannerRef.current.scanFile(file, true);
+      onScanSuccess(decodedText);
+    } catch (err) {
+      console.error("Error scanning file", err);
+      toast.error("Could not find a valid QR code in the uploaded image.");
+    } finally {
+      setIsInitializing(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   useEffect(() => {
     if (isOpen && !scannerRef.current) {
@@ -84,7 +112,7 @@ export function QRScannerOverlay() {
   const handleOpenLink = () => {
     if (scannedResult && isLink) {
       window.open(scannedResult, "_blank");
-      resetScanner();
+      closeOverlay();
     }
   };
 
@@ -174,13 +202,41 @@ export function QRScannerOverlay() {
                           {isInitializing ? "Requesting permission from browser" : "Please click the button below to start scanning"}
                         </p>
                       </div>
-                      <button
-                        onClick={() => setIsCameraReady(true)}
-                        disabled={isInitializing}
-                        className="w-full max-w-[200px] py-3 bg-emerald-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-700 transition-all active:scale-95 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
-                      >
-                        {isInitializing ? "Starting..." : "Access Camera"}
-                      </button>
+                      <div className="flex flex-col gap-3 w-full max-w-[200px]">
+                        <button
+                          onClick={() => setIsCameraReady(true)}
+                          disabled={isInitializing}
+                          className="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-700 transition-all active:scale-95 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+                        >
+                          {isInitializing ? "Starting..." : "Access Camera"}
+                        </button>
+                        
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          className="hidden" 
+                          ref={fileInputRef}
+                          onChange={handleFileUpload}
+                        />
+                        <button
+                          onClick={async () => {
+                            if (scannerRef.current && scannerRef.current.isScanning) {
+                              try {
+                                await scannerRef.current.stop();
+                              } catch(e) {
+                                console.error(e);
+                              }
+                              setIsCameraReady(false);
+                            }
+                            fileInputRef.current?.click();
+                          }}
+                          disabled={isInitializing}
+                          className="w-full py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-gray-700 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+                        >
+                          <Upload className="w-4 h-4" />
+                          Upload Image
+                        </button>
+                      </div>
                     </div>
                   )}
                   
@@ -229,11 +285,30 @@ export function QRScannerOverlay() {
             </div>
             
             {/* Footer Tip */}
-            <div className="px-6 pb-6 pt-2">
+            <div className="px-6 pb-6 pt-2 flex items-center justify-between">
               <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
                 <Camera className="h-3 w-3" />
-                <span>Camera access required for scanning</span>
+                <span>Camera access required for live scanning</span>
               </div>
+              {isCameraReady && (
+                <button
+                  onClick={async () => {
+                    if (scannerRef.current && scannerRef.current.isScanning) {
+                      try {
+                        await scannerRef.current.stop();
+                      } catch(e) {
+                        console.error(e);
+                      }
+                      setIsCameraReady(false);
+                    }
+                    fileInputRef.current?.click();
+                  }}
+                  className="flex items-center gap-1 text-[10px] text-emerald-600 hover:text-emerald-700 font-bold uppercase tracking-tighter transition-colors"
+                >
+                  <Upload className="h-3 w-3" />
+                  <span>Upload Image</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

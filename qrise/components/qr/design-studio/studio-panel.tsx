@@ -9,6 +9,8 @@ import { LogoUploader } from "./logo-uploader";
 import { FrameSelector } from "./frame-selector";
 import { EyeShapeSelector } from "./eye-shape-selector";
 import { EyeAndFrameColorPicker } from "./eye-frame-color-picker";
+import { QRVersionSelector } from "./qr-version-selector";
+import { SizeSelector } from "./size-selector";
 import { RotateCcw } from "lucide-react";
 
 export function StudioPanel() {
@@ -21,6 +23,10 @@ export function StudioPanel() {
       logoUrl: undefined,
       frameStyle: "none",
       dotStyle: "square",
+      qrVersion: 0,
+      shape: "square",
+      width: 300,
+      height: 300,
     });
   };
 
@@ -48,9 +54,13 @@ export function StudioPanel() {
         </TabsList>
 
         <TabsContent value="style" className="space-y-6 mt-6">
+          <SizeSelector />
+          <div className="h-px bg-gray-200 w-full" />
           <ColorPicker />
           <div className="h-px bg-gray-200 w-full" />
           <DotPatternSelector />
+          <div className="h-px bg-gray-200 w-full" />
+          <QRVersionSelector />
         </TabsContent>
 
         <TabsContent value="logo" className="mt-6">

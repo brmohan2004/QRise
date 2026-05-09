@@ -183,3 +183,52 @@ html {
   border-radius: 9999px;
   margin: 12px auto;
 }
+
+/* Native Range Slider */
+.range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  outline: none;
+  cursor: pointer;
+}
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0F6E56;
+  border: 2px solid #0F6E56;
+  cursor: grab;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.range-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 6px rgba(15,110,86,0.12);
+}
+.range-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 8px rgba(15,110,86,0.18);
+}
+.range-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0F6E56;
+  border: 2px solid #0F6E56;
+  cursor: grab;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+.range-slider::-moz-range-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.15);
+}
+.range-slider::-moz-range-track {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 9999px;
+}

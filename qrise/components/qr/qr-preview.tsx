@@ -41,6 +41,9 @@ export const QRPreview = forwardRef<QRPreviewHandle, QRPreviewProps>(({
 
   const mergedOptions = { ...defaultOptions, ...options };
 
+  const finalWidth = mergedOptions.width || size;
+  const finalHeight = mergedOptions.height || size;
+
   useImperativeHandle(ref, () => ({
     download: async (name?: string) => {
       await handleDownload(name);
@@ -51,13 +54,17 @@ export const QRPreview = forwardRef<QRPreviewHandle, QRPreviewProps>(({
     if (!containerRef.current) return;
 
     const qr = new QRCodeStyling({
-      width: size,
-      height: size,
+      width: finalWidth,
+      height: finalHeight,
       margin: 12,
       data: data || "https://example.com",
       imageOptions: {
         crossOrigin: "anonymous",
         margin: 5,
+      },
+      qrOptions: {
+        typeNumber: (mergedOptions.qrVersion || 0) as any,
+        errorCorrectionLevel: "Q",
       },
       dotsOptions: {
         color: mergedOptions.dotColor,
@@ -87,7 +94,7 @@ export const QRPreview = forwardRef<QRPreviewHandle, QRPreviewProps>(({
         containerRef.current.innerHTML = "";
       }
     };
-  }, [data, size, mergedOptions]);
+  }, [data, finalWidth, finalHeight, mergedOptions]);
 
   useEffect(() => {
     if (qrRef.current && data) {
@@ -123,8 +130,8 @@ export const QRPreview = forwardRef<QRPreviewHandle, QRPreviewProps>(({
       const hasText = mergedOptions.frameText && (mergedOptions.frameStyle === "badge_below" || mergedOptions.frameStyle === "badge_above");
       const textSpace = hasText ? 28 : 0;
       
-      const totalWidth = size + (padding * 2) + (borderSize * 2);
-      const totalHeight = size + (padding * 2) + (borderSize * 2) + textSpace;
+      const totalWidth = finalWidth + (padding * 2) + (borderSize * 2);
+      const totalHeight = finalHeight + (padding * 2) + (borderSize * 2) + textSpace;
 
       canvas.width = totalWidth * 2; // High DPI
       canvas.height = totalHeight * 2;
@@ -159,11 +166,11 @@ export const QRPreview = forwardRef<QRPreviewHandle, QRPreviewProps>(({
       ctx.fillStyle = "#ffffff";
       const qrAreaX = borderSize + padding - 4;
       const qrAreaY = borderSize + padding - 4 + (mergedOptions.frameStyle === "badge_above" ? textSpace : 0);
-      const qrAreaSize = size + 8;
-      drawRoundedRect(qrAreaX, qrAreaY, qrAreaSize, qrAreaSize, 8);
+      
+      drawRoundedRect(qrAreaX, qrAreaY, finalWidth + 8, finalHeight + 8, 8);
 
       // Draw QR Code
-      ctx.drawImage(qrCanvas, qrAreaX + 4, qrAreaY + 4, size, size);
+      ctx.drawImage(qrCanvas, qrAreaX + 4, qrAreaY + 4, finalWidth, finalHeight);
 
       // Draw text if present
       if (hasText && mergedOptions.frameText) {
@@ -191,27 +198,26 @@ export const QRPreview = forwardRef<QRPreviewHandle, QRPreviewProps>(({
 
   return (
     <div className={cn("space-y-3", className)}>
-      <div className="flex justify-center">
+      <div className="flex justify-center max-w-full overflow-hidden">
         {!data ? (
           <div
-            className="flex items-center justify-center bg-gray-100 rounded-lg"
-            style={{ width: size, height: size }}
+            className="flex items-center justify-center bg-gray-100 rounded-lg max-w-full"
+            style={{ width: finalWidth, height: finalHeight, aspectRatio: `${finalWidth}/${finalHeight}` }}
           >
             <p className="text-sm text-gray-400">QR code will appear here</p>
           </div>
         ) : (
-          <div className="relative">
+          <div className="relative max-w-full">
             {loading && (
               <div 
                 className="absolute inset-0 flex items-center justify-center bg-gray-50/50 backdrop-blur-[1px] z-20"
-                style={{ width: size, height: size }}
               >
                 <Loader2 className="w-6 h-6 animate-spin text-primary/40" />
               </div>
             )}
             <div
               className={cn(
-                "relative transition-all duration-500 ease-in-out flex flex-col items-center justify-center",
+                "relative transition-all duration-500 ease-in-out flex flex-col items-center justify-center max-w-full",
                 mergedOptions.frameStyle === "rounded" && "rounded-[2rem] border-[6px]",
                 mergedOptions.frameStyle === "simple" && "rounded-xl border-[4px]",
                 mergedOptions.frameStyle === "badge_below" && "rounded-2xl border-[6px]",
@@ -236,10 +242,12 @@ export const QRPreview = forwardRef<QRPreviewHandle, QRPreviewProps>(({
 
               <div
                 ref={containerRef}
-                className="bg-white rounded-lg shadow-sm overflow-hidden"
+                className="bg-white rounded-lg shadow-sm overflow-hidden [&_canvas]:max-w-full [&_canvas]:h-auto flex items-center justify-center"
                 style={{ 
-                  width: size, 
-                  height: size,
+                  width: finalWidth, 
+                  height: finalHeight,
+                  maxWidth: '100%',
+                  aspectRatio: `${finalWidth}/${finalHeight}`
                 }}
               />
 

@@ -1,4 +1,4 @@
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 import { db } from "@/lib/db";
 import { plans } from "@/lib/db/schema";

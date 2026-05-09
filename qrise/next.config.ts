@@ -3,10 +3,10 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   // Enable gzip compression
   compress: true,
-  
+
   // Powered by header removal (security + slight perf)
   poweredByHeader: false,
-  
+
   async headers() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://*.supabase.co';
     const upstashUrl = process.env.UPSTASH_REDIS_REST_URL || 'https://*.upstash.io';
@@ -74,7 +74,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
+            value: 'camera=(self), microphone=(self), geolocation=(self)',
           },
           {
             key: 'X-XSS-Protection',

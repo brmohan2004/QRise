@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { Redis } from '@upstash/redis';
+import type { User } from '@supabase/supabase-js';
 
 export default async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -75,10 +76,10 @@ export default async function middleware(request: NextRequest) {
       setTimeout(() => reject(new Error('Supabase auth timeout')), 5000)
     );
     try {
-      const result = await Promise.race([
+      const result = (await Promise.race([
         supabase.auth.getUser(),
         timeout
-      ]) as { data: { user: any } };
+      ])) as { data: { user: User | null }; error: unknown };
       return result;
     } catch (e) {
       console.error('Middleware auth check failed or timed out:', e);

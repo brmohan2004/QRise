@@ -12,6 +12,10 @@ export interface QRDesign {
   logoPublicId?: string;
   frameStyle?: 'none' | 'simple' | 'rounded' | 'badge_below' | 'badge_above' | 'bubble';
   dotStyle?: 'square' | 'dots' | 'rounded' | 'extra_rounded';
+  qrVersion?: number;
+  shape?: 'square' | 'micro' | 'rectangular';
+  width?: number;
+  height?: number;
 }
 
 export interface RoutingCondition {

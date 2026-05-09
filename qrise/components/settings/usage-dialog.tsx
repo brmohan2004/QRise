@@ -6,7 +6,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 
 interface UsageData {
@@ -35,35 +35,22 @@ export function UsageDialog() {
   const router = useRouter();
   
   const isOpen = searchParams.get("usage") === "true";
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<UsageData | null>(null);
 
-  const fetchUsage = async () => {
-    setLoading(true);
-    setError(null);
-    try {
+  const { data, isLoading: loading, error, refetch: fetchUsage } = useQuery<UsageData>({
+    queryKey: ["user-usage"],
+    queryFn: async () => {
       const response = await fetch("/api/user/usage");
       const result = await response.json();
       
-      if (response.ok && result.data) {
-        setData(result.data);
-      } else {
-        setError(result.error || "Failed to load usage data");
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to load usage data");
       }
-    } catch (error) {
-      console.error("Failed to fetch usage:", error);
-      setError("An unexpected error occurred while fetching usage data.");
-    } finally {
-      setLoading(false);
-    }
-  };
+      return result.data;
+    },
+    enabled: isOpen
+  });
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchUsage();
-    }
-  }, [isOpen]);
+  const errorMessage = error instanceof Error ? error.message : (error as string | null);
 
 
   const handleClose = () => {
@@ -113,17 +100,17 @@ export function UsageDialog() {
             </div>
           ) : null}
 
-          {error && !loading && (
+          {errorMessage && !loading && (
             <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
               <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-500">
                 <AlertCircle className="w-8 h-8" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-900">Oops! Something went wrong</h3>
-                <p className="text-slate-500 text-sm max-w-xs mx-auto">{error}</p>
+                <p className="text-slate-500 text-sm max-w-xs mx-auto">{errorMessage}</p>
               </div>
               <Button 
-                onClick={fetchUsage}
+                onClick={() => fetchUsage()}
                 variant="outline"
                 className="rounded-xl border-slate-200"
               >

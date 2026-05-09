@@ -260,13 +260,13 @@ export function GeneralDialog() {
       {isMobile ? (
         <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
           <SheetContent side="bottom" className="p-0 h-[92vh] rounded-t-3xl overflow-hidden border-none outline-none">
-            <FormContent />
+            {FormContent()}
           </SheetContent>
         </Sheet>
       ) : (
         <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
           <DialogContent showCloseButton={false} className="sm:max-w-3xl md:h-[80vh] h-[90vh] w-[95vw] p-0 overflow-hidden rounded-3xl border-none shadow-2xl flex flex-col">
-            <FormContent />
+            {FormContent()}
           </DialogContent>
         </Dialog>
       )}
