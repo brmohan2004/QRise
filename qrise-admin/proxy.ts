@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import * as jose from "jose";
 import { User } from "@supabase/supabase-js";
 
-export async function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,

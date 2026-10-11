@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
+import path from "path";
+
+const projectRoot = typeof __dirname !== "undefined" ? __dirname : process.cwd();
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  turbopack: {
+    root: path.resolve(projectRoot),
+  },
 };
 
 export default nextConfig;
