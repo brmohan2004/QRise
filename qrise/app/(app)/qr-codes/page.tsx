@@ -143,7 +143,8 @@ export default function QrCodesPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      {/* Header (Desktop only - removed on mobile for clean minimalistic view) */}
+      <div className="hidden sm:flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-lg sm:text-2xl font-black tracking-tight text-gray-900 leading-tight">My QR Codes</h1>
           <p className="text-xs text-gray-500 mt-1 leading-relaxed">Manage and track your QR performance.</p>
@@ -160,7 +161,7 @@ export default function QrCodesPage() {
             {isSelectionMode ? "Cancel" : "Select"}
           </Button>
           <Link 
-            href="/create" 
+            href="/create?from=/qr-codes" 
             className="flex-1 sm:flex-none h-9 sm:h-10 bg-gray-900 hover:bg-black text-white px-4 sm:px-6 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm"
           >
             <Plus className="h-4 w-4" />

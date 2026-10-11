@@ -176,7 +176,8 @@ export default function FormsClient() {
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      {/* Header (Desktop only - removed on mobile for clean minimalistic view) */}
+      <div className="hidden sm:flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-lg sm:text-2xl font-black tracking-tight text-gray-900 leading-tight">Form Studio</h1>
           <p className="text-xs text-gray-500 mt-1 leading-relaxed">Create, manage, and analyze your lead capture forms.</p>

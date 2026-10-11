@@ -115,61 +115,19 @@ export function SmartRoutingConfig() {
     setRules(rules.filter((r) => r.id !== id));
   };
 
-  const handleSave = async () => {
-    setLoading(true);
+  // Auto-sync to wizard store
+  useEffect(() => {
     setWizardName(localName);
-    const newConfig = {
-      type: "smart_routing" as const,
+    setConfig({
+      type: "smart_routing",
       defaultUrl,
       defaultDestinationType,
       rules,
-    };
-    setConfig(newConfig);
-
-    try {
-      const isEditing = !!editingQrId;
-      const url = isEditing ? `/api/qr/${editingQrId}` : "/api/qr";
-      const method = isEditing ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: localName,
-          type: "smart_routing",
-          config: newConfig,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || errorData.message || "Failed to save to storage");
-      }
-
-      const data = await response.json();
-      if (!isEditing && data.data?.id) {
-        setEditingQrId(data.data.id);
-        // Sync the full saved QR back to the store (includes shortCode)
-        setConfig(data.data);
-      }
-      
-      toast.success("Configuration saved to storage");
-    } catch (e: any) {
-      toast.error(e.message || "Failed to save configuration");
-    } finally {
-      setLoading(false);
-    }
-  };
+    });
+  }, [localName, defaultUrl, defaultDestinationType, rules, setWizardName, setConfig]);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900">Smart Routing QR</h2>
-        <p className="text-sm text-gray-500 mt-1">
-          Route scans based on device, location, or time
-        </p>
-      </div>
-
       <div>
         <label className="block text-sm font-medium text-gray-700">QR Name</label>
         <input
@@ -254,15 +212,6 @@ export function SmartRoutingConfig() {
           </SortableContext>
         </DndContext>
       </div>
-
-      <button
-        type="button"
-        onClick={handleSave}
-        disabled={loading || isLimitReached}
-        className="w-full px-4 py-2 bg-[#0F6E56] text-white rounded-lg font-medium hover:bg-[#0d5c48] disabled:opacity-50 flex items-center justify-center"
-      >
-        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Save Configuration"}
-      </button>
     </div>
   );
 }

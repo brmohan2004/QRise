@@ -63,6 +63,15 @@ export function URLConfig() {
     utmCampaign && `utm_campaign=${encodeURIComponent(utmCampaign)}`,
   ].filter(Boolean).join(targetUrl.includes("?") ? "&" : "?");
 
+  const watchedName = watch("name");
+
+  // Sync name to store
+  useEffect(() => {
+    if (watchedName !== undefined) {
+      setName(watchedName);
+    }
+  }, [watchedName, setName]);
+
   // Sync form to store for live preview
   useEffect(() => {
     if (targetUrl) {
@@ -130,14 +139,7 @@ export function URLConfig() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div>
-        <h2 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900">URL QR Code</h2>
-        <p className="text-sm text-gray-500 mt-1.5 leading-relaxed">
-          Enter the destination URL where your QR code will redirect users.
-        </p>
-      </div>
-
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
       <div className="space-y-4 sm:space-y-6">
         <div className="space-y-2">
           <label htmlFor="name" className="text-[10px] uppercase font-black tracking-widest text-gray-400 ml-1">
@@ -206,60 +208,6 @@ export function URLConfig() {
         </div>
       </div>
 
-      {/* UTM Builder Accordion */}
-      <div>
-        <button
-          type="button"
-          onClick={() => setShowUTM(!showUTM)}
-          className="flex items-center gap-2 text-[10px] uppercase font-black tracking-widest text-emerald-600 hover:text-emerald-700 transition-colors bg-emerald-50 px-3 py-1.5 rounded-full"
-        >
-          {showUTM ? "− Hide" : "+ Show"} UTM Builder
-        </button>
-
-        {showUTM && (
-          <div className="mt-4 space-y-4 p-5 bg-emerald-50/30 rounded-2xl border border-emerald-100 animate-in slide-in-from-top-2 duration-300">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[9px] uppercase font-black tracking-widest text-emerald-600/60 ml-1">Source</label>
-                <input
-                  type="text"
-                  value={utmSource}
-                  onChange={(e) => setUtmSource(e.target.value)}
-                  className="block w-full px-3 py-2 bg-white border border-emerald-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                  placeholder="google"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[9px] uppercase font-black tracking-widest text-emerald-600/60 ml-1">Medium</label>
-                <input
-                  type="text"
-                  value={utmMedium}
-                  onChange={(e) => setUtmMedium(e.target.value)}
-                  className="block w-full px-3 py-2 bg-white border border-emerald-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                  placeholder="qr"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[9px] uppercase font-black tracking-widest text-emerald-600/60 ml-1">Campaign</label>
-                <input
-                  type="text"
-                  value={utmCampaign}
-                  onChange={(e) => setUtmCampaign(e.target.value)}
-                  className="block w-full px-3 py-2 bg-white border border-emerald-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                  placeholder="spring_sale"
-                />
-              </div>
-            </div>
-            {finalUrl && (
-              <div className="mt-2 pt-3 border-t border-emerald-100">
-                <p className="text-[9px] uppercase font-black tracking-widest text-emerald-600/60 mb-1">Generated URL:</p>
-                <p className="text-xs text-emerald-700 break-all font-mono bg-white p-2 rounded border border-emerald-100">{finalUrl}</p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
       {isLimitReached && (
         <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
           <AlertCircle className="h-5 w-5 text-rose-600 shrink-0" />
@@ -270,24 +218,6 @@ export function URLConfig() {
           <Link href="/billing" className="ml-auto text-[10px] font-black text-rose-600 uppercase underline decoration-rose-200">Upgrade</Link>
         </div>
       )}
-
-      <button
-        type="submit"
-        disabled={loading || isLimitReached}
-        className="group relative w-full h-12 flex items-center justify-center bg-gray-900 text-white rounded-xl font-bold overflow-hidden transition-all hover:bg-black active:scale-[0.98] disabled:opacity-50"
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-600 opacity-0 group-hover:opacity-10 transition-opacity" />
-        {loading ? (
-          <Loader2 className="h-5 w-5 animate-spin mx-auto" />
-        ) : (
-          <span className="flex items-center gap-2">
-            Save & Continue
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </span>
-        )}
-      </button>
     </form>
   );
 }

@@ -35,7 +35,14 @@ export function MobileBottomNav() {
   const isMarketplaceActive = pathname.startsWith("/marketplace");
 
   if (!mounted) return null;
-  if (pathname === "/profile" || pathname?.startsWith("/profile")) return null;
+
+  // Hide bottom nav bar on profile, create QR, and create form pages
+  const isHiddenRoute = 
+    pathname === "/profile" || pathname.startsWith("/profile") ||
+    pathname === "/create" || pathname.startsWith("/create") ||
+    pathname === "/forms/create" || pathname.startsWith("/forms/create");
+
+  if (isHiddenRoute) return null;
 
   return (
     <>
@@ -204,7 +211,8 @@ export function MobileBottomNav() {
                 onClick={() => {
                   useWizardStore.getState().reset();
                   setIsCreateOpen(false);
-                  router.push("/create");
+                  const target = pathname ? `/create?from=${encodeURIComponent(pathname)}` : "/create";
+                  router.push(target);
                 }}
                 className="w-full p-4 rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-4 text-left group active:scale-[0.98]"
               >

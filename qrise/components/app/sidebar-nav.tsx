@@ -156,7 +156,7 @@ export function SidebarNav({
                   size="sm"
                   onClick={() => { resetWizard(); onNavClick?.(); }}
                 >
-                  <Link href="/create">
+                  <Link href={pathname ? `/create?from=${encodeURIComponent(pathname)}` : "/create"}>
                     <Plus className="w-4 h-4 shrink-0" />
                     <AnimatePresence>
                       {!collapsed && (

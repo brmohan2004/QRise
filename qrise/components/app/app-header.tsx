@@ -20,6 +20,8 @@ export function AppHeader() {
   const [mounted, setMounted] = useState(false);
 
   const isProfilePage = pathname === "/profile" || pathname?.startsWith("/profile");
+  const isCreatePage = pathname === "/create" || pathname?.startsWith("/create");
+  const isShowOnlyBack = isProfilePage || isCreatePage;
 
   useEffect(() => {
     setMounted(true);
@@ -56,7 +58,7 @@ export function AppHeader() {
   }, [mounted]);
 
   useEffect(() => {
-    if (pathname && !pathname.startsWith("/profile")) {
+    if (pathname && !pathname.startsWith("/profile") && !pathname.startsWith("/create")) {
       try {
         sessionStorage.setItem("qrise_previous_screen", pathname);
       } catch (e) {}
@@ -75,7 +77,7 @@ export function AppHeader() {
       } catch (e) {}
     }
 
-    if (fromUrl && !fromUrl.startsWith("/profile")) {
+    if (fromUrl && !fromUrl.startsWith("/profile") && !fromUrl.startsWith("/create")) {
       router.push(fromUrl);
     } else if (typeof window !== "undefined" && window.history.length > 1) {
       router.back();
@@ -84,7 +86,7 @@ export function AppHeader() {
     }
   };
 
-  if (isProfilePage) {
+  if (isShowOnlyBack) {
     return (
       <header className="sticky top-0 z-30 w-full bg-background/95 backdrop-blur border-b border-border/60">
         <div className="flex items-center h-14 lg:h-16 px-4 lg:px-6">

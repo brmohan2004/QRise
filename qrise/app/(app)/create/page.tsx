@@ -1,4 +1,5 @@
 import { TypeSelector } from "@/components/qr/wizard/type-selector";
+import { WizardShell } from "@/components/qr/wizard/wizard-shell";
 import { isFeatureEnabled } from "@/lib/feature-flags";
 
 export const dynamic = 'force-dynamic';
@@ -15,8 +16,8 @@ export default async function CreatePage() {
   };
 
   return (
-    <div className="space-y-8">
+    <WizardShell currentStep={1} showPreview={false}>
       <TypeSelector enabledFlags={flags} />
-    </div>
+    </WizardShell>
   );
 }

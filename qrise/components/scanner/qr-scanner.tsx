@@ -139,7 +139,8 @@ export function QRScannerOverlay() {
     setIsCameraReady(false);
   };
 
-  if (pathname === "/profile" || pathname?.startsWith("/profile")) {
+  const isHomePage = pathname === "/dashboard" || pathname === "/";
+  if (!isHomePage) {
     return null;
   }
 
@@ -148,10 +149,7 @@ export function QRScannerOverlay() {
       {/* Floating Action Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={cn(
-          "fixed right-4 sm:right-6 z-40 p-3.5 sm:p-4 bg-emerald-600 text-white rounded-full shadow-2xl hover:bg-emerald-700 hover:scale-110 transition-all active:scale-95 group overflow-hidden",
-          pathname === "/profile" || pathname?.startsWith("/profile") ? "bottom-6" : "bottom-24 lg:bottom-6"
-        )}
+        className="fixed bottom-24 lg:bottom-6 right-4 sm:right-6 z-40 p-3.5 sm:p-4 bg-emerald-600 text-white rounded-full shadow-2xl hover:bg-emerald-700 hover:scale-110 transition-all active:scale-95 group overflow-hidden"
         aria-label="Scan QR/Barcode"
         title="Scan QR/Barcode"
       >

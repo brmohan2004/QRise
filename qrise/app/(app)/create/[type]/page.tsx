@@ -8,6 +8,7 @@ import { MultiActionConfig } from "@/components/qr/wizard/multi-action-config";
 import { BulkUpload } from "@/components/qr/wizard/bulk-upload";
 import type { QRType } from "@/types/qr.types";
 import { isFeatureEnabled } from "@/lib/feature-flags";
+import { Stage2Nav } from "@/components/qr/wizard/stage2-nav";
 
 export const dynamic = 'force-dynamic';
 
@@ -53,34 +54,13 @@ export default async function CreateTypePage({ params }: PageProps) {
   const config = configComponents[type as QRType];
 
   return (
-    <div className="">
-      <WizardShell showPreview={type !== "bulk"}>
-        <div className="mb-8">
-          <Link 
-            href="/create" 
-            className="group inline-flex items-center gap-2 text-[10px] uppercase font-black tracking-widest text-gray-400 hover:text-emerald-600 transition-all"
-          >
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 group-hover:bg-emerald-50 transition-colors">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" />
-              </svg>
-            </div>
-            Back to type selection
-          </Link>
-        </div>
+    <WizardShell currentStep={2} showPreview={type !== "bulk"}>
+      <div className="space-y-6 pb-36 sm:pb-0">
         {config}
-        <div className="mt-8 pt-8 border-t border-gray-100 flex justify-end">
-          <Link
-            href={`/create/design?type=${type}`}
-            className="flex items-center gap-2 px-6 py-3 bg-emerald-50 text-emerald-700 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-100 transition-all active:scale-95 border border-emerald-100"
-          >
-            Next: Design Studio
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        </div>
-      </WizardShell>
-    </div>
+
+        {/* Stage 2 Bottom Navigation (Floatable fixed bar on mobile) */}
+        <Stage2Nav type={type} />
+      </div>
+    </WizardShell>
   );
 }

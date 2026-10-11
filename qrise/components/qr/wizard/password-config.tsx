@@ -96,6 +96,22 @@ export function PasswordConfig() {
   const destinationType = watch("destinationType");
   const strength = getPasswordStrength(password);
 
+  // Auto sync form inputs to wizard store
+  useEffect(() => {
+    const subscription = watch((val) => {
+      if (val.name !== undefined) setName(val.name);
+      if (val.targetUrl !== undefined || val.destinationType !== undefined) {
+        setConfig({
+          type: "password",
+          targetUrl: val.targetUrl || "",
+          destinationType: val.destinationType || "url",
+        });
+      }
+      if (val.password) setTempPassword(val.password);
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, setName, setConfig, setTempPassword]);
+
   const onSubmit = async (data: PasswordFormData) => {
     setLoading(true);
     setName(data.name);
@@ -150,13 +166,6 @@ export function PasswordConfig() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900">Password Protected QR</h2>
-        <p className="text-sm text-gray-500 mt-1">
-          Gate your URL behind a password
-        </p>
-      </div>
-
       <div>
         <label className="block text-sm font-medium text-gray-700">QR Name</label>
         <input
@@ -259,14 +268,6 @@ export function PasswordConfig() {
           Password is encrypted — QRise staff cannot access it.
         </p>
       </div>
-
-      <button
-        type="submit"
-        disabled={loading || isLimitReached}
-        className="w-full px-4 py-2 bg-[#0F6E56] text-white rounded-lg font-medium hover:bg-[#0d5c48] disabled:opacity-50"
-      >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Save Configuration"}
-      </button>
     </form>
   );
 }

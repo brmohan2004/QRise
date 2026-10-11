@@ -427,13 +427,7 @@ export function BulkUpload() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Bulk Generator</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Generate hundreds of QR codes at once
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 ml-auto">
           <select 
             value={bulkType} 
             onChange={(e) => { setBulkType(e.target.value as any); setData([]); setIsManualEntry(false); }}
