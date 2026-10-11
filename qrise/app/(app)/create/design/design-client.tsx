@@ -3,7 +3,6 @@
 import { useWizardStore } from "@/stores/qr-wizard.store";
 import { WizardShell } from "@/components/qr/wizard/wizard-shell";
 import { StudioPanel } from "@/components/qr/design-studio/studio-panel";
-import { ScannabilityScore } from "@/components/qr/design-studio/scannability-score";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
@@ -111,13 +110,11 @@ export function DesignClient({ isEnabled }: { isEnabled: boolean }) {
   }
 
   return (
-    <WizardShell currentStep={3} showPreview={true}>
+    <WizardShell currentStep={3} showPreview={true} onScannabilityWarning={setWarning}>
       <div className="space-y-6">
         <StudioPanel />
         
-        <div className="mt-8 border-t border-slate-100 dark:border-slate-800 pt-8">
-          <ScannabilityScore onWarning={setWarning} />
-          
+        <div className="mt-6 border-t border-slate-100 dark:border-slate-800 pt-6">
           {usage && usage.metrics.dynamicQrs.limit !== -1 && usage.metrics.dynamicQrs.current >= usage.metrics.dynamicQrs.limit && !editingQrId && (
             <div className="mt-6 p-4 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
               <div className="h-10 w-10 rounded-xl bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center shrink-0">

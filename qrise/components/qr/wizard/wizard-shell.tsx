@@ -9,6 +9,7 @@ import { QRPreview } from "../qr-preview";
 import { useUsageStats } from "@/lib/hooks/use-usage-stats";
 import { TypeBanner } from "./type-banner";
 import { ChangeTypeDialog } from "./change-type-dialog";
+import { ScannabilityScore } from "@/components/qr/design-studio/scannability-score";
 import Link from "next/link";
 import type { QRType } from "@/types/qr.types";
 
@@ -16,6 +17,7 @@ interface WizardShellProps {
   children: React.ReactNode;
   showPreview?: boolean;
   currentStep?: 1 | 2 | 3;
+  onScannabilityWarning?: (warn: boolean) => void;
 }
 
 const steps = [
@@ -28,6 +30,7 @@ export function WizardShell({
   children,
   showPreview = true,
   currentStep,
+  onScannabilityWarning,
 }: WizardShellProps) {
   const router = useRouter();
   const { step, config, qrType, design, name, editingQrId, isDynamic, loadQR, setStep, setSaveStatus } = useWizardStore();
@@ -272,6 +275,12 @@ export function WizardShell({
                 className="mx-auto"
                 downloadName={name || "qr-code"}
               />
+
+              {activeStep === 3 && (
+                <div className="mt-4">
+                  <ScannabilityScore onWarning={onScannabilityWarning} />
+                </div>
+              )}
 
               <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 text-center">
                 <p className="text-[11px] text-muted-foreground font-medium">
