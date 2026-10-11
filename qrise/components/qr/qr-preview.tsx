@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "re
 import QRCodeStyling from "qr-code-styling";
 import { Loader2, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { QRDesign } from "@/types/qr.types";
+import type { QRDesign, QRShapeType } from "@/types/qr.types";
+import { SHAPE_METADATA, renderTagShape } from "@/lib/qr-shapes";
 
 interface QRPreviewProps {
   data: string;
@@ -62,10 +63,11 @@ export const QRPreview = forwardRef<QRPreviewHandle, QRPreviewProps>(({
   const [shapeNotice, setShapeNotice] = useState<string | null>(null);
 
   const mergedOptions = { ...defaultOptions, ...options };
-  const shape = mergedOptions.shape || "square";
+  const shape = (mergedOptions.shape || "square") as QRShapeType;
+  const shapeMeta = SHAPE_METADATA[shape];
 
-  const finalWidth = mergedOptions.width || (shape === "rectangular" ? 340 : shape === "micro" ? 200 : size);
-  const finalHeight = mergedOptions.height || (shape === "rectangular" ? 170 : shape === "micro" ? 200 : size);
+  const finalWidth = mergedOptions.width || (shapeMeta ? shapeMeta.width : size);
+  const finalHeight = mergedOptions.height || (shapeMeta ? shapeMeta.height : size);
 
   useImperativeHandle(ref, () => ({
     download: async (name?: string) => {
@@ -87,7 +89,7 @@ export const QRPreview = forwardRef<QRPreviewHandle, QRPreviewProps>(({
       const cleanDot = dotColor.replace("#", "");
       const cleanBg = bgColor.replace("#", "");
 
-      if (shape === "micro" || shape === "rectangular") {
+      if (shape !== "square") {
         try {
           const bwipModule = await import("bwip-js");
           const bwip = (bwipModule as any).default || bwipModule;
@@ -98,23 +100,24 @@ export const QRPreview = forwardRef<QRPreviewHandle, QRPreviewProps>(({
 
           if (shape === "micro") {
             try {
+              const minDim = Math.min(finalWidth, finalHeight);
               bwip.toCanvas(canvas, {
                 bcid: "microqrcode",
                 text: targetData,
-                scale: 5,
+                scale: Math.max(3, Math.round(minDim / 40)),
                 barcolor: cleanDot,
                 backgroundcolor: cleanBg,
                 includetext: false,
-                padding: 10,
+                padding: Math.max(6, Math.round(minDim * 0.05)),
               });
-              setShapeNotice(null);
+              setShapeNotice(shapeMeta?.scannabilityNote || null);
             } catch {
               // Micro QR ISO M4 holds max 15-21 characters. Fallback to compact preview sample
               const sample = targetData.length > 15 ? targetData.slice(0, 15) : "QRise.com";
               bwip.toCanvas(canvas, {
                 bcid: "microqrcode",
                 text: sample,
-                scale: 5,
+                scale: Math.max(3, Math.round(Math.min(finalWidth, finalHeight) / 40)),
                 barcolor: cleanDot,
                 backgroundcolor: cleanBg,
                 includetext: false,
@@ -129,15 +132,24 @@ export const QRPreview = forwardRef<QRPreviewHandle, QRPreviewProps>(({
                 bcid: "rectangularmicroqrcode",
                 text: targetData,
                 version: bestVersion,
-                scale: 3,
+                scale: Math.max(2, Math.round(finalWidth / 110)),
                 barcolor: cleanDot,
                 backgroundcolor: cleanBg,
                 includetext: false,
-                padding: 8,
+                padding: Math.max(4, Math.round(finalHeight * 0.04)),
               });
-              setShapeNotice(null);
+              setShapeNotice(shapeMeta?.scannabilityNote || null);
             } catch {
               setShapeNotice("Rectangular (rMQR) capacity exceeded for this data length.");
+            }
+          } else {
+            // Render the 9 additional mobile tagging shapes with dynamic width & height!
+            try {
+              renderTagShape(canvas, shape, targetData, bwip, dotColor, bgColor, finalWidth, finalHeight);
+              setShapeNotice(shapeMeta?.scannabilityNote || null);
+            } catch (shapeErr) {
+              console.error(`Rendering shape ${shape} failed:`, shapeErr);
+              setShapeNotice(`Notice: Showing ${shapeMeta?.label || shape} preview.`);
             }
           }
 
@@ -167,7 +179,7 @@ export const QRPreview = forwardRef<QRPreviewHandle, QRPreviewProps>(({
           setLoading(false);
           return;
         } catch (err) {
-          console.error("BWIP rendering failed:", err);
+          console.error("BWIP/Shape rendering failed:", err);
         }
       }
 

@@ -30,6 +30,12 @@ export function StudioPanel() {
     });
   };
 
+  const isStandardQR =
+    !design.shape ||
+    design.shape === "square" ||
+    design.shape === "micro" ||
+    design.shape === "rectangular";
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-end">
@@ -51,12 +57,20 @@ export function StudioPanel() {
 
         <TabsContent value="style" className="space-y-6 mt-6">
           <SizeSelector />
-          <div className="h-px bg-gray-200 w-full" />
+          <div className="h-px bg-gray-200 dark:bg-slate-800 w-full" />
           <ColorPicker />
-          <div className="h-px bg-gray-200 w-full" />
-          <DotPatternSelector />
-          <div className="h-px bg-gray-200 w-full" />
-          <QRVersionSelector />
+          {isStandardQR && (
+            <>
+              <div className="h-px bg-gray-200 dark:bg-slate-800 w-full" />
+              <DotPatternSelector />
+              {(!design.shape || design.shape === "square") && (
+                <>
+                  <div className="h-px bg-gray-200 dark:bg-slate-800 w-full" />
+                  <QRVersionSelector />
+                </>
+              )}
+            </>
+          )}
         </TabsContent>
 
         <TabsContent value="logo" className="mt-6">
@@ -65,9 +79,13 @@ export function StudioPanel() {
 
         <TabsContent value="frame" className="space-y-6 mt-6">
           <FrameSelector />
-          <div className="h-px bg-gray-200 w-full" />
-          <EyeShapeSelector />
-          <div className="h-px bg-gray-200 w-full" />
+          {(!design.shape || design.shape === "square") && (
+            <>
+              <div className="h-px bg-gray-200 dark:bg-slate-800 w-full" />
+              <EyeShapeSelector />
+            </>
+          )}
+          <div className="h-px bg-gray-200 dark:bg-slate-800 w-full" />
           <EyeAndFrameColorPicker />
         </TabsContent>
       </Tabs>

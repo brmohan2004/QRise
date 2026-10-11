@@ -1,5 +1,13 @@
 export type QRType = 'url' | 'smart_routing' | 'password' | 'multi_action' | 'bulk';
 
+export type QRShapeType = 
+  | 'square' 
+  | 'micro' 
+  | 'rectangular' 
+  | 'datamatrix' 
+  | 'aztec' 
+  | 'trillcode';
+
 export interface QRDesign {
   dotColor: string;
   bgColor: string;
@@ -13,7 +21,7 @@ export interface QRDesign {
   frameStyle?: 'none' | 'simple' | 'rounded' | 'badge_below' | 'badge_above' | 'bubble';
   dotStyle?: 'square' | 'dots' | 'rounded' | 'extra_rounded';
   qrVersion?: number;
-  shape?: 'square' | 'micro' | 'rectangular';
+  shape?: QRShapeType;
   width?: number;
   height?: number;
 }
