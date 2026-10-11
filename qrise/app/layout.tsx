@@ -113,16 +113,17 @@ import { UsageLimitModal } from "@/components/billing/usage-limit-modal";
 
 import { OrganizationSchema, WebApplicationSchema, SoftwareApplicationSchema, HowToSchema, ReviewSchema } from "@/components/seo/json-ld";
 
-import { headers } from "next/headers";
-import { QRScannerOverlay } from "@/components/scanner/qr-scanner";
+import dynamic from "next/dynamic";
 
-export default async function RootLayout({
+const QRScannerOverlay = dynamic(
+  () => import("@/components/scanner/qr-scanner").then((mod) => mod.QRScannerOverlay)
+);
+
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const nonce = (await headers()).get('x-nonce') || undefined;
-
   return (
     <html
       lang="en"
@@ -130,11 +131,11 @@ export default async function RootLayout({
       data-scroll-behavior="smooth"
     >
       <head>
-        <OrganizationSchema nonce={nonce} />
-        <WebApplicationSchema nonce={nonce} />
-        <SoftwareApplicationSchema nonce={nonce} />
-        <HowToSchema nonce={nonce} />
-        <ReviewSchema nonce={nonce} />
+        <OrganizationSchema />
+        <WebApplicationSchema />
+        <SoftwareApplicationSchema />
+        <HowToSchema />
+        <ReviewSchema />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

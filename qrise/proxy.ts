@@ -148,12 +148,10 @@ export default async function middleware(request: NextRequest) {
   let profile: { is_suspended: boolean; is_admin: boolean } | null = null;
 
   // We only fetch the user if it's a protected path, an API route, or an auth path (login/register)
-  // We ALSO fetch it for the marketplace to decide on rewrites, and for / to show personalized content if available
-  // BUT to maximize SEO, we should avoid it for / if the user is likely a bot or guest.
-  // For now, let's only fetch if NOT a static public path that doesn't change based on auth.
   const needsAuthCheck = isProtectedPath || isApiRoute || isAuthPath || pathname === '/marketplace';
+  const hasAuthCookie = request.cookies.getAll().some((c) => c.name.startsWith('sb-') || c.name.includes('-auth-token'));
 
-  if (needsAuthCheck) {
+  if (needsAuthCheck && hasAuthCookie) {
     const {
       data: { user: foundUser },
     } = await getUserWithTimeout();
@@ -243,6 +241,6 @@ export default async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|manifest.*|robots.txt|sitemap.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff|woff2|ttf|eot)$).*)',
   ],
 };

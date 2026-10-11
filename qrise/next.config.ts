@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(projectRoot),
   },
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'recharts', 'date-fns', 'framer-motion', '@tanstack/react-query'],
+  },
   // Enable gzip compression
   compress: true,
 
