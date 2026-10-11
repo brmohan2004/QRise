@@ -81,7 +81,7 @@ export function TypeSelector({
   }
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300 pb-36 sm:pb-0">
+    <div className="space-y-5 animate-in fade-in duration-300">
       {/* Visual Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">

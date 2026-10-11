@@ -111,7 +111,7 @@ export function DesignClient({ isEnabled }: { isEnabled: boolean }) {
 
   return (
     <WizardShell currentStep={3} showPreview={true}>
-      <div className="space-y-6 pb-36 sm:pb-0">
+      <div className="space-y-6">
         <StudioPanel />
         
         <div className="mt-8 border-t border-slate-100 dark:border-slate-800 pt-8">

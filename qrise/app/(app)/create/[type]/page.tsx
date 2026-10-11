@@ -55,7 +55,7 @@ export default async function CreateTypePage({ params }: PageProps) {
 
   return (
     <WizardShell currentStep={2} showPreview={type !== "bulk"}>
-      <div className="space-y-6 pb-36 sm:pb-0">
+      <div className="space-y-6">
         {config}
 
         {/* Stage 2 Bottom Navigation (Floatable fixed bar on mobile) */}

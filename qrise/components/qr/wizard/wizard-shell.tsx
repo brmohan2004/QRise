@@ -120,7 +120,7 @@ export function WizardShell({
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 animate-in fade-in duration-300">
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 pb-28 sm:pb-0">
         {/* Minimalist Segmented Stepper */}
         <div className="mb-6 sm:mb-8">
           <div className="p-1.5 bg-slate-100/90 dark:bg-slate-800/60 rounded-2xl flex items-center gap-1.5 border border-slate-200/70 dark:border-slate-800 max-w-xl mx-auto shadow-xs">
