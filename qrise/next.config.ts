@@ -1,6 +1,12 @@
 import type { NextConfig } from 'next';
+import path from 'path';
+
+const projectRoot = typeof __dirname !== 'undefined' ? __dirname : process.cwd();
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: path.resolve(projectRoot),
+  },
   // Enable gzip compression
   compress: true,
 
