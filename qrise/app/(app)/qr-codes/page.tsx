@@ -53,7 +53,7 @@ export default function QrCodesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['qrcodes'] });
-      toast.success(`${selectedIds.length} QR codes deleted`);
+      toast.success(`${selectedIds.length} QR code(s) deleted. Retrievable via support for 7 days.`);
       setSelectedIds([]);
     },
     onError: (err: any) => {

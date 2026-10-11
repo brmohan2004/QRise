@@ -14,7 +14,7 @@ export async function getUserQRCodes(
   limit = 20,
   offset = 0
 ): Promise<QRCode[]> {
-  const conditions = [eq(qrCodes.userId, userId)];
+  const conditions = [eq(qrCodes.userId, userId), eq(qrCodes.isDeleted, false)];
   
   if (filters?.type) {
     conditions.push(eq(qrCodes.type, filters.type));
@@ -38,7 +38,7 @@ export async function getUserQRCodes(
 }
 
 export async function getQRById(id: string): Promise<QRCode | undefined> {
-  const result = await db.select().from(qrCodes).where(eq(qrCodes.id, id)).limit(1);
+  const result = await db.select().from(qrCodes).where(and(eq(qrCodes.id, id), eq(qrCodes.isDeleted, false))).limit(1);
   return result[0];
 }
 
@@ -62,5 +62,11 @@ export async function updateQR(id: string, data: Partial<NewQRCode>): Promise<QR
 }
 
 export async function deleteQR(id: string): Promise<void> {
-  await db.update(qrCodes).set({ isActive: false }).where(eq(qrCodes.id, id));
+  await db.update(qrCodes).set({
+    isActive: false,
+    isDeleted: true,
+    status: 'suspended',
+    deletedAt: new Date(),
+    updatedAt: new Date()
+  }).where(eq(qrCodes.id, id));
 }

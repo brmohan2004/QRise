@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = 'force-dynamic';
 
 import { db } from "@/lib/db";
-import { bulkJobs, webhookDeliveries, scanEvents, scanDailyRollups } from "@/lib/db/schema";
+import { bulkJobs, webhookDeliveries, scanEvents, scanDailyRollups, qrCodes } from "@/lib/db/schema";
 import { lt, sql, eq, and, isNotNull, inArray } from "drizzle-orm";
 import { utapi } from "@/lib/uploadthing-server";
 
@@ -15,10 +15,11 @@ export async function POST(request: NextRequest) {
     }
 
     const now = new Date();
-    const results = {
+    const results: Record<string, number> = {
       zips: 0,
       deliveries: 0,
-      rollups: 0
+      rollups: 0,
+      deletedQRs: 0
     };
 
     // 1. Delete UploadThing ZIPs older than 7 days
@@ -57,6 +58,15 @@ export async function POST(request: NextRequest) {
     
     // Aggregation logic would go here, inserting into scanDailyRollups
     results.rollups = 1; // Mark as success for audit
+
+    // 4. Auto-delete soft-deleted QR codes older than 7 days (grace period expired)
+    const deletedQRs = await db.delete(qrCodes)
+      .where(and(
+        eq(qrCodes.isDeleted, true),
+        lt(qrCodes.deletedAt, sevenDaysAgo)
+      ))
+      .returning();
+    results.deletedQRs = deletedQRs.length;
 
     return NextResponse.json({ 
       success: true, 

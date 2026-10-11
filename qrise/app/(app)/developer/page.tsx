@@ -12,6 +12,7 @@ import {
   Activity, 
   Download, 
   ArrowUpRight,
+  ArrowLeft,
   Calendar,
   Code2
 } from "lucide-react";
@@ -72,14 +73,19 @@ export default function DeveloperHubPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-lg sm:text-2xl font-black tracking-tight text-gray-900 leading-tight">Developer Hub</h1>
-          <p className="text-xs text-gray-500 mt-1 leading-relaxed">Integrate QRise into your existing workflow with our API and webhooks.</p>
-        </div>
+      {/* Action Bar (Title and description removed per request) */}
+      <div className="flex items-center justify-between gap-3 w-full">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => router.back()} 
+          className="lg:hidden h-9 w-9 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 shadow-sm shrink-0"
+          aria-label="Back"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex items-center gap-3 ml-auto w-full sm:w-auto justify-end">
           <AnimatePresence mode="wait">
             {activeTab === "api-keys" && (
               <motion.div
@@ -176,8 +182,7 @@ export default function DeveloperHubPage() {
                   </p>
                   <Button 
                     asChild
-                    variant="outline"
-                    className="w-full border-gray-700 text-white hover:bg-white hover:text-black font-black uppercase text-[9px] tracking-widest h-9 rounded-xl transition-all"
+                    className="w-full bg-white hover:bg-gray-100 text-gray-900 font-black uppercase text-[9px] tracking-widest h-9 rounded-xl transition-all shadow-sm border-none relative z-10"
                   >
                     <a href="/docs/sdk" target="_blank" rel="noopener noreferrer">View SDK Docs</a>
                   </Button>
@@ -274,8 +279,7 @@ export default function DeveloperHubPage() {
                   </p>
                   <Button 
                     asChild
-                    variant="outline"
-                    className="w-full border-emerald-400 text-white hover:bg-white hover:text-emerald-600 font-black uppercase text-[9px] tracking-widest h-9 rounded-xl transition-all relative z-10"
+                    className="w-full bg-white hover:bg-emerald-50 text-emerald-700 font-black uppercase text-[9px] tracking-widest h-9 rounded-xl transition-all shadow-sm border-none relative z-10"
                   >
                     <a href="/docs/webhooks" target="_blank" rel="noopener noreferrer">Guide</a>
                   </Button>

@@ -26,6 +26,7 @@ export async function GET(
       .from('qr_codes')
       .select('id, user_id')
       .eq('id', id)
+      .eq('is_deleted', false)
       .single();
 
     if (qrError || !qr) {

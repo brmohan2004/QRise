@@ -21,6 +21,7 @@ export function AppHeader() {
 
   const isProfilePage = pathname === "/profile" || pathname?.startsWith("/profile");
   const isCreatePage = pathname === "/create" || pathname?.startsWith("/create");
+  const isDeveloperPage = pathname === "/developer" || pathname?.startsWith("/developer");
   const isShowOnlyBack = isProfilePage || isCreatePage;
 
   useEffect(() => {
@@ -110,7 +111,8 @@ export function AppHeader() {
         "sticky top-0 z-30 w-full transition-all duration-300 ease-in-out",
         isScrolled 
           ? "p-2 sm:p-3 lg:p-0 bg-transparent" 
-          : "p-0 bg-background/95 backdrop-blur border-b border-border/60"
+          : "p-0 bg-background/95 backdrop-blur border-b border-border/60",
+        isDeveloperPage && "hidden lg:block"
       )}
     >
       <div 

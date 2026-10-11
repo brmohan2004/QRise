@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 import { useUsageLimit } from "@/lib/hooks/use-usage-limit";
 
 import { MobileBottomNav } from "@/components/app/mobile-bottom-nav";
+import { CreateSheet } from "@/components/app/create-sheet";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { openModal } = useUsageLimit();
@@ -80,6 +81,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </div>
       {mounted && <MobileBottomNav />}
+      <CreateSheet />
       <Suspense fallback={null}>
         <GeneralDialog />
         <BackupDialog />

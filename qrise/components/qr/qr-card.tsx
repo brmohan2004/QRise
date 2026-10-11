@@ -134,7 +134,7 @@ export function QrCard({
     try {
       const res = await fetch(`/api/qr/${qr.id}`, { method: "DELETE" });
       if (res.ok) {
-        toast.success("QR Code deleted successfully");
+        toast.success("QR Code deleted. Retrievable via support for 7 days.");
         setShowDeleteConfirm(false);
         // Refresh the data without reloading the whole page
         queryClient.invalidateQueries({ queryKey: ['qrcodes'] });

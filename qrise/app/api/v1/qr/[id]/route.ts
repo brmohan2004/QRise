@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { qrCodes, qrRedirectHistory } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { withApiAuth } from '@/lib/api/auth-middleware';
 import { apiSuccess, apiError } from '@/lib/api/response';
 import { fireWebhookEvent } from '@/lib/webhooks/delivery';
@@ -28,7 +28,7 @@ export const GET = withApiAuth(async (req, ctx) => {
       tags: qrCodes.tags,
     })
     .from(qrCodes)
-    .where(eq(qrCodes.id, id))
+    .where(and(eq(qrCodes.id, id), eq(qrCodes.isDeleted, false)))
     .limit(1);
 
   if (!qr[0]) {

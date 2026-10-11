@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useWizardStore } from "@/stores/qr-wizard.store";
+import { useCreateSheetStore } from "@/stores/create-sheet.store";
 import { usePathname, useSearchParams } from "next/navigation";
 import { 
   LayoutDashboard, 
@@ -148,33 +149,35 @@ export function SidebarNav({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
-                  asChild 
+                  type="button"
                   className={cn(
                     "w-full gap-2 shadow-sm rounded-xl font-bold transition-all",
                     collapsed ? "justify-center px-0" : "justify-start px-4"
                   )} 
                   size="sm"
-                  onClick={() => { resetWizard(); onNavClick?.(); }}
+                  onClick={() => { 
+                    resetWizard(); 
+                    onNavClick?.(); 
+                    useCreateSheetStore.getState().open();
+                  }}
                 >
-                  <Link href={pathname ? `/create?from=${encodeURIComponent(pathname)}` : "/create"}>
-                    <Plus className="w-4 h-4 shrink-0" />
-                    <AnimatePresence>
-                      {!collapsed && (
-                        <motion.span
-                          initial={{ opacity: 0, width: 0 }}
-                          animate={{ opacity: 1, width: "auto" }}
-                          exit={{ opacity: 0, width: 0 }}
-                          transition={{ duration: 0 }}
-                          className="whitespace-nowrap ml-2"
-                        >
-                          Create QR
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </Link>
+                  <Plus className="w-4 h-4 shrink-0" />
+                  <AnimatePresence>
+                    {!collapsed && (
+                      <motion.span
+                        initial={{ opacity: 0, width: 0 }}
+                        animate={{ opacity: 1, width: "auto" }}
+                        exit={{ opacity: 0, width: 0 }}
+                        transition={{ duration: 0 }}
+                        className="whitespace-nowrap ml-2"
+                      >
+                        Create
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
                 </Button>
               </TooltipTrigger>
-              {collapsed && <TooltipContent side="right">Create QR</TooltipContent>}
+              {collapsed && <TooltipContent side="right">Create</TooltipContent>}
             </Tooltip>
           </div>
         )}
