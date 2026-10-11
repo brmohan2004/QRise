@@ -34,7 +34,6 @@ export default function ApiManagerClient() {
   if (userData && !userData.plan?.has_api) {
     return (
       <div className="min-h-[500px] flex flex-col items-center justify-center text-center p-8 bg-white border border-gray-100 rounded-[2.5rem] shadow-xl shadow-gray-200/50 relative overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-emerald-600 via-emerald-400 to-emerald-600" />
         <div className="w-24 h-24 bg-emerald-50 text-emerald-600 flex items-center justify-center rounded-[2rem] mb-8 shadow-inner border border-emerald-100/50">
           <Lock className="h-10 w-10" />
         </div>

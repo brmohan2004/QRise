@@ -129,8 +129,6 @@ export function FeedbackModal({ open, onOpenChange }: FeedbackModalProps) {
 
   const FormContent = () => (
     <div className="relative overflow-hidden h-full sm:h-auto bg-white">
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 z-50" />
-      
       {submitted ? (
         <div className="py-12 sm:py-16 flex flex-col items-center text-center space-y-4 animate-in fade-in zoom-in duration-300 px-6">
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/20">

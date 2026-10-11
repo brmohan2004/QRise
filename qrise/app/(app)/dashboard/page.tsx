@@ -2,21 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 import { DashboardStats } from "@/components/app/dashboard-stats";
 import { ScanTrendChart } from "@/components/app/scan-trend-chart";
 import { WorldScanMap } from "@/components/app/world-scan-map";
 import { ActivityFeed } from "@/components/app/activity-feed";
 import { TopQRList } from "@/components/app/top-qr-list";
-import { RefreshCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const queryClient = useQueryClient();
-  const { success } = useToast();
   const [range, setRange] = useState<"7d" | "30d" | "90d">("7d");
 
   // Check if user has any QRs for onboarding redirect
@@ -43,8 +37,6 @@ export default function DashboardPage() {
   const { 
     data: analyticsData, 
     isLoading: isAnalyticsLoading, 
-    isFetching: isAnalyticsFetching,
-    refetch: refetchAnalytics 
   } = useQuery({
     queryKey: ["analytics", range],
     queryFn: async () => {
@@ -58,8 +50,6 @@ export default function DashboardPage() {
   const { 
     data: statsData, 
     isLoading: isStatsLoading, 
-    isFetching: isStatsFetching,
-    refetch: refetchStats 
   } = useQuery({
     queryKey: ["stats"],
     queryFn: async () => {
@@ -70,49 +60,8 @@ export default function DashboardPage() {
     refetchInterval: 60000,
   });
 
-  const isRefreshing = isAnalyticsFetching || isStatsFetching;
-
-  const handleRefresh = async () => {
-    // Force a refetch of all dashboard-related data
-    try {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["analytics"] }),
-        queryClient.invalidateQueries({ queryKey: ["stats"] }),
-        // Add a tiny artificial delay for better UX if the network is too fast
-        new Promise(resolve => setTimeout(resolve, 500))
-      ]);
-      success("Dashboard data updated");
-    } catch (error) {
-      console.error("Refresh error:", error);
-    }
-  };
-
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Overview</h2>
-          <p className="text-muted-foreground text-sm font-medium">
-            Real-time performance across your QR code ecosystem.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] uppercase font-bold text-emerald-600 tracking-wider">Live tracking active</span>
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="h-9 font-bold bg-background shadow-sm border-muted-foreground/10"
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-          >
-            <RefreshCcw className={cn("h-3.5 w-3.5 mr-2", isRefreshing && "animate-spin")} />
-            {isRefreshing ? "Refreshing..." : "Refresh"}
-          </Button>
-        </div>
-      </div>
 
       <DashboardStats />
 

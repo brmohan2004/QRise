@@ -99,9 +99,8 @@ export function FieldSettingsPanel({
 
   return (
     <aside className="w-full bg-white flex flex-col shrink-0 animate-in slide-in-from-right duration-300 overflow-hidden h-full">
-      {/* Header with gradient accent bar */}
+      {/* Header */}
       <div className="relative overflow-hidden shrink-0">
-        <div className="absolute inset-x-0 top-0 h-1 bg-emerald-600" />
         <div className="h-20 border-b border-gray-100 flex items-center justify-between px-5 shrink-0 bg-white">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center shadow-sm">
