@@ -60,6 +60,10 @@ export function BackupDialog() {
     router.replace(`${pathname}${params.toString() ? `?${params.toString()}` : ""}`);
   };
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent showCloseButton={false} className="sm:max-w-4xl md:w-[90vw] md:h-[80vh] h-[85vh] w-[95vw] p-0 overflow-hidden rounded-[32px] md:rounded-[48px] border-none shadow-2xl flex flex-col">

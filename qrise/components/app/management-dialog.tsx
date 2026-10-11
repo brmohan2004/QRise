@@ -105,6 +105,10 @@ export function ManagementDialog() {
     </div>
   );
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <>
       {isMobile ? (

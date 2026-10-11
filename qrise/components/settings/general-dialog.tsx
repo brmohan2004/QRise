@@ -255,6 +255,10 @@ export function GeneralDialog() {
     </div>
   );
 
+  if (!isOpen && !isDestroyDialogOpen) {
+    return null;
+  }
+
   return (
     <>
       {isMobile ? (

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { User, CreditCard, LogOut, Database, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -33,6 +33,7 @@ interface UserMenuProps {
 
 export function UserMenu({ user, isCollapsed, isLoading }: UserMenuProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const supabase = createClient();
   const { data: usage } = useUsageStats();
 
@@ -118,6 +119,17 @@ export function UserMenu({ user, isCollapsed, isLoading }: UserMenuProps) {
 
         <DropdownMenuSeparator className="bg-slate-100 mx-1" />
         
+        <DropdownMenuItem asChild className="cursor-pointer rounded-xl h-10 sm:h-11 focus:bg-slate-50">
+          <Link 
+            href={pathname ? `/profile?from=${encodeURIComponent(pathname)}` : "/profile"} 
+            onClick={() => setIsDropdownOpen(false)}
+            className="flex items-center w-full font-bold text-slate-600 text-[11px] sm:text-sm"
+          >
+            <User className="mr-2 sm:mr-3 h-3.5 sm:h-4 w-3.5 sm:w-4 text-primary" />
+            My Profile
+          </Link>
+        </DropdownMenuItem>
+
         <DropdownMenuItem asChild className="cursor-pointer rounded-xl h-10 sm:h-11 focus:bg-slate-50">
           <Link 
             href="?general=true" 

@@ -69,27 +69,33 @@ export function NotificationDropdown() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchNotifications = async () => {
-    try {
-      const res = await fetch('/api/notifications');
-      const data = await res.json();
-      if (data.success) {
-        setNotifications(data.data.map((n: any) => ({
-          ...n,
-          timestamp: new Date(n.timestamp),
-          type: n.type === 'broadcast' ? 'feature' : 'info',
-          detail: n.message // Map message to detail for the dialog
-        })));
-      }
-    } catch (error) {
-      console.error("Failed to fetch notifications:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
+    let isMounted = true;
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch('/api/notifications');
+        const data = await res.json();
+        if (isMounted && data.success) {
+          setNotifications(data.data.map((n: any) => ({
+            ...n,
+            timestamp: new Date(n.timestamp),
+            type: n.type === 'broadcast' ? 'feature' : 'info',
+            detail: n.message // Map message to detail for the dialog
+          })));
+        }
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
     fetchNotifications();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;

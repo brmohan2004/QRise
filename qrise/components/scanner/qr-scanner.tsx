@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import { Maximize, X, ExternalLink, Camera, QrCode, Copy, Check, Loader2, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 export function QRScannerOverlay() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
@@ -137,12 +139,20 @@ export function QRScannerOverlay() {
     setIsCameraReady(false);
   };
 
+  if (pathname === "/profile" || pathname?.startsWith("/profile")) {
+    return null;
+  }
+
   return (
     <>
       {/* Floating Action Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 p-4 bg-emerald-600 text-white rounded-full shadow-2xl hover:bg-emerald-700 hover:scale-110 transition-all active:scale-95 group overflow-hidden"
+        className={cn(
+          "fixed right-4 sm:right-6 z-40 p-3.5 sm:p-4 bg-emerald-600 text-white rounded-full shadow-2xl hover:bg-emerald-700 hover:scale-110 transition-all active:scale-95 group overflow-hidden",
+          pathname === "/profile" || pathname?.startsWith("/profile") ? "bottom-6" : "bottom-24 lg:bottom-6"
+        )}
+        aria-label="Scan QR/Barcode"
         title="Scan QR/Barcode"
       >
         <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform" />

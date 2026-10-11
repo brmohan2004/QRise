@@ -15,6 +15,8 @@ import { motion } from "framer-motion";
 
 import { useUsageLimit } from "@/lib/hooks/use-usage-limit";
 
+import { MobileBottomNav } from "@/components/app/mobile-bottom-nav";
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { openModal } = useUsageLimit();
 
@@ -58,7 +60,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex h-screen overflow-hidden bg-background">
+      <div className="flex h-screen h-[100dvh] max-h-[100dvh] overflow-hidden bg-background">
         {/* Desktop Sidebar */}
         <motion.div
           initial={false}
@@ -70,13 +72,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {mounted && <SidebarNav className="w-full" isMobile={false} />}
         </motion.div>
 
-        <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col overflow-hidden relative min-h-0">
           <AppHeader />
-          <main className="flex-1 overflow-y-auto p-6 lg:p-[30px]">
+          <main id="main-content" className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-[30px] pb-32 lg:pb-[30px]">
             {children}
           </main>
         </div>
       </div>
+      {mounted && <MobileBottomNav />}
       <Suspense fallback={null}>
         <GeneralDialog />
         <BackupDialog />
