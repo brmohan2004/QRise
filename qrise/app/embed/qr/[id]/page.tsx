@@ -10,13 +10,19 @@ export const metadata = {
   },
 };
 
-export default async function EmbedPage({ params, searchParams }: { params: { id: string }, searchParams: Record<string, string | string[] | null> }) {
-  const { id } = params;
-  const style = (searchParams.style as string) || 'card';
-  const theme = (searchParams.theme as string) || 'auto';
-  const size = (searchParams.size as string) || 'md';
-  const showScanCount = searchParams.show_scan_count !== 'false';
-  const showName = searchParams.show_name !== 'false';
+interface EmbedPageProps {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function EmbedPage({ params, searchParams }: EmbedPageProps) {
+  const { id } = await params;
+  const resolvedSearchParams = await searchParams;
+  const style = (resolvedSearchParams.style as string) || 'card';
+  const theme = (resolvedSearchParams.theme as string) || 'auto';
+  const size = (resolvedSearchParams.size as string) || 'md';
+  const showScanCount = resolvedSearchParams.show_scan_count !== 'false';
+  const showName = resolvedSearchParams.show_name !== 'false';
 
   const data = await db
     .select({ 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,7 +8,12 @@ import { CheckCircle2, XCircle, Loader2, AlertTriangle, ArrowRight } from 'lucid
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
-export default function SubmitMarketplacePage({ params }: { params: { slug: string } }) {
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export default function SubmitMarketplacePage({ params: paramsPromise }: PageProps) {
+  const { slug } = use(paramsPromise);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -16,19 +21,19 @@ export default function SubmitMarketplacePage({ params }: { params: { slug: stri
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
-    fetch(`/api/v1/types/${params.slug}`)
+    fetch(`/api/v1/types/${slug}`)
       .then(r => r.json())
       .then(res => {
         if (res.ok) setTypeData(res.data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [params.slug]);
+  }, [slug]);
 
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/v1/types/${params.slug}/marketplace`, {
+      const res = await fetch(`/api/v1/types/${slug}/marketplace`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notes }),
