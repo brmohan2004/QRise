@@ -12,6 +12,8 @@ interface WizardStore {
   editingQrId: string | null;
   // SECURITY: tempPassword is NOT persisted - only used during wizard flow, cleared on reset
   tempPassword: string | null;
+  saveStatus: 'idle' | 'saving' | 'saved' | 'error';
+  lastSavedAt: number | null;
   setName: (name: string) => void;
   setStep: (step: 1 | 2 | 3) => void;
   setType: (type: QRType) => void;
@@ -20,6 +22,7 @@ interface WizardStore {
   setDynamic: (isDynamic: boolean) => void;
   setEditingQrId: (id: string | null) => void;
   setTempPassword: (password: string | null) => void;
+  setSaveStatus: (status: 'idle' | 'saving' | 'saved' | 'error') => void;
   loadQR: (qr: Record<string, unknown>) => void;
   reset: () => void;
 }
@@ -33,24 +36,51 @@ const initialState = {
   isDynamic: true,
   editingQrId: null as string | null,
   tempPassword: null as string | null,
+  saveStatus: 'saved' as const,
+  lastSavedAt: null as number | null,
+};
+
+let autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
+const triggerSaveStatus = (set: any) => {
+  set({ saveStatus: 'saving' });
+  if (autoSaveTimer) clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(() => {
+    set({ saveStatus: 'saved', lastSavedAt: Date.now() });
+  }, 450);
 };
 
 export const useWizardStore = create<WizardStore>()(
   persist(
     (set) => ({
       ...initialState,
-      setName: (name: string) => set({ name }),
+      setName: (name: string) => {
+        set({ name });
+        triggerSaveStatus(set);
+      },
       setStep: (step: 1 | 2 | 3) => set({ step }),
-      setType: (qrType: QRType) => set({ qrType, step: 2 }),
-      setConfig: (config: Partial<QRConfig>) => set((state) => ({ 
-        config: { ...state.config, ...config } as Partial<QRConfig>
-      })),
-      setDesign: (design: Partial<QRDesign>) => set((state) => ({ 
-        design: { ...state.design, ...design } as Partial<QRDesign>
-      })),
-      setDynamic: (isDynamic: boolean) => set({ isDynamic }),
+      setType: (qrType: QRType) => {
+        set({ qrType, step: 2 });
+        triggerSaveStatus(set);
+      },
+      setConfig: (config: Partial<QRConfig>) => {
+        set((state) => ({ 
+          config: { ...state.config, ...config } as Partial<QRConfig>
+        }));
+        triggerSaveStatus(set);
+      },
+      setDesign: (design: Partial<QRDesign>) => {
+        set((state) => ({ 
+          design: { ...state.design, ...design } as Partial<QRDesign>
+        }));
+        triggerSaveStatus(set);
+      },
+      setDynamic: (isDynamic: boolean) => {
+        set({ isDynamic });
+        triggerSaveStatus(set);
+      },
       setEditingQrId: (editingQrId: string | null) => set({ editingQrId }),
       setTempPassword: (tempPassword: string | null) => set({ tempPassword }),
+      setSaveStatus: (saveStatus: 'idle' | 'saving' | 'saved' | 'error') => set({ saveStatus }),
       loadQR: (qr: Record<string, unknown>) => set({
         editingQrId: qr.id as string,
         name: qr.name as string,

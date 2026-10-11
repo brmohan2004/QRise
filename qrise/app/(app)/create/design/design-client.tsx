@@ -7,12 +7,13 @@ import { ScannabilityScore } from "@/components/qr/design-studio/scannability-sc
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
-import { Loader2, Lock, AlertCircle, Zap } from "lucide-react";
+import { Loader2, Lock, AlertCircle, Zap, ArrowLeft, Check } from "lucide-react";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useUsageStats } from "@/lib/hooks/use-usage-stats";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 export function DesignClient({ isEnabled }: { isEnabled: boolean }) {
   const { name, qrType, config, design, isDynamic, setDynamic, editingQrId, reset, tempPassword } = useWizardStore();
@@ -136,60 +137,59 @@ export function DesignClient({ isEnabled }: { isEnabled: boolean }) {
           )}
 
           {/* Stage 3 Bottom Navigation (Floatable fixed bar on mobile) */}
-          <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800 p-3 sm:static sm:bg-transparent sm:border-0 sm:p-0 sm:mt-8 space-y-2.5 sm:space-y-4 shadow-lg sm:shadow-none">
-            {/* Dynamic vs Static Toggle */}
-            <div className="flex items-center justify-between p-2.5 sm:p-3.5 bg-slate-50/90 dark:bg-slate-800/60 rounded-xl sm:rounded-2xl border border-slate-200/70 dark:border-slate-800">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                  <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                </div>
-                <div className="min-w-0">
+          <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800 p-3 sm:static sm:bg-transparent sm:border-0 sm:p-0 sm:mt-8 shadow-lg sm:shadow-none">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Link 
+                  href={`/create/${qrType || "url"}`} 
+                  className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  title="Back to Configuration"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span className="hidden xs:inline">Config</span>
+                </Link>
+
+                {/* Dynamic vs Static Toggle */}
+                <div className="flex items-center gap-2 sm:gap-2.5 px-3 py-2 bg-slate-100/90 dark:bg-slate-800/80 rounded-xl sm:rounded-2xl border border-slate-200/70 dark:border-slate-700/60 transition-all select-none">
+                  <div
+                    className={cn(
+                      "w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors",
+                      isDynamic
+                        ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                        : "bg-slate-200 dark:bg-slate-700 text-slate-500"
+                    )}
+                  >
+                    <Zap className="w-3.5 h-3.5" />
+                  </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-                      {isDynamic ? "Dynamic QR" : "Static QR"}
+                    <span className="text-xs font-extrabold text-slate-900 dark:text-white">
+                      {isDynamic ? "Dynamic" : "Static"}
                     </span>
-                    <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-emerald-100/70 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-                      {isDynamic ? "Editable" : "Static"}
+                    <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-100/70 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 hidden sm:inline-block">
+                      {isDynamic ? "Editable" : "Direct"}
                     </span>
                   </div>
-                  <p className="text-[10px] sm:text-[11px] text-muted-foreground truncate hidden xs:block sm:block">
-                    {isDynamic ? "Editable target & scan analytics" : "Direct permanent destination"}
-                  </p>
+                  <Switch
+                    id="stage3-dynamic-toggle"
+                    checked={isDynamic}
+                    onCheckedChange={setDynamic}
+                    className="scale-90 ml-1"
+                  />
                 </div>
               </div>
 
-              <Switch
-                id="stage3-dynamic-toggle"
-                checked={isDynamic}
-                onCheckedChange={setDynamic}
-              />
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center justify-between gap-3">
-              <Link 
-                href={`/create/${qrType || "url"}`} 
-                className="inline-flex items-center gap-1.5 px-3 py-2.5 sm:py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
-                </svg>
-                <span>Configure QR</span>
-              </Link>
-
+              {/* Action Buttons */}
               <button
                 onClick={handleFinish}
                 disabled={isSubmitting || warning || (!!usage && usage.metrics.dynamicQrs.limit !== -1 && usage.metrics.dynamicQrs.current >= usage.metrics.dynamicQrs.limit && !editingQrId)}
-                className="group relative h-10 sm:h-11 px-6 sm:px-7 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold text-xs uppercase tracking-wider overflow-hidden shadow-sm shadow-emerald-600/20 transition-all active:scale-[0.98] disabled:opacity-50"
+                className="group relative h-10 sm:h-11 px-5 sm:px-7 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold text-xs uppercase tracking-wider overflow-hidden shadow-sm shadow-emerald-600/20 transition-all active:scale-[0.98] disabled:opacity-50 shrink-0"
               >
                 {isSubmitting ? (
                   <Loader2 className="h-4 w-4 animate-spin mx-auto" />
                 ) : (
                   <span className="flex items-center gap-2">
                     <span>Create QR</span>
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                    </svg>
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
                   </span>
                 )}
               </button>

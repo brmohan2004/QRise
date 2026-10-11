@@ -30,10 +30,9 @@ export function WizardShell({
   currentStep,
 }: WizardShellProps) {
   const router = useRouter();
-  const { step, config, qrType, design, name, editingQrId, isDynamic, loadQR, setStep } = useWizardStore();
+  const { step, config, qrType, design, name, editingQrId, isDynamic, loadQR, setStep, setSaveStatus } = useWizardStore();
   const activeStep = currentStep || step || 1;
 
-  const [showSaved, setShowSaved] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isChangeTypeOpen, setIsChangeTypeOpen] = useState(false);
 
@@ -73,13 +72,42 @@ export function WizardShell({
     fetchQR();
   }, [editId, editingQrId, loadQR]);
 
+  // Debounced auto-save to backend API when editing an existing QR code
   useEffect(() => {
-    if (activeStep > 1 && !editId) {
-      setShowSaved(true);
-      const timer = setTimeout(() => setShowSaved(false), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [config, design, activeStep, editId]);
+    if (!editingQrId || activeStep === 1) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        setSaveStatus("saving");
+        const res = await fetch(`/api/qr/${editingQrId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            type: qrType,
+            targetUrl: (config as any)?.targetUrl || (config as any)?.defaultUrl,
+            destinationType: (config as any)?.destinationType || "url",
+            isDynamic,
+            design,
+            rules: (config as any)?.rules,
+            actions: (config as any)?.actions,
+            config,
+          }),
+        });
+
+        if (res.ok) {
+          setSaveStatus("saved");
+        } else {
+          setSaveStatus("error");
+        }
+      } catch (error) {
+        console.error("Auto-save failed:", error);
+        setSaveStatus("error");
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [name, config, design, isDynamic, editingQrId, activeStep, qrType, setSaveStatus]);
 
   // Determine preview data based on config
   const getPreviewData = () => {

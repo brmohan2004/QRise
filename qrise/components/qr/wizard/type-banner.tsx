@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useWizardStore } from "@/stores/qr-wizard.store";
 import { getQRTypeInfo } from "./types-config";
 import { ChangeTypeDialog } from "./change-type-dialog";
-import { ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, Check, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { QRType } from "@/types/qr.types";
 
@@ -14,7 +14,7 @@ interface TypeBannerProps {
 }
 
 export function TypeBanner({ currentType, stage = 2 }: TypeBannerProps) {
-  const { qrType } = useWizardStore();
+  const { qrType, saveStatus } = useWizardStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const activeType = currentType || qrType || "url";
   const typeInfo = getQRTypeInfo(activeType);
@@ -41,16 +41,39 @@ export function TypeBanner({ currentType, stage = 2 }: TypeBannerProps) {
           </div>
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => setIsDialogOpen(true)}
-          className="h-8 px-3 rounded-xl font-bold text-xs gap-1.5 border-slate-200 dark:border-slate-700 hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all shrink-0 active:scale-95 shadow-2xs"
-        >
-          <ArrowLeftRight className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-          <span>Change Type</span>
-        </Button>
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Auto-Save Status Badge */}
+          <div className="flex items-center select-none transition-all">
+            {saveStatus === "saving" ? (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20 animate-pulse">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                <span className="hidden xs:inline">Saving...</span>
+              </span>
+            ) : saveStatus === "error" ? (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-lg border border-rose-500/20">
+                <AlertCircle className="w-3 h-3" />
+                <span className="hidden xs:inline">Save error</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">
+                <Check className="w-3 h-3 stroke-[2.5]" />
+                <span className="hidden xs:inline">Auto-saved</span>
+              </span>
+            )}
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setIsDialogOpen(true)}
+            className="h-8 px-2.5 sm:px-3 rounded-xl font-bold text-xs gap-1.5 border-slate-200 dark:border-slate-700 hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all shrink-0 active:scale-95 shadow-2xs"
+          >
+            <ArrowLeftRight className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+            <span className="hidden sm:inline">Change Type</span>
+            <span className="sm:hidden">Change</span>
+          </Button>
+        </div>
       </div>
 
       <ChangeTypeDialog

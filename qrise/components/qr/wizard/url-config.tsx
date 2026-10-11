@@ -48,39 +48,24 @@ export function URLConfig() {
     },
   });
 
-  const targetUrl = watch("targetUrl");
   const destinationType = watch("destinationType");
 
-  // Build UTM appends
-  const [utmSource, setUtmSource] = useState("");
-  const [utmMedium, setUtmMedium] = useState("");
-  const [utmCampaign, setUtmCampaign] = useState("");
-
-  const finalUrl = targetUrl && [
-    targetUrl,
-    utmSource && `utm_source=${encodeURIComponent(utmSource)}`,
-    utmMedium && `utm_medium=${encodeURIComponent(utmMedium)}`,
-    utmCampaign && `utm_campaign=${encodeURIComponent(utmCampaign)}`,
-  ].filter(Boolean).join(targetUrl.includes("?") ? "&" : "?");
-
-  const watchedName = watch("name");
-
-  // Sync name to store
+  // Auto-sync form inputs to wizard store on every change
   useEffect(() => {
-    if (watchedName !== undefined) {
-      setName(watchedName);
-    }
-  }, [watchedName, setName]);
-
-  // Sync form to store for live preview
-  useEffect(() => {
-    if (targetUrl) {
-      setConfig({ 
-        targetUrl: destinationType === 'url' ? (finalUrl || targetUrl) : targetUrl,
-        destinationType 
-      });
-    }
-  }, [targetUrl, finalUrl, destinationType, setConfig]);
+    const subscription = watch((val) => {
+      if (val.name !== undefined) {
+        setName(val.name);
+      }
+      if (val.targetUrl !== undefined || val.destinationType !== undefined) {
+        setConfig({
+          type: "url",
+          targetUrl: val.targetUrl || "",
+          destinationType: val.destinationType || "url",
+        });
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, setName, setConfig]);
 
   // Sync store to form (for editing)
   useEffect(() => {
@@ -98,7 +83,7 @@ export function URLConfig() {
     setName(data.name);
     const newConfig = {
       type: "url" as const,
-      targetUrl: destinationType === 'url' ? (finalUrl || data.targetUrl) : data.targetUrl,
+      targetUrl: data.targetUrl,
       destinationType: data.destinationType,
     };
     setConfig(newConfig);
