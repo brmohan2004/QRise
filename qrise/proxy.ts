@@ -71,9 +71,10 @@ export default async function middleware(request: NextRequest) {
 
   // IMPORTANT: This refreshes the session cookie on every request (updateSession pattern)
   // Added a timeout to prevent middleware from hanging if Supabase is unreachable
+  let isAuthTimeout = false;
   const getUserWithTimeout = async () => {
     const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Supabase auth timeout')), 5000)
+      setTimeout(() => reject(new Error('Supabase auth timeout')), 8000)
     );
     try {
       const result = (await Promise.race([
@@ -81,7 +82,10 @@ export default async function middleware(request: NextRequest) {
         timeout
       ])) as { data: { user: User | null }; error: unknown };
       return result;
-    } catch (e) {
+    } catch (e: any) {
+      if (e?.message?.includes('Supabase auth timeout')) {
+        isAuthTimeout = true;
+      }
       console.error('Middleware auth check failed or timed out:', e);
       return { data: { user: null } };
     }
@@ -132,6 +136,7 @@ export default async function middleware(request: NextRequest) {
     '/settings',
     '/onboarding',
     '/developer',
+    '/qrise-matrix',
   ];
   const isProtectedPath = protectedPaths.some((path) => pathname.startsWith(path));
 
@@ -198,6 +203,10 @@ export default async function middleware(request: NextRequest) {
   }
 
   if (isProtectedPath && !user) {
+    if (isAuthTimeout && hasAuthCookie) {
+      console.warn('Auth timed out in middleware; allowing request through with existing session cookie.');
+      return applySecurityHeaders(supabaseResponse);
+    }
     const url = new URL('/login', request.url);
     url.searchParams.set('redirect', pathname);
     return applySecurityHeaders(NextResponse.redirect(url));

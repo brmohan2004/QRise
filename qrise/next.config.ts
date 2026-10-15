@@ -16,6 +16,18 @@ const nextConfig: NextConfig = {
   // Powered by header removal (security + slight perf)
   poweredByHeader: false,
 
+  async redirects() {
+    return [
+      { source: '/marketplace', destination: '/qrise-matrix/marketplace', permanent: false },
+      { source: '/developer', destination: '/qrise-matrix/devhub', permanent: false },
+      { source: '/api-keys', destination: '/qrise-matrix/devhub?tab=api-keys', permanent: false },
+      { source: '/usage', destination: '/qrise-matrix/devhub?tab=usage', permanent: false },
+      { source: '/webhooks', destination: '/qrise-matrix/devhub?tab=webhooks', permanent: false },
+      { source: '/custom-types', destination: '/qrise-matrix/devhub?tab=custom-types', permanent: false },
+      { source: '/api-manager', destination: '/qrise-matrix/api-manager', permanent: false },
+    ];
+  },
+
   async headers() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://*.supabase.co';
     const upstashUrl = process.env.UPSTASH_REDIS_REST_URL || 'https://*.upstash.io';

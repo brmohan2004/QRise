@@ -52,7 +52,7 @@ export function DeveloperSection() {
 
         <div className="developer-footer">
           <Link 
-            href="/developer" 
+            href="/qrise-matrix/devhub" 
             className="developer-cta"
           >
             Open Developer Hub <ArrowRight className="h-4 w-4" />

@@ -255,22 +255,19 @@ export default function ProfilePage() {
 
       {/* DEVELOPER HUB BUTTON */}
       <Link
-        href="/developer"
-        className="group relative overflow-hidden flex items-center justify-between p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-300 dark:hover:border-indigo-800/80 hover:shadow-md hover:shadow-indigo-500/5 transition-all"
+        href="/qrise-matrix/devhub"
+        className="group relative overflow-hidden flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs transition-all"
       >
-        {/* Subtle accent glow in background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/[0.03] via-transparent to-purple-500/[0.03] opacity-0 group-hover:opacity-100 transition-opacity" />
-
         <div className="relative flex items-center gap-3.5 sm:gap-4 min-w-0">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 group-hover:rotate-1 transition-all shrink-0">
-            <Code2 className="w-6 h-6" />
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-all shrink-0">
+            <Code2 className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-black text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight truncate">
                 Developer Hub
               </h2>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-full border border-indigo-200/60 dark:border-indigo-800/60 shrink-0">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full border border-slate-200/70 dark:border-slate-700 shrink-0">
                 API
               </span>
             </div>
@@ -280,7 +277,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="relative w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-md group-hover:shadow-indigo-500/20 transition-all shrink-0 ml-3">
+        <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-all shrink-0 ml-3">
           <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
         </div>
       </Link>
@@ -288,17 +285,14 @@ export default function ProfilePage() {
       {/* BACKUP OPTION BUTTON */}
       <Link
         href="?backup=true"
-        className="group relative overflow-hidden flex items-center justify-between p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-cyan-300 dark:hover:border-cyan-800/80 hover:shadow-md hover:shadow-cyan-500/5 transition-all"
+        className="group relative overflow-hidden flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs transition-all"
       >
-        {/* Subtle accent glow in background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/[0.03] via-transparent to-blue-500/[0.03] opacity-0 group-hover:opacity-100 transition-opacity" />
-
         <div className="relative flex items-center gap-3.5 sm:gap-4 min-w-0">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 group-hover:rotate-1 transition-all shrink-0">
-            <Database className="w-6 h-6" />
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center group-hover:bg-slate-200/70 dark:group-hover:bg-slate-700/70 transition-all shrink-0">
+            <Database className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-base font-black text-slate-900 dark:text-white tracking-tight group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors truncate">
+            <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight truncate">
               Backup & Data Export
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5 font-medium truncate sm:whitespace-normal">
@@ -307,7 +301,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="relative w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-cyan-600 group-hover:text-white group-hover:shadow-md group-hover:shadow-cyan-500/20 transition-all shrink-0 ml-3">
+        <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-all shrink-0 ml-3">
           <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
         </div>
       </Link>

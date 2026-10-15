@@ -15,7 +15,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Zap,
-  ArrowUpRight
+  ArrowUpRight,
+  Layers
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -31,11 +32,10 @@ const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "My QR Codes", href: "/qr-codes", icon: QrCode },
   { label: "Form Builder", href: "/forms", icon: FormInput },
-  { label: "Marketplace", href: "/marketplace", icon: ShoppingCart },
 ];
 
-const developerItems = [
-  { label: "Developer Hub", href: "/developer", icon: Code2 },
+const matrixItems = [
+  { label: "QRise Matrix", href: "/qrise-matrix", icon: Layers, isNew: true },
 ];
 
 export function SidebarNav({ 
@@ -229,14 +229,14 @@ export function SidebarNav({
           <div className="pt-4 pb-2">
             {!collapsed && !isMobile && (
               <p className="px-4 text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest mb-2">
-                Developer
+                Industrial Mode
               </p>
             )}
             {collapsed && <div className="mx-4 border-t border-muted my-4" />}
           </div>
 
-          {developerItems.map((item) => {
-            const isActive = pathname === item.href;
+          {matrixItems.map((item) => {
+            const isActive = pathname.startsWith(item.href);
             return (
               <Tooltip key={item.label}>
                 <TooltipTrigger asChild>
@@ -247,8 +247,8 @@ export function SidebarNav({
                       "flex items-center rounded-xl font-bold transition-all duration-200 overflow-hidden",
                       isMobile ? "py-2.5 px-4 text-[0.8125rem] gap-3" : (collapsed ? "py-2.5 justify-center px-0 text-sm" : "py-2.5 gap-3 px-4 text-sm"),
                       isActive 
-                        ? "bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20" 
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        ? "bg-indigo-600 text-white shadow-sm" 
+                        : "text-indigo-600 dark:text-indigo-400 bg-indigo-50/60 dark:bg-indigo-950/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40"
                     )}
                   >
                     <item.icon className="w-5 h-5 shrink-0" />
@@ -259,9 +259,12 @@ export function SidebarNav({
                           animate={{ opacity: 1, width: "auto" }}
                           exit={{ opacity: 0, width: 0 }}
                           transition={{ duration: 0 }}
-                          className="whitespace-nowrap"
+                          className="whitespace-nowrap flex items-center gap-1.5"
                         >
                           {item.label}
+                          <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-full bg-indigo-500 text-white font-extrabold tracking-wider">
+                            New
+                          </span>
                         </motion.span>
                       )}
                     </AnimatePresence>

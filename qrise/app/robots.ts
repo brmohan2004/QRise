@@ -22,6 +22,7 @@ export default function robots(): MetadataRoute.Robots {
           '/checkout/',
           '/onboarding/',
           '/usage/',
+          '/qrise-matrix/',
           '/embed/',
           '/s/',
           '/f/',

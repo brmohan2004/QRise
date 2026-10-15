@@ -21,8 +21,13 @@ export function AppHeader() {
 
   const isProfilePage = pathname === "/profile" || pathname?.startsWith("/profile");
   const isCreatePage = pathname === "/create" || pathname?.startsWith("/create");
-  const isDeveloperPage = pathname === "/developer" || pathname?.startsWith("/developer");
+  const isDeveloperPage = pathname === "/developer" || pathname?.startsWith("/developer") || pathname?.startsWith("/qrise-matrix/devhub");
   const isShowOnlyBack = isProfilePage || isCreatePage;
+
+  // Hide header completely on Create Project, Create Custom Label, and Individual Project Workspace
+  const isHiddenMatrixPage = 
+    (pathname?.startsWith("/qrise-matrix/projects/") && pathname !== "/qrise-matrix/projects") ||
+    Boolean(pathname?.includes("/create-label"));
 
   useEffect(() => {
     setMounted(true);
@@ -86,6 +91,10 @@ export function AppHeader() {
       router.push("/dashboard");
     }
   };
+
+  if (isHiddenMatrixPage) {
+    return null;
+  }
 
   if (isShowOnlyBack) {
     return (
