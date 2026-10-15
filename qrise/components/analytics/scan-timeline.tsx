@@ -25,7 +25,10 @@ interface ScanTimelineProps {
 export function ScanTimeline({ data, isLoading, exportEnabled = true }: ScanTimelineProps) {
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
-    setIsMounted(true);
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 50);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleExport = () => {

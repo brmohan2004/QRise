@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 
@@ -14,14 +15,23 @@ interface ResolverLatencyChartProps {
 }
 
 export function ResolverLatencyChart({ data, maxTimeoutMs }: ResolverLatencyChartProps) {
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <Card className="border-none shadow-sm h-[400px]">
       <CardHeader className="pb-2">
         <CardTitle className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Resolver Latency (Avg)</CardTitle>
       </CardHeader>
       <CardContent className="h-[320px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        {isMounted ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="latencyGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2} />
@@ -66,6 +76,9 @@ export function ResolverLatencyChart({ data, maxTimeoutMs }: ResolverLatencyChar
             />
           </AreaChart>
         </ResponsiveContainer>
+        ) : (
+          <div className="w-full h-full bg-slate-50 dark:bg-slate-800/40 rounded-xl animate-pulse" />
+        )}
       </CardContent>
     </Card>
   );

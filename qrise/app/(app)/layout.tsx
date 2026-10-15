@@ -65,12 +65,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         {/* Desktop Sidebar */}
         <motion.div
           initial={false}
-          animate={{ width: mounted ? (isCollapsed ? 80 : 256) : 256 }}
+          animate={{ width: isCollapsed ? 80 : 256 }}
           transition={{ duration: 0 }}
           className="hidden lg:flex border-r"
           suppressHydrationWarning
         >
-          {mounted && <SidebarNav className="w-full" isMobile={false} />}
+          <SidebarNav className="w-full" isMobile={false} />
         </motion.div>
 
         <div className="flex flex-1 flex-col overflow-hidden relative min-h-0">
@@ -80,7 +80,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </main>
         </div>
       </div>
-      {mounted && <MobileBottomNav />}
+      <MobileBottomNav />
       <CreateSheet />
       <Suspense fallback={null}>
         <GeneralDialog />

@@ -217,7 +217,7 @@ export default function MatrixDevHubPage() {
         onClick={handleFloatingCreate}
         disabled={activeTab === "custom-types" && isCustomTypesLocked}
         className={cn(
-          "fixed bottom-24 sm:bottom-8 right-5 sm:right-8 z-40 w-14 h-14 rounded-full bg-slate-950 dark:bg-white text-white dark:text-slate-950 shadow-2xl shadow-black/35 flex items-center justify-center transition-all duration-200 active:scale-90 hover:scale-105 outline-none ring-4 ring-white/90 dark:ring-slate-900/90 group",
+          "fixed bottom-6 sm:bottom-8 right-5 sm:right-8 z-40 w-14 h-14 rounded-full bg-slate-950 dark:bg-white text-white dark:text-slate-950 shadow-2xl shadow-black/35 flex items-center justify-center transition-all duration-200 active:scale-90 hover:scale-105 outline-none ring-4 ring-white/90 dark:ring-slate-900/90 group",
           activeTab === "custom-types" && isCustomTypesLocked && "opacity-50 cursor-not-allowed hover:scale-100"
         )}
         aria-label={

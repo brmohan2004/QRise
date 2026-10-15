@@ -11,6 +11,7 @@ import { ManagementDialog } from "@/components/app/management-dialog";
 import { useSidebarStore } from "@/stores/sidebar.store";
 import { motion } from "framer-motion";
 import { MobileBottomNav } from "@/components/app/mobile-bottom-nav";
+import { CreateSheet } from "@/components/app/create-sheet";
 
 export default function MatrixLayout({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -38,12 +39,12 @@ export default function MatrixLayout({ children }: { children: React.ReactNode }
         {/* Desktop Matrix Sidebar */}
         <motion.div
           initial={false}
-          animate={{ width: mounted ? (isCollapsed ? 80 : 256) : 256 }}
+          animate={{ width: isCollapsed ? 80 : 256 }}
           transition={{ duration: 0 }}
           className="hidden lg:flex border-r"
           suppressHydrationWarning
         >
-          {mounted && <MatrixSidebarNav className="w-full" isMobile={false} />}
+          <MatrixSidebarNav className="w-full" isMobile={false} />
         </motion.div>
 
         <div className="flex flex-1 flex-col overflow-hidden relative min-h-0">
@@ -54,7 +55,8 @@ export default function MatrixLayout({ children }: { children: React.ReactNode }
         </div>
       </div>
 
-      {mounted && <MobileBottomNav />}
+      <MobileBottomNav />
+      <CreateSheet />
 
       <Suspense fallback={null}>
         <GeneralDialog />

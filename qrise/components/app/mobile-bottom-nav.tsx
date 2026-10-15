@@ -22,22 +22,17 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { open: openCreateSheet } = useCreateSheetStore();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   // Determine whether current screen is in QRise Matrix mode
   const isMatrixMode = pathname.startsWith("/qrise-matrix");
 
-  // Hide bottom nav bar on profile, create QR, and create form screens
+  // Hide bottom nav bar on profile, create QR, create form screens, and developer hub
   // Also hide completely on Create Project, Create Custom Label, and Individual Project Workspace
   const isHiddenMatrixPage = 
     (pathname.startsWith("/qrise-matrix/projects/") && pathname !== "/qrise-matrix/projects") ||
-    pathname.includes("/create-label");
+    pathname.includes("/create-label") ||
+    pathname.startsWith("/qrise-matrix/devhub") ||
+    pathname.startsWith("/developer");
 
   const isHiddenRoute = 
     pathname === "/profile" || pathname.startsWith("/profile") ||

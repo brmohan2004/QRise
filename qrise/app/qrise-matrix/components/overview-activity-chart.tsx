@@ -41,7 +41,10 @@ export function OverviewActivityChart() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 50);
+    return () => clearTimeout(timer);
   }, []);
 
   const chartData = range === "7D" ? DATA_7D : range === "30D" ? DATA_30D : DATA_90D;

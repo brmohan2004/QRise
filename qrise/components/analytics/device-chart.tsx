@@ -25,7 +25,10 @@ const COLORS = ["#059669", "#10b981", "#34d399", "#6ee7b7", "#a7f3d0"];
 export function DeviceChart({ data }: { data: DeviceData }) {
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
-    setIsMounted(true);
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 50);
+    return () => clearTimeout(timer);
   }, []);
 
   if (!isMounted) {
