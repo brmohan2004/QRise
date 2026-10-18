@@ -2,16 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
 import { 
   Home, 
   QrCode, 
   Plus, 
   FormInput, 
   ShoppingCart,
-  LayoutDashboard,
   FolderKanban,
-  Code2,
+  Tag,
   Sparkles,
   Layers
 } from "lucide-react";
@@ -48,8 +46,9 @@ export function MobileBottomNav() {
   const isFormsActive = pathname.startsWith("/forms") && !pathname.includes("/forms/create");
 
   // Matrix Mode Active States
-  const isMatrixOverviewActive = pathname === "/qrise-matrix";
-  const isMatrixProjectsActive = pathname === "/qrise-matrix/projects";
+  // Requested 5 items: (projects, my labels, add, market, qrise studio)
+  const isMatrixProjectsActive = pathname === "/qrise-matrix/projects" || pathname === "/qrise-matrix";
+  const isMatrixMyLabelsActive = pathname.startsWith("/qrise-matrix/my-labels");
   const isMatrixMarketplaceActive = pathname.startsWith("/qrise-matrix/marketplace");
 
   return (
@@ -63,35 +62,13 @@ export function MobileBottomNav() {
           <div className="flex-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-y border-l border-slate-200/90 dark:border-slate-800 rounded-l-[28px] h-[64px] flex items-center justify-around px-2 pb-0.5">
             {isMatrixMode ? (
               <>
-                {/* Matrix: Overview */}
-                <Link
-                  href="/qrise-matrix"
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-200 active:scale-95",
-                    isMatrixOverviewActive
-                      ? "text-indigo-600 dark:text-indigo-400 font-bold"
-                      : "text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 font-medium"
-                  )}
-                >
-                  <div className={cn(
-                    "relative flex items-center justify-center transition-transform duration-200",
-                    isMatrixOverviewActive && "scale-110"
-                  )}>
-                    <LayoutDashboard className="w-5 h-5" />
-                    {isMatrixOverviewActive && (
-                      <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-indigo-600 dark:bg-indigo-400" />
-                    )}
-                  </div>
-                  <span className="text-[10px] tracking-tight whitespace-nowrap">Overview</span>
-                </Link>
-
-                {/* Matrix: My Projects */}
+                {/* 1. Projects */}
                 <Link
                   href="/qrise-matrix/projects"
                   className={cn(
-                    "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-200 active:scale-95",
+                    "flex flex-col items-center justify-center gap-1 py-1 px-2.5 rounded-xl transition-all duration-200 active:scale-95",
                     isMatrixProjectsActive
-                      ? "text-indigo-600 dark:text-indigo-400 font-bold"
+                      ? "text-emerald-600 dark:text-emerald-400 font-bold"
                       : "text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 font-medium"
                   )}
                 >
@@ -101,10 +78,32 @@ export function MobileBottomNav() {
                   )}>
                     <FolderKanban className="w-5 h-5" />
                     {isMatrixProjectsActive && (
-                      <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-indigo-600 dark:bg-indigo-400" />
+                      <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-emerald-600 dark:bg-emerald-400" />
                     )}
                   </div>
                   <span className="text-[10px] tracking-tight whitespace-nowrap">Projects</span>
+                </Link>
+
+                {/* 2. My Labels */}
+                <Link
+                  href="/qrise-matrix/my-labels"
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1 py-1 px-2.5 rounded-xl transition-all duration-200 active:scale-95",
+                    isMatrixMyLabelsActive
+                      ? "text-emerald-600 dark:text-emerald-400 font-bold"
+                      : "text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 font-medium"
+                  )}
+                >
+                  <div className={cn(
+                    "relative flex items-center justify-center transition-transform duration-200",
+                    isMatrixMyLabelsActive && "scale-110"
+                  )}>
+                    <Tag className="w-5 h-5" />
+                    {isMatrixMyLabelsActive && (
+                      <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-emerald-600 dark:bg-emerald-400" />
+                    )}
+                  </div>
+                  <span className="text-[10px] tracking-tight whitespace-nowrap">My Labels</span>
                 </Link>
               </>
             ) : (
@@ -156,7 +155,7 @@ export function MobileBottomNav() {
             )}
           </div>
 
-          {/* Center Notched Cradle Section */}
+          {/* Center Notched Cradle Section: 3. Add */}
           <div className="w-[88px] h-[64px] relative shrink-0">
             <svg
               viewBox="0 0 88 64"
@@ -185,11 +184,11 @@ export function MobileBottomNav() {
               />
             </svg>
 
-            {/* Elevated Circular Center Button with '+' for Create in both Modes */}
+            {/* Elevated Circular Center Button with '+' for Add in both Modes */}
             <button
               type="button"
               onClick={() => openCreateSheet()}
-              className="absolute -top-5 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-slate-950 dark:bg-white text-white dark:text-slate-950 flex items-center justify-center shadow-2xl shadow-black/35 active:scale-90 hover:scale-105 transition-all duration-200 z-30 group ring-4 ring-white/90 dark:ring-slate-900/90 outline-none"
+              className="absolute -top-5 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-slate-950 dark:bg-white text-white dark:text-slate-950 flex items-center justify-center shadow-2xl shadow-black/35 active:scale-90 hover:scale-105 transition-all duration-200 z-30 group ring-4 ring-white/90 dark:ring-slate-900/90 outline-none cursor-pointer"
               aria-label={isMatrixMode ? "Create Project or Custom Label" : "Add New QR or Form"}
             >
               <Plus className="w-7 h-7 stroke-[2.5] transition-transform duration-300 group-hover:rotate-90 group-active:scale-90" />
@@ -200,13 +199,13 @@ export function MobileBottomNav() {
           <div className="flex-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-y border-r border-slate-200/90 dark:border-slate-800 rounded-r-[28px] h-[64px] flex items-center justify-around px-2 pb-0.5">
             {isMatrixMode ? (
               <>
-                {/* Matrix: Marketplace */}
+                {/* 4. Market */}
                 <Link
                   href="/qrise-matrix/marketplace"
                   className={cn(
-                    "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-200 active:scale-95",
+                    "flex flex-col items-center justify-center gap-1 py-1 px-2.5 rounded-xl transition-all duration-200 active:scale-95",
                     isMatrixMarketplaceActive
-                      ? "text-indigo-600 dark:text-indigo-400 font-bold"
+                      ? "text-emerald-600 dark:text-emerald-400 font-bold"
                       : "text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 font-medium"
                   )}
                 >
@@ -216,22 +215,22 @@ export function MobileBottomNav() {
                   )}>
                     <ShoppingCart className="w-5 h-5" />
                     {isMatrixMarketplaceActive && (
-                      <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-indigo-600 dark:bg-indigo-400" />
+                      <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-emerald-600 dark:bg-emerald-400" />
                     )}
                   </div>
                   <span className="text-[10px] tracking-tight whitespace-nowrap">Market</span>
                 </Link>
 
-                {/* Matrix: Switch to Studio (Standard Mode) */}
+                {/* 5. QRise Studio */}
                 <Link
                   href="/dashboard"
-                  className="flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-200 active:scale-95 text-slate-400 hover:text-indigo-600 dark:text-slate-500 dark:hover:text-indigo-400 font-medium"
+                  className="flex flex-col items-center justify-center gap-1 py-1 px-2.5 rounded-xl transition-all duration-200 active:scale-95 text-slate-400 hover:text-emerald-600 dark:text-slate-500 dark:hover:text-emerald-400 font-medium"
                   title="Switch to QRise Studio"
                 >
                   <div className="relative flex items-center justify-center transition-transform duration-200 hover:scale-110">
                     <Sparkles className="w-5 h-5 text-amber-500" />
                   </div>
-                  <span className="text-[10px] tracking-tight whitespace-nowrap font-bold text-amber-600 dark:text-amber-400">
+                  <span className="text-[10px] tracking-tight whitespace-nowrap font-bold text-slate-700 dark:text-slate-300">
                     Studio
                   </span>
                 </Link>
@@ -262,7 +261,7 @@ export function MobileBottomNav() {
 
                 {/* Standard: QRise Matrix */}
                 <Link
-                  href="/qrise-matrix"
+                  href="/qrise-matrix/projects"
                   className="flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-200 active:scale-95 text-slate-400 hover:text-indigo-600 dark:text-slate-500 dark:hover:text-indigo-400 font-medium"
                   title="Switch to QRise Matrix"
                 >

@@ -55,14 +55,14 @@ export default function ProjectWorkspacePage({ params }: WorkspacePageProps) {
           <WorkspaceRecentActivity />
 
           {/* 6. My Labels Printable Stickers Preview */}
-          <WorkspaceLabelsList />
+          <WorkspaceLabelsList projectId={resolvedParams.projectId} />
         </div>
       )}
 
       {/* Tab 2: My Labels List View */}
       {activeTab === "labels" && (
         <div className="space-y-4 animate-in fade-in duration-300">
-          <WorkspaceLabelsList />
+          <WorkspaceLabelsList projectId={resolvedParams.projectId} />
         </div>
       )}
 
@@ -85,12 +85,12 @@ export default function ProjectWorkspacePage({ params }: WorkspacePageProps) {
         </div>
       )}
 
-      {/* Floating Fixed '+' Button to Create Custom Label */}
+      {/* Floating Fixed '+' Button to Add Label */}
       <Link
-        href={`/qrise-matrix/projects/${resolvedParams.projectId}/create-label`}
-        className="fixed bottom-6 sm:bottom-8 right-5 sm:right-8 z-40 w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xl shadow-emerald-600/40 flex items-center justify-center transition-all duration-200 active:scale-90 hover:scale-105 outline-none ring-4 ring-white/90 dark:ring-slate-900/90 group"
-        title="Create Custom Label"
-        aria-label="Create Label"
+        href={`/qrise-matrix/projects/${resolvedParams.projectId}/add-label`}
+        className="fixed bottom-6 sm:bottom-8 right-5 sm:right-8 z-40 w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xl shadow-emerald-600/40 flex items-center justify-center transition-all duration-200 active:scale-90 hover:scale-105 outline-none ring-4 ring-white/90 dark:ring-slate-900/90 group cursor-pointer"
+        title="Add Label"
+        aria-label="Add Label"
       >
         <Plus className="w-6 h-6 stroke-[2.5] transition-transform duration-300 group-hover:rotate-90 group-active:scale-90" />
       </Link>

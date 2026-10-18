@@ -21,10 +21,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 
+import { Tag } from "lucide-react";
+
 const matrixNavItems = [
-  { label: "Overview", href: "/qrise-matrix", icon: LayoutDashboard },
-  { label: "Marketplace", href: "/qrise-matrix/marketplace", icon: ShoppingCart },
   { label: "Projects", href: "/qrise-matrix/projects", icon: FolderKanban },
+  { label: "My Labels", href: "/qrise-matrix/my-labels", icon: Tag },
+  { label: "Marketplace", href: "/qrise-matrix/marketplace", icon: ShoppingCart },
   { label: "Developer Hub", href: "/qrise-matrix/devhub", icon: Code2 },
 ];
 

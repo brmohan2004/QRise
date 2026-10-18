@@ -1,29 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { 
-  Truck, 
-  HeartPulse, 
-  ShoppingBag, 
-  Warehouse, 
-  Factory, 
-  Apple, 
-  Ticket,
-  Plus
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Plus, FolderPlus, ChevronDown } from "lucide-react";
 
 interface CreateProjectDialogProps {
   open: boolean;
@@ -32,13 +28,15 @@ interface CreateProjectDialogProps {
 }
 
 const INDUSTRIES = [
-  { id: "Postal & Tracking", name: "Postal & Tracking", icon: Truck },
-  { id: "Healthcare & Hospitals", name: "Healthcare & Hospitals", icon: HeartPulse },
-  { id: "Retail & Supermarkets", name: "Retail & Supermarkets", icon: ShoppingBag },
-  { id: "Logistics, Shipping and Warehousing", name: "Logistics & Warehousing", icon: Warehouse },
-  { id: "Manufacturing & Automotive", name: "Manufacturing & Automotive", icon: Factory },
-  { id: "Food, Agriculture and Produce", name: "Food & Agriculture", icon: Apple },
-  { id: "Entertainment and Events", name: "Entertainment & Events", icon: Ticket },
+  "Postal & Tracking",
+  "Healthcare & Hospitals",
+  "Retail & Supermarkets",
+  "Logistics, Shipping and Warehousing",
+  "Manufacturing & Automotive",
+  "Food, Agriculture and Produce",
+  "Entertainment and Events",
+  "Electronics & Hardware",
+  "General Commercial",
 ];
 
 export function CreateProjectDialog({
@@ -47,9 +45,28 @@ export function CreateProjectDialog({
   onProjectCreated,
 }: CreateProjectDialogProps) {
   const [name, setName] = useState("");
-  const [industry, setIndustry] = useState("Postal & Tracking");
   const [description, setDescription] = useState("");
+  const [industry, setIndustry] = useState(INDUSTRIES[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Responsive mobile screen check (< 640px)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Reset fields when opening
+  useEffect(() => {
+    if (open) {
+      setName("");
+      setDescription("");
+      setIndustry(INDUSTRIES[0]);
+      setIsSubmitting(false);
+    }
+  }, [open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,94 +97,129 @@ export function CreateProjectDialog({
     }, 400);
   };
 
+  const FormContent = () => (
+    <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+      {/* 1. Project Name */}
+      <div className="space-y-1.5">
+        <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+          Project Name <span className="text-emerald-500">*</span>
+        </label>
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="e.g. Courier Tracking"
+          className="rounded-xl h-10 text-xs sm:text-sm bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 font-semibold"
+          required
+        />
+      </div>
+
+      {/* 2. Description */}
+      <div className="space-y-1.5">
+        <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+          Description <span className="text-slate-400 font-normal">(Optional)</span>
+        </label>
+        <Textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Track shipments, deliveries and parcel movements."
+          className="rounded-xl min-h-[75px] text-xs sm:text-sm bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 resize-none font-medium"
+        />
+      </div>
+
+      {/* 3. Industry Dropdown Menu */}
+      <div className="space-y-1.5">
+        <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+          Industry
+        </label>
+        <div className="relative">
+          <select
+            value={industry}
+            onChange={(e) => setIndustry(e.target.value)}
+            className="w-full h-10 rounded-xl px-3.5 pr-9 text-xs sm:text-sm font-semibold bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-emerald-500"
+          >
+            {INDUSTRIES.map((ind) => (
+              <option key={ind} value={ind}>
+                {ind}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="pt-2 flex items-center justify-end gap-2.5">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => onOpenChange(false)}
+          className="rounded-xl h-10 px-4 text-xs font-bold border-slate-200 dark:border-slate-800"
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-10 px-5 text-xs font-bold shadow-sm shadow-emerald-600/30 flex items-center gap-1.5"
+        >
+          <Plus className="w-4 h-4 stroke-[2.5]" />
+          <span>{isSubmitting ? "Creating..." : "Create Project"}</span>
+        </Button>
+      </div>
+    </form>
+  );
+
+  // Mobile: Bottom Sheet
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent 
+          side="bottom" 
+          className="rounded-t-[32px] p-5 pb-8 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 max-h-[85vh] overflow-y-auto"
+        >
+          <SheetHeader className="text-left px-0 pt-0 pb-1">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20">
+                <FolderPlus className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <div>
+                <SheetTitle className="text-base font-extrabold text-slate-900 dark:text-white">
+                  Create Project
+                </SheetTitle>
+                <SheetDescription className="text-xs text-slate-500 dark:text-slate-400">
+                  Enter project name, description and industry
+                </SheetDescription>
+              </div>
+            </div>
+          </SheetHeader>
+
+          <FormContent />
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  // Desktop: Dialog Popup
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-3xl p-6 border-slate-200 dark:border-slate-800">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            Create Industrial Project
-          </DialogTitle>
-          <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
-            Select an industry sector and configure barcode workflows.
-          </DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-          {/* Project Name */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Project Name <span className="text-emerald-500">*</span>
-            </label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Express Courier Tracking"
-              className="rounded-xl h-10 text-xs sm:text-sm border-slate-200 dark:border-slate-800"
-              required
-            />
-          </div>
-
-          {/* Industry Selection */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Industry Sector
-            </label>
-            <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto no-scrollbar p-0.5">
-              {INDUSTRIES.map((ind) => {
-                const Icon = ind.icon;
-                const isSelected = industry === ind.id;
-                return (
-                  <button
-                    key={ind.id}
-                    type="button"
-                    onClick={() => setIndustry(ind.id)}
-                    className={cn(
-                      "flex items-center gap-2 p-2.5 rounded-xl border text-left transition-all text-xs font-semibold",
-                      isSelected
-                        ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 shadow-sm"
-                        : "border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                    )}
-                  >
-                    <Icon className="w-3.5 h-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                    <span className="truncate">{ind.name}</span>
-                  </button>
-                );
-              })}
+      <DialogContent className="sm:max-w-md rounded-3xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
+        <DialogHeader className="pb-1">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20">
+              <FolderPlus className="w-5 h-5 stroke-[2.2]" />
+            </div>
+            <div>
+              <DialogTitle className="text-lg font-extrabold text-slate-900 dark:text-white">
+                Create Project
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
+                Enter project name, description and industry
+              </DialogDescription>
             </div>
           </div>
+        </DialogHeader>
 
-          {/* Short Description */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Description <span className="text-slate-400 font-normal">(Optional)</span>
-            </label>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief details about parcel tracking, shelf barcodes, or hospital asset tags."
-              className="rounded-xl min-h-[70px] text-xs sm:text-sm border-slate-200 dark:border-slate-800 resize-none"
-            />
-          </div>
-
-          <DialogFooter className="pt-2 gap-2 sm:gap-0">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="rounded-xl h-10 text-xs font-bold border-slate-200 dark:border-slate-800"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-10 text-xs font-bold shadow-sm shadow-emerald-600/30"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              {isSubmitting ? "Creating..." : "Create Project"}
-            </Button>
-          </DialogFooter>
-        </form>
+        <FormContent />
       </DialogContent>
     </Dialog>
   );

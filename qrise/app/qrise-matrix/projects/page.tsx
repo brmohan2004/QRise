@@ -101,20 +101,15 @@ const INITIAL_PROJECTS: ProjectData[] = [
 export default function MatrixProjectsPage() {
   const [projects, setProjects] = useState<ProjectData[]>(INITIAL_PROJECTS);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  // Filter projects by search query and category pill
+  // Filter projects by search query
   const filteredProjects = projects.filter((project) => {
-    const matchesSearch =
+    return (
       project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       project.industry.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.description.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesCategory =
-      selectedCategory === "all" || project.industry === selectedCategory;
-
-    return matchesSearch && matchesCategory;
+      project.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   });
 
   const handleProjectCreated = (newProject: any) => {
@@ -128,16 +123,14 @@ export default function MatrixProjectsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5 sm:space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-4xl mx-auto space-y-4 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* 1. Header */}
       <ProjectsHeader onNewProject={() => setIsCreateOpen(true)} />
 
-      {/* 2. Filters (Search Bar + Category Pills) */}
+      {/* 2. Search Bar */}
       <ProjectsFilters
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
       />
 
       {/* 3. Projects List */}
@@ -163,13 +156,12 @@ export default function MatrixProjectsPage() {
             <Button
               onClick={() => {
                 setSearchQuery("");
-                setSelectedCategory("all");
               }}
               variant="outline"
               size="sm"
               className="mt-4 rounded-xl text-xs font-bold"
             >
-              Reset Filters
+              Reset Search
             </Button>
           </div>
         )}
