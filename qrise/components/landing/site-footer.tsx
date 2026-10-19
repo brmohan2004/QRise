@@ -10,16 +10,15 @@ const footerLinks: Record<string, FooterLink[]> = {
   Product: [
     { name: "Features", href: "/features" },
     { name: "Pricing", href: "/pricing" },
-    { name: "Explore Templates", href: "/explore" },
     { name: "Docs", href: "/docs" },
     { name: "API Reference", href: "/docs" },
   ],
   "Use Cases": [
     { name: "Marketing Campaigns", href: "/features" },
-    { name: "Event Management", href: "/explore" },
+    { name: "Event Management", href: "/features" },
     { name: "Product Packaging", href: "/features" },
     { name: "Business Cards", href: "/features" },
-    { name: "Retail & Logistics", href: "/explore" },
+    { name: "Retail & Logistics", href: "/features" },
   ],
   Company: [
     { name: "About", href: "/about" },

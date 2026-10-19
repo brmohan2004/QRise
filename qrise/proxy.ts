@@ -108,9 +108,6 @@ export default async function middleware(request: NextRequest) {
     '/api/cron/',
     '/api/webhooks/deliver',
     '/api/bulk/process',
-    '/explore',
-    '/marketplace',
-    '/api/marketplace',
   ];
 
   // Essential paths that bypass maintenance mode even for non-admins (e.g., webhooks, cron, auth)
@@ -152,7 +149,7 @@ export default async function middleware(request: NextRequest) {
   let profile: { is_suspended: boolean; is_admin: boolean } | null = null;
 
   // We only fetch the user if it's a protected path, an API route, or an auth path (login/register)
-  const needsAuthCheck = isProtectedPath || isApiRoute || isAuthPath || pathname === '/marketplace';
+  const needsAuthCheck = isProtectedPath || isApiRoute || isAuthPath;
   const hasAuthCookie = request.cookies.getAll().some((c) => c.name.startsWith('sb-') || c.name.includes('-auth-token'));
 
   if (needsAuthCheck && hasAuthCookie) {
@@ -196,9 +193,9 @@ export default async function middleware(request: NextRequest) {
     return res;
   };
 
-  // ── Public Marketplace Rewrite ──
-  if (pathname === '/marketplace' && !user) {
-    return applySecurityHeaders(NextResponse.rewrite(new URL('/explore', request.url)));
+  // ── Redirect deprecated marketplace / explore routes to home ──
+  if (pathname === '/marketplace' || pathname === '/explore') {
+    return applySecurityHeaders(NextResponse.redirect(new URL('/', request.url)));
   }
 
   if (isProtectedPath && !user) {
