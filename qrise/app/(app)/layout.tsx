@@ -73,7 +73,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           className="hidden lg:flex border-r"
           suppressHydrationWarning
         >
-          <SidebarNav className="w-full" isMobile={false} />
+          <Suspense fallback={<div className="w-full h-full bg-card" />}>
+            <SidebarNav className="w-full" isMobile={false} />
+          </Suspense>
         </motion.div>
 
         <div className="flex flex-1 flex-col overflow-hidden relative min-h-0">

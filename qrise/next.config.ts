@@ -4,9 +4,11 @@ import path from 'path';
 const projectRoot = typeof __dirname !== 'undefined' ? __dirname : process.cwd();
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    root: path.resolve(projectRoot),
-  },
+  ...(process.env.VERCEL ? {} : {
+    turbopack: {
+      root: path.resolve(projectRoot),
+    },
+  }),
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts', 'date-fns', 'framer-motion', '@tanstack/react-query'],
   },

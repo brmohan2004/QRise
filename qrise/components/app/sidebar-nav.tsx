@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useWizardStore } from "@/stores/qr-wizard.store";
 import { useCreateSheetStore } from "@/stores/create-sheet.store";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
   QrCode, 
@@ -43,7 +43,6 @@ export function SidebarNav({
   isMobile?: boolean 
 }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const resetWizard = useWizardStore((state) => state.reset);
   const { isCollapsed, toggle } = useSidebarStore();
 
@@ -180,12 +179,8 @@ export function SidebarNav({
 
         <nav className="flex-1 space-y-1.5 px-3 overflow-y-auto overflow-x-hidden py-2 custom-scrollbar">
           {navItems.map((item) => {
-            const isSettings = item.label === "Settings";
-            const isActive = isSettings 
-              ? searchParams.get("settings") === "true" 
-              : pathname === item.href;
-            
-            const href = isSettings ? `?settings=true` : item.href;
+            const isActive = pathname === item.href;
+            const href = item.href;
             
             return (
               <Tooltip key={item.label}>
