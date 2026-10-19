@@ -3,11 +3,20 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import dynamic from "next/dynamic";
 import { DashboardStats } from "@/components/app/dashboard-stats";
-import { ScanTrendChart } from "@/components/app/scan-trend-chart";
-import { WorldScanMap } from "@/components/app/world-scan-map";
 import { ActivityFeed } from "@/components/app/activity-feed";
 import { TopQRList } from "@/components/app/top-qr-list";
+
+const ScanTrendChart = dynamic(
+  () => import("@/components/app/scan-trend-chart").then((m) => m.ScanTrendChart),
+  { ssr: false }
+);
+
+const WorldScanMap = dynamic(
+  () => import("@/components/app/world-scan-map").then((m) => m.WorldScanMap),
+  { ssr: false }
+);
 
 export default function DashboardPage() {
   const router = useRouter();

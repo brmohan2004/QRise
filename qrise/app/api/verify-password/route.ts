@@ -7,6 +7,7 @@ import { randomUUID } from 'crypto';
 import { rateLimitByIP } from '@/lib/redis';
 import { sendPasswordBruteForceAlert } from '@/lib/resend';
 import { users } from '@/lib/db/schema';
+import { getClientIp } from '@/lib/client-ip';
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,28 +40,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Constant-time comparison to prevent timing attacks
+    // 1. Check brute force attempt using Redis BEFORE expensive bcrypt hash comparison
+    const ip = getClientIp(request);
+    const rl = await rateLimitByIP(ip, `pw-brute:${qrId}`, 10, "15m");
+    
+    if (!rl.success) {
+      const owner = await db.select().from(users).where(eq(users.id, qr[0].userId)).limit(1);
+      if (owner[0]) {
+        await sendPasswordBruteForceAlert(owner[0].email, qr[0].name, 10, ip);
+      }
+      return NextResponse.json(
+        { error: "Too many attempts. Please try again in 15 minutes." },
+        { status: 429 }
+      );
+    }
+
+    // 2. Constant-time comparison to prevent timing attacks
     const isValid = await bcrypt.compare(password, qr[0].passwordHash);
 
     if (!isValid) {
-      // 1. Detect brute force attempt using Redis
-      const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
-      const rl = await rateLimitByIP(ip, `pw-brute:${qrId}`, 5, "15m");
-      
-      // 2. If limit reached, alert the owner
-      if (!rl.success) {
-        const owner = await db.select().from(users).where(eq(users.id, qr[0].userId)).limit(1);
-        if (owner[0]) {
-          await sendPasswordBruteForceAlert(owner[0].email, qr[0].name, 5, ip);
-        }
-        return NextResponse.json(
-          { error: "Too many failed attempts. Please try again later." },
-          { status: 429 }
-        );
-      }
-
       return NextResponse.json(
-        { valid: false },
+        { valid: false, error: "Incorrect password" },
         { status: 401 }
       );
     }

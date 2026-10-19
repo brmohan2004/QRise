@@ -13,18 +13,16 @@ export default async function BillingPage() {
     redirect('/login');
   }
 
-  // Fetch user data
-  const [dbUser] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
-  
-  // Fetch billing events
-  const history = await db.select()
-    .from(billingEvents)
-    .where(eq(billingEvents.userId, user.id))
-    .orderBy(desc(billingEvents.createdAt))
-    .limit(10);
-
-  // Fetch available plans (for upgrade options if needed)
-  const allPlans = await db.select().from(plans).where(eq(plans.isPubliclyVisible, true));
+  // Fetch user, billing events, and plans concurrently in parallel to eliminate waterfall latency
+  const [[dbUser], history, allPlans] = await Promise.all([
+    db.select().from(users).where(eq(users.id, user.id)).limit(1),
+    db.select()
+      .from(billingEvents)
+      .where(eq(billingEvents.userId, user.id))
+      .orderBy(desc(billingEvents.createdAt))
+      .limit(10),
+    db.select().from(plans).where(eq(plans.isPubliclyVisible, true)),
+  ]);
 
   return (
     <div className="max-w-4xl mx-auto py-10 px-4 space-y-10">

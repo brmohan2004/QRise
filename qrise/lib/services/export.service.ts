@@ -2,17 +2,35 @@ import { db } from '@/lib/db';
 import { qrCodes, forms, formSubmissions } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
+function sanitizeCSVCell(value: any): string {
+  if (value === null || value === undefined) return '""';
+  let str = String(value);
+  // Neutralize spreadsheet formula execution triggers: =, +, -, @, tab, newline
+  const triggers = ['=', '+', '-', '@', '\t', '\r', '\n'];
+  if (triggers.includes(str.charAt(0))) {
+    str = `'${str}`;
+  }
+  // Escape embedded quotes
+  return `"${str.replace(/"/g, '""')}"`;
+}
+
 export async function exportUserQRs(userId: string): Promise<string> {
   const qrList = await db
     .select()
     .from(qrCodes)
     .where(eq(qrCodes.userId, userId));
   
+  const headers = ['name', 'type', 'short_code', 'target_url', 'is_active', 'created_at'];
   const csv = [
-    'name,type,short_code,target_url,is_active,created_at',
-    ...qrList.map(qr => 
-      `"${qr.name}","${qr.type}","${qr.shortCode}","${qr.targetUrl || ''}",${qr.isActive},"${qr.createdAt}"`
-    ),
+    headers.join(','),
+    ...qrList.map(qr => [
+      sanitizeCSVCell(qr.name),
+      sanitizeCSVCell(qr.type),
+      sanitizeCSVCell(qr.shortCode),
+      sanitizeCSVCell(qr.targetUrl || ''),
+      String(qr.isActive),
+      sanitizeCSVCell(qr.createdAt ? new Date(qr.createdAt).toISOString() : '')
+    ].join(',')),
   ].join('\n');
   
   return csv;
@@ -42,18 +60,24 @@ export async function exportFormSubmissions(
     .where(eq(formSubmissions.formId, formId));
   
   const fields = JSON.parse(form[0].fieldsSchema as string) as { id: string; label: string }[];
-  const headers = ['submitted_at', ...fields.map(f => f.label), 'ip_hash'];
+  const headers = ['submitted_at', ...fields.map(f => sanitizeCSVCell(f.label)), 'ip_hash'];
   
   const csv = [
     headers.join(','),
     ...submissions.map(sub => {
-      const data = JSON.parse(sub.submissionData as string);
+      let data: Record<string, any> = {};
+      try {
+        data = typeof sub.submissionData === 'string' 
+          ? JSON.parse(sub.submissionData) 
+          : (sub.submissionData || {});
+      } catch {}
+
       const submittedAt = sub.submittedAt ? sub.submittedAt.toISOString() : 'N/A';
-      const row = [submittedAt];
+      const row = [sanitizeCSVCell(submittedAt)];
       for (const field of fields) {
-        row.push(`"${data[field.id] || ''}"`);
+        row.push(sanitizeCSVCell(data[field.id] || ''));
       }
-      row.push(sub.ipHash || '');
+      row.push(sanitizeCSVCell(sub.ipHash || ''));
       return row.join(',');
     }),
   ].join('\n');

@@ -155,23 +155,47 @@ export default async function ShortCodePage({
           </div>
           <div className="p-6 space-y-4">
             {sortedActions.map((action) => {
-              let href = action.actionValue || '#';
+              const rawVal = action.actionValue?.trim() || '';
+              const isDangerousScheme = /^(javascript|data|vbscript):/i.test(rawVal);
+              let href = '#';
               let Icon = Globe;
-              if (action.actionType === 'phone') { href = `tel:${action.actionValue}`; Icon = Phone; }
-              else if (action.actionType === 'email') { href = `mailto:${action.actionValue}`; Icon = Mail; }
-              else if (action.actionType === 'whatsapp') { 
-                const cleanPhone = action.actionValue?.replace(/\D/g, '') || '';
-                href = `https://wa.me/${cleanPhone}`; Icon = MessageCircle; 
-              }
-              else if (action.actionType === 'map') { href = `https://maps.google.com/?q=${encodeURIComponent(action.actionValue || '')}`; Icon = MapPin; }
-              else if (action.actionType === 'download') { Icon = Download; }
-              else if (action.actionType === 'text') { 
+
+              if (isDangerousScheme) {
+                href = '#';
+              } else if (action.actionType === 'url') {
+                href = rawVal.startsWith('http://') || rawVal.startsWith('https://') 
+                  ? rawVal 
+                  : `https://${rawVal}`;
+                Icon = Globe;
+              } else if (action.actionType === 'phone') { 
+                href = `tel:${rawVal.replace(/[^0-9+\s-]/g, '')}`; 
+                Icon = Phone; 
+              } else if (action.actionType === 'email') { 
+                href = `mailto:${encodeURIComponent(rawVal)}`; 
+                Icon = Mail; 
+              } else if (action.actionType === 'whatsapp') { 
+                const cleanPhone = rawVal.replace(/\D/g, '');
+                href = `https://wa.me/${cleanPhone}`; 
+                Icon = MessageCircle; 
+              } else if (action.actionType === 'map') { 
+                href = `https://maps.google.com/?q=${encodeURIComponent(rawVal)}`; 
+                Icon = MapPin; 
+              } else if (action.actionType === 'download') { 
+                href = rawVal.startsWith('http://') || rawVal.startsWith('https://') ? rawVal : '#';
+                Icon = Download; 
+              } else if (action.actionType === 'text') { 
                 href = `/s/${code}?actionId=${action.id}`;
                 Icon = Type;
               }
 
               return (
-                <a key={action.id} href={href} className="flex items-center p-4 border border-gray-200 rounded-xl hover:border-[#0F6E56] hover:bg-emerald-50 transition-colors group">
+                <a 
+                  key={action.id} 
+                  href={href} 
+                  target={action.actionType === 'url' || action.actionType === 'download' ? "_blank" : undefined}
+                  rel={action.actionType === 'url' ? "noopener noreferrer" : undefined}
+                  className="flex items-center p-4 border border-gray-200 rounded-xl hover:border-[#0F6E56] hover:bg-emerald-50 transition-colors group"
+                >
                   <div className="flex-shrink-0 w-12 h-12 bg-emerald-100 text-[#0F6E56] rounded-full flex items-center justify-center group-hover:bg-[#0F6E56] group-hover:text-white transition-colors">
                     <Icon className="w-6 h-6" />
                   </div>
@@ -256,7 +280,7 @@ export default async function ShortCodePage({
                   srcDoc={result.rendered_html} 
                   title={qr.name}
                   className="w-full h-full border-none"
-                  sandbox="allow-scripts allow-forms allow-popups allow-same-origin"
+                  sandbox="allow-scripts allow-forms allow-popups"
                 />
               </div>
             );
@@ -272,7 +296,7 @@ export default async function ShortCodePage({
                     srcDoc={resolver.fallbackHtml} 
                     title={qr.name}
                     className="w-full h-full border-none"
-                    sandbox="allow-scripts allow-forms allow-popups allow-same-origin"
+                    sandbox="allow-scripts allow-forms allow-popups"
                   />
                 </div>
               );
@@ -296,6 +320,22 @@ export default async function ShortCodePage({
         <div className="text-center">
           <h1 className="text-2xl font-bold text-slate-900">No Destination</h1>
           <p className="text-slate-500 mt-2">This QR code doesn't have a destination set.</p>
+          <div className="mt-6">
+            <a href={`/report/abuse/${code}`} className="text-sm text-red-600 hover:underline font-medium">Report this QR code</a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Safety check: ensure target is a valid HTTP/HTTPS URL
+  const isSafeWebUrl = /^https?:\/\//i.test(finalTargetUrl.trim());
+  if (!isSafeWebUrl) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-50 px-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600">Blocked Unsafe Link</h1>
+          <p className="text-slate-500 mt-2">The destination URL of this QR code failed security verification.</p>
           <div className="mt-6">
             <a href={`/report/abuse/${code}`} className="text-sm text-red-600 hover:underline font-medium">Report this QR code</a>
           </div>

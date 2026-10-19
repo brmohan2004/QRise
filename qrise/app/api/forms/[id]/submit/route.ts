@@ -6,6 +6,7 @@ import { ApiResponse } from "@/lib/api-response";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { submitForm } from "@/lib/services/form.service";
+import { getClientIp } from "@/lib/client-ip";
 
 // Initialize rate limiter
 const ratelimit = new Ratelimit({
@@ -21,7 +22,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
+    const ip = getClientIp(request);
     const { success } = await ratelimit.limit(`${id}:${ip}`);
     
     if (!success) {

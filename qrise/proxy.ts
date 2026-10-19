@@ -3,6 +3,10 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { Redis } from '@upstash/redis';
 import type { User } from '@supabase/supabase-js';
 
+// In-memory profile and session cache to avoid redundant database round-trips on every request
+const profileCache = new Map<string, { profile: { is_suspended: boolean; is_admin: boolean } | null; expiry: number }>();
+const userSessionCache = new Map<string, { user: User; expiry: number }>();
+
 export default async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -150,21 +154,45 @@ export default async function middleware(request: NextRequest) {
 
   // We only fetch the user if it's a protected path, an API route, or an auth path (login/register)
   const needsAuthCheck = isProtectedPath || isApiRoute || isAuthPath;
-  const hasAuthCookie = request.cookies.getAll().some((c) => c.name.startsWith('sb-') || c.name.includes('-auth-token'));
+  const authCookies = request.cookies.getAll().filter((c) => c.name.startsWith('sb-') || c.name.includes('-auth-token'));
+  const hasAuthCookie = authCookies.length > 0;
 
   if (needsAuthCheck && hasAuthCookie) {
-    const {
-      data: { user: foundUser },
-    } = await getUserWithTimeout();
-    user = foundUser;
+    const sessionSig = authCookies.map((c) => `${c.name}:${c.value}`).join(';');
+    const now = Date.now();
+    const cachedUser = userSessionCache.get(sessionSig);
+
+    if (cachedUser && cachedUser.expiry > now) {
+      user = cachedUser.user;
+    } else {
+      const {
+        data: { user: foundUser },
+      } = await getUserWithTimeout();
+      user = foundUser;
+
+      if (user) {
+        if (userSessionCache.size > 1000) {
+          for (const [k, v] of userSessionCache) {
+            if (v.expiry <= now) userSessionCache.delete(k);
+          }
+        }
+        userSessionCache.set(sessionSig, { user, expiry: now + 60_000 });
+      }
+    }
 
     if (user) {
-      const { data } = await supabase
-        .from('users')
-        .select('is_suspended, is_admin')
-        .eq('id', user.id)
-        .single();
-      profile = data;
+      const cached = profileCache.get(user.id);
+      if (cached && cached.expiry > now) {
+        profile = cached.profile;
+      } else {
+        const { data } = await supabase
+          .from('users')
+          .select('is_suspended, is_admin')
+          .eq('id', user.id)
+          .single();
+        profile = data;
+        profileCache.set(user.id, { profile, expiry: now + 60_000 });
+      }
     }
   }
 
@@ -199,11 +227,11 @@ export default async function middleware(request: NextRequest) {
   }
 
   if (isProtectedPath && !user) {
-    if (isAuthTimeout && hasAuthCookie) {
-      console.warn('Auth timed out in middleware; allowing request through with existing session cookie.');
-      return applySecurityHeaders(supabaseResponse);
-    }
     const url = new URL('/login', request.url);
+    if (isAuthTimeout) {
+      console.warn('Auth check timed out in middleware; failing closed to login.');
+      url.searchParams.set('error', 'auth_timeout');
+    }
     url.searchParams.set('redirect', pathname);
     return applySecurityHeaders(NextResponse.redirect(url));
   }

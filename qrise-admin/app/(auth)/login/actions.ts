@@ -50,8 +50,12 @@ export async function signInWithMagicLink(formData: FormData) {
   // say we must check the DB here, but it's safer. 
   // However, magic link auth doesn't create users if shouldCreateUser is false.
   
-  // 4. Rate limiting
-  const ip = (await headers()).get('x-forwarded-for') || '127.0.0.1'
+  // 4. Rate limiting with safe IP resolution
+  const headerList = await headers()
+  const cfIp = headerList.get('cf-connecting-ip')
+  const realIp = headerList.get('x-real-ip')
+  const xff = headerList.get('x-forwarded-for')
+  const ip = cfIp?.trim() || realIp?.trim() || (xff ? xff.split(',').pop()?.trim() : null) || '127.0.0.1'
   const { success } = await ratelimit.limit(`${email}:${ip}`)
   
   if (!success) {
@@ -87,7 +91,19 @@ export async function signInWithCredentials(formData: FormData) {
     return { error: 'Please enter both email and password.' }
   }
 
-  // 2. Check against .env.local
+  // 2. Rate limiting for credentials to prevent brute-forcing ADMIN_PASSWORD
+  const headerList = await headers()
+  const cfIp = headerList.get('cf-connecting-ip')
+  const realIp = headerList.get('x-real-ip')
+  const xff = headerList.get('x-forwarded-for')
+  const ip = cfIp?.trim() || realIp?.trim() || (xff ? xff.split(',').pop()?.trim() : null) || '127.0.0.1'
+  const { success } = await ratelimit.limit(`admin-cred:${email}:${ip}`)
+
+  if (!success) {
+    return { error: 'Too many failed login attempts. Please try again in 15 minutes.' }
+  }
+
+  // 3. Check against .env.local
   if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET)
     const token = await new jose.SignJWT({ 

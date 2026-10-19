@@ -5,14 +5,33 @@ import { isFeatureEnabled } from "@/lib/feature-flags";
 export const dynamic = 'force-dynamic';
 
 export default async function CreatePage() {
+  // Fetch all feature flags in parallel instead of 7 sequential round-trips
+  const [
+    password,
+    multiAction,
+    bulk,
+    smartRouting,
+    designStudio,
+    static_qr,
+    dynamic_qr,
+  ] = await Promise.all([
+    isFeatureEnabled("password_qr_enabled"),
+    isFeatureEnabled("multi_action_qr"),
+    isFeatureEnabled("bulk_qr_enabled"),
+    isFeatureEnabled("smart_routing_enabled"),
+    isFeatureEnabled("design_studio"),
+    isFeatureEnabled("static_qr"),
+    isFeatureEnabled("dynamic_qr"),
+  ]);
+
   const flags = {
-    password: await isFeatureEnabled("password_qr_enabled"),
-    multiAction: await isFeatureEnabled("multi_action_qr"),
-    bulk: await isFeatureEnabled("bulk_qr_enabled"),
-    smartRouting: await isFeatureEnabled("smart_routing_enabled"),
-    designStudio: await isFeatureEnabled("design_studio"),
-    static_qr: await isFeatureEnabled("static_qr"),
-    dynamic_qr: await isFeatureEnabled("dynamic_qr"),
+    password,
+    multiAction,
+    bulk,
+    smartRouting,
+    designStudio,
+    static_qr,
+    dynamic_qr,
   };
 
   return (
