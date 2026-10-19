@@ -22,6 +22,7 @@ export default function DashboardPage() {
       const data = await res.json();
       return { total: data.total || 0 };
     },
+    staleTime: 1000 * 60 * 5,
   });
 
   // Redirect to onboarding if user has no QRs and hasn't skipped
@@ -40,10 +41,11 @@ export default function DashboardPage() {
   } = useQuery({
     queryKey: ["analytics", range],
     queryFn: async () => {
-      const res = await fetch(`/api/analytics?range=${range}`, { cache: "no-store" });
+      const res = await fetch(`/api/analytics?range=${range}`);
       if (!res.ok) throw new Error("Failed to fetch analytics");
       return res.json();
     },
+    staleTime: 1000 * 60 * 3,
     refetchInterval: 60000,
   });
 
@@ -53,10 +55,11 @@ export default function DashboardPage() {
   } = useQuery({
     queryKey: ["stats"],
     queryFn: async () => {
-      const res = await fetch("/api/stats", { cache: "no-store" });
+      const res = await fetch("/api/stats");
       if (!res.ok) throw new Error("Failed to fetch stats");
       return res.json();
     },
+    staleTime: 1000 * 60 * 3,
     refetchInterval: 60000,
   });
 

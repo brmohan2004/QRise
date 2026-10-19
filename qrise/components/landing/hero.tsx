@@ -11,16 +11,18 @@ export function Hero() {
         <div className="hero-grid">
           {/* Text content */}
           <div className="hero-content">
-            <h1 className="hero-title">
-              The <strong>QR code platform</strong> built for{" "}
-              <span>real results</span>
+            <h1 className="hero-title flex flex-wrap items-center justify-center gap-x-2">
+              <span className="text-gray-900 animate-blur-focus-in stagger-delay-1">The</span>
+              <strong className="animate-blur-focus-in stagger-delay-2">QR code platform</strong>
+              <span className="text-gray-900 animate-blur-focus-in stagger-delay-3">built for</span>
+              <span className="text-[#0F6E56] animate-blur-focus-in stagger-delay-4">real results</span>
             </h1>
-            <p className="hero-description">
+            <p className="hero-description animate-blur-focus-in stagger-delay-5">
               Create <strong>dynamic QR codes</strong>, <strong>multiple action menus</strong>, and <strong>password protected</strong> links that track every scan. Change destinations anytime without
               reprinting. Powerful <strong>analytics</strong>, <strong>design studio</strong>, and integrations for modern
               teams. Free to start.
             </p>
-            <div className="hero-actions">
+            <div className="hero-actions animate-blur-focus-in stagger-delay-6">
               <Link href="/register" className="hero-btn-primary" aria-label="Create your free QR code — sign up for QRise">
                 Start for free
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -31,7 +33,7 @@ export function Hero() {
             </div>
 
             {/* Stats */}
-            <div className="hero-stats" role="group" aria-label="QRise platform statistics">
+            <div className="hero-stats animate-blur-focus-in stagger-delay-7" role="group" aria-label="QRise platform statistics">
               <div className="stat-item">
                 <p className="stat-value">10,000+</p>
                 <p className="stat-label">QR codes created</p>
@@ -47,14 +49,6 @@ export function Hero() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="hero-scroll-indicator" aria-hidden="true">
-        <div className="mouse">
-          <div className="wheel"></div>
-        </div>
-        <span className="scroll-text">Scroll to explore</span>
       </div>
     </section>
   );

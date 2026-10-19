@@ -16,9 +16,13 @@ export default function PrivacyPage() {
         { name: "Home", url: "https://qrise.app" },
         { name: "Privacy Policy", url: "https://qrise.app/privacy" },
       ]} />
-      <article className="max-w-4xl mx-auto py-24 px-4 sm:px-6 lg:px-8 prose prose-slate">
-        <h1>Privacy Policy</h1>
-        <p className="lead">Last updated: May 2026</p>
+      <article className="max-w-4xl mx-auto py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
+        <header className="text-center mb-12">
+          <h1 className="text-2xl sm:text-[1.875rem] md:text-[2.25rem] font-bold tracking-tight text-gray-900 leading-[1.2] mb-3">Privacy Policy</h1>
+          <p className="text-sm text-gray-500 max-w-xl mx-auto leading-normal mt-3">Last updated: May 2026</p>
+        </header>
+
+        <div className="prose prose-slate mx-auto">
         
         <section>
           <h2>1. Information We Collect</h2>
@@ -73,6 +77,7 @@ export default function PrivacyPage() {
           <h2>7. Contact Us</h2>
           <p>If you have questions about this Privacy Policy, please contact us at <a href="mailto:support@qrise.com">support@qrise.com</a>.</p>
         </section>
+        </div>
       </article>
     </>
   );

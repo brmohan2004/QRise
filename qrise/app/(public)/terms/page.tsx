@@ -16,9 +16,13 @@ export default function TermsPage() {
         { name: "Home", url: "https://qrise.app" },
         { name: "Terms of Service", url: "https://qrise.app/terms" },
       ]} />
-      <article className="max-w-4xl mx-auto py-24 px-4 sm:px-6 lg:px-8 prose prose-slate">
-        <h1>Terms of Service</h1>
-        <p className="lead">Last updated: May 2026</p>
+      <article className="max-w-4xl mx-auto py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
+        <header className="text-center mb-12">
+          <h1 className="text-2xl sm:text-[1.875rem] md:text-[2.25rem] font-bold tracking-tight text-gray-900 leading-[1.2] mb-3">Terms of Service</h1>
+          <p className="text-sm text-gray-500 max-w-xl mx-auto leading-normal mt-3">Last updated: May 2026</p>
+        </header>
+
+        <div className="prose prose-slate mx-auto">
         
         <section>
           <h2>1. Acceptance of Terms</h2>
@@ -76,6 +80,7 @@ export default function TermsPage() {
           <h2>10. Contact</h2>
           <p>For questions about these Terms, contact us at <a href="mailto:support@qrise.com">support@qrise.com</a>.</p>
         </section>
+        </div>
       </article>
     </>
   );

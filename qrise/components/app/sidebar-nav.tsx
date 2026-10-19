@@ -53,7 +53,8 @@ export function SidebarNav({
       const res = await fetch("/api/user");
       const json = await res.json();
       return json.data;
-    }
+    },
+    staleTime: 1000 * 60 * 15,
   });
 
 
@@ -89,7 +90,7 @@ export function SidebarNav({
               >
                 <Link 
                   href="/dashboard" 
-                  className="flex items-center gap-3 font-bold text-xl text-primary"
+                  className="flex items-center gap-3 font-bold text-xl lg:text-base text-primary"
                   onClick={onNavClick}
                 >
                   <Image 
@@ -97,7 +98,7 @@ export function SidebarNav({
                     alt="QRise" 
                     width={32} 
                     height={32} 
-                    className="w-8 h-8 object-contain"
+                    className="w-8 h-8 lg:w-7 lg:h-7 object-contain"
                   />
                   <span>QRise</span>
                 </Link>
@@ -164,7 +165,7 @@ export function SidebarNav({
                         animate={{ opacity: 1, width: "auto" }}
                         exit={{ opacity: 0, width: 0 }}
                         transition={{ duration: 0 }}
-                        className="whitespace-nowrap ml-2"
+                        className="whitespace-nowrap ml-2 lg:text-xs"
                       >
                         Create
                       </motion.span>
@@ -191,16 +192,19 @@ export function SidebarNav({
                 <TooltipTrigger asChild>
                   <Link
                     href={href}
+                    prefetch={true}
                     onClick={onNavClick}
                     className={cn(
                       "flex items-center rounded-xl font-bold transition-all duration-200 overflow-hidden",
-                      isMobile ? "py-2.5 px-4 text-[0.8125rem] gap-3" : (collapsed ? "py-2.5 justify-center px-0 text-sm" : "py-2.5 gap-3 px-4 text-sm"),
+                      isMobile 
+                        ? "py-2.5 px-4 text-[0.8125rem] gap-3" 
+                        : (collapsed ? "py-2.5 justify-center px-0 text-sm" : "py-2.5 gap-3 px-4 text-sm lg:text-[0.8125rem] lg:py-2 lg:gap-2.5"),
                       isActive 
                         ? "bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20" 
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     )}
                   >
-                    <item.icon className="w-5 h-5 shrink-0" />
+                    <item.icon className="w-5 h-5 lg:w-4 lg:h-4 shrink-0" />
                     <AnimatePresence>
                       {!collapsed && (
                         <motion.span

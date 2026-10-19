@@ -1,0 +1,803 @@
+PROJECT: QRISE — RESTAURANT MENU QR & CUSTOM UI REDIRECTION
+
+OBJECTIVE
+Integrate a complete Restaurant Menu QR feature into my existing Qrise
+application.
+
+IMPORTANT:
+This is an enhancement to an existing application, NOT a new application.
+Inspect the existing codebase before making any changes.
+
+Do not replace, rebuild, or redesign the existing Qrise dashboard.
+Reuse the existing components, design system, routing, authentication,
+database, QR code infrastructure, and navigation wherever possible.
+
+==================================================
+1. EXISTING QRISE APPLICATION
+==================================================
+
+My application already contains:
+
+- QR Dashboard
+- My QR
+- Select QR Type
+- Existing QR generation functionality
+- Existing scan analytics
+- Existing application navigation
+- Existing user authentication
+
+Preserve all existing functionality.
+
+Add a new QR type:
+
+"Restaurant Menu QR"
+
+Description:
+Create a digital restaurant menu with table-wise QR codes,
+product categories, offers, coupons, cart, ordering, digital receipts,
+and restaurant analytics.
+
+When the user selects Restaurant Menu QR from the existing
+Select QR Type page, start the Restaurant Menu Builder workflow.
+
+Do not create duplicate dashboard pages if existing pages can be extended.
+
+==================================================
+2. UI DESIGN REQUIREMENTS
+==================================================
+
+Follow the current Qrise application design system.
+
+Use the existing dashboard screenshot as the design reference.
+
+Visual requirements:
+
+- Minimalist interface
+- White backgrounds
+- Green primary action color matching existing Qrise UI
+- Soft gray borders
+- Rounded cards consistent with existing components
+- Subtle shadows
+- Compact mobile-first layouts
+- Consistent typography and spacing
+- Simple outline icons
+- Responsive design for mobile, tablet, and desktop
+- Accessible forms and buttons
+- Clear loading, empty, success, and error states
+
+Reuse the existing Qrise header and bottom navigation on
+authenticated screens.
+
+Do not introduce a completely different visual design.
+
+The customer-facing restaurant menu should use the restaurant's
+configured branding while retaining a consistent, professional
+Qrise-powered experience.
+
+Use the provided customer-side restaurant menu mockup as a visual
+reference for:
+
+1. Restaurant menu
+2. Product details
+3. Shopping cart and coupon application
+4. Order confirmation
+5. Digital bill
+
+Treat mockups as design references, not production data.
+
+==================================================
+3. RESTAURANT MENU BUILDER
+==================================================
+
+Create a guided five-step builder.
+
+Step 1: Restaurant Details
+Step 2: Menu Categories
+Step 3: Products
+Step 4: Offers and Coupons
+Step 5: Preview and Publish
+
+Display a progress indicator and Back, Continue, and Save Draft
+actions where appropriate.
+
+------------------------------------------
+STEP 1: RESTAURANT DETAILS
+------------------------------------------
+
+Fields:
+
+- Restaurant name
+- Restaurant logo upload
+- Restaurant cover image upload
+- Description
+- Contact number
+- Address
+- Currency
+- Number of tables
+- Menu theme
+
+Provide theme presets consistent with Qrise:
+
+- Green
+- Cream
+- Dark
+
+Use appropriate image validation, upload progress, and error messages.
+
+The number of tables determines how many table-specific QR codes
+must be created.
+
+For example, if the owner enters 12 tables, create 12 unique table
+records and associate each with a unique QR identifier.
+
+Do not generate duplicate tables when the owner saves or revisits
+the builder.
+
+------------------------------------------
+STEP 2: MENU CATEGORIES
+------------------------------------------
+
+Allow restaurant owners to create, edit, delete, hide, and reorder
+menu categories.
+
+Category fields:
+
+- Category name
+- Category image
+- Description
+- Display order
+- Active/inactive status
+
+Examples:
+
+- Biryani
+- Starters
+- Main Course
+- Beverages
+- Desserts
+
+Display categories as compact cards.
+
+Each category should show its image, name, and product count.
+
+Provide an Add Category action.
+
+------------------------------------------
+STEP 3: PRODUCTS
+------------------------------------------
+
+Allow owners to add products to categories.
+
+Product fields:
+
+- Product name
+- Product image
+- Description
+- Price
+- Optional discounted price
+- Availability
+- Dietary label
+- Optional preparation time
+- Optional product customizations
+
+Examples:
+
+Chicken Biryani — ₹220
+Mutton Biryani — ₹300
+Veg Biryani — ₹160
+
+Support:
+
+- Add product
+- Edit product
+- Delete product
+- Reorder products
+- Mark unavailable
+- Upload or replace product images
+- Optional product variants and add-ons
+
+Validate product prices and required fields.
+
+Customers must not be able to order unavailable products.
+
+Store prices as appropriate integer minor units or use the existing
+application's reliable monetary representation.
+
+The backend must be authoritative for all prices.
+
+------------------------------------------
+STEP 4: OFFERS AND COUPONS
+------------------------------------------
+
+Provide two sections:
+
+A. Special Offers
+
+Fields:
+
+- Offer title
+- Promotional banner image
+- Description
+- Discount type
+- Discount value
+- Start date
+- End date
+- Applicable products or categories
+- Minimum order amount
+- Maximum discount
+- Active/inactive status
+
+B. Coupons
+
+Fields:
+
+- Coupon code
+- Discount type
+- Discount value
+- Minimum order amount
+- Maximum discount
+- Validity period
+- Usage limit
+- Eligible products or categories
+- Combination rules
+- Active/inactive status
+
+Allow owners to preview offers and coupons.
+
+Validate coupon eligibility and calculate discounts on the server.
+
+Prevent expired, disabled, and ineligible coupons from being applied.
+
+Define and consistently enforce coupon stacking rules.
+
+------------------------------------------
+STEP 5: PREVIEW AND PUBLISH
+------------------------------------------
+
+Display a realistic preview of the customer-facing restaurant menu.
+
+Preview:
+
+- Restaurant logo and branding
+- Cover image
+- Promotional banners
+- Categories
+- Product cards
+- Product prices
+- Add-to-cart buttons
+- Coupons
+- Shopping cart
+- Checkout layout
+
+Provide:
+
+- Back to Edit
+- Save Draft
+- Publish Menu
+
+Only publish when required information is valid.
+
+Unpublished drafts must not be publicly accessible.
+
+Publishing must preserve existing QR associations and must not
+create duplicate QR codes.
+
+Support later editing and republishing.
+
+==================================================
+4. TABLE-WISE QR CODE MANAGEMENT
+==================================================
+
+Create a table QR management interface integrated with the existing
+Qrise QR infrastructure.
+
+For each restaurant table, store:
+
+- Restaurant ID
+- Table ID
+- Display table number
+- Stable QR identifier
+- QR destination
+- Active/inactive status
+
+Example:
+
+Table 1 → Unique QR identifier
+Table 2 → Unique QR identifier
+Table 3 → Unique QR identifier
+
+Every table QR code opens the same published restaurant menu,
+but the system identifies the table associated with that QR code.
+
+Generate QR codes through the existing Qrise QR implementation
+where possible.
+
+Provide:
+
+- View QR
+- Download QR
+- Download all QR codes as ZIP
+- Print QR cards
+- Rename table
+- Add table
+- Deactivate table
+- Regenerate QR if supported
+
+Use stable, unique QR identifiers rather than trusting a table
+number supplied by the browser.
+
+Do not create separate copies of the menu for individual tables.
+
+If the restaurant changes the menu, existing active QR codes should
+continue to open the updated published menu.
+
+Avoid changing the behavior of existing non-restaurant QR codes.
+
+==================================================
+5. CUSTOMER-FACING RESTAURANT MENU
+==================================================
+
+Create a public, mobile-first restaurant menu page.
+
+Example route:
+
+/p/:restaurantSlug
+
+Use the existing routing conventions if different.
+
+When a customer scans a table QR code:
+
+1. Resolve the QR identifier.
+2. Verify that the QR code is active.
+3. Resolve the restaurant and table association.
+4. Load the currently published menu.
+5. Display the restaurant branding.
+6. Display the correct table context.
+7. Record the appropriate analytics event.
+
+Display:
+
+- Restaurant logo and name
+- Cover image
+- Promotional offers
+- Search
+- Category navigation
+- Product cards
+- Product images
+- Descriptions
+- Prices
+- Availability
+- Add buttons
+- Cart summary
+
+Use responsive layouts and optimized images.
+
+Do not require customers to install an application.
+
+Do not expose private owner information or draft menu content.
+
+==================================================
+6. PRODUCT SELECTION AND CART
+==================================================
+
+Implement a functional shopping cart.
+
+Customers can:
+
+- Add products
+- Increase quantities
+- Decrease quantities
+- Remove products
+- Select supported variants and add-ons
+- Add optional special instructions
+- View available coupons
+- Apply an eligible coupon
+- Remove a coupon
+- Review the complete bill
+
+Cart items should contain product identifiers, selected options,
+and quantities.
+
+Do not trust client-submitted prices or discounts.
+
+Calculate the final order amount on the server using current,
+authoritative product prices and applicable rules.
+
+Display a clear price breakdown:
+
+- Subtotal
+- Discounts
+- Taxes, where applicable
+- Other applicable charges
+- Final payable amount
+
+Prevent negative quantities, invalid discounts, and invalid totals.
+
+Preserve cart contents during normal navigation where appropriate.
+
+Associate the cart with the restaurant and table context.
+
+Prevent accidental mixing of products from different restaurants.
+
+==================================================
+7. CHECKOUT AND ORDER CREATION
+==================================================
+
+Create a checkout screen with:
+
+- Restaurant name
+- Table number
+- Selected products
+- Quantities
+- Customizations
+- Special instructions
+- Coupon information
+- Complete bill
+- Place Order button
+
+When Place Order is clicked:
+
+1. Validate the restaurant and table association.
+2. Validate product availability.
+3. Recalculate all prices on the server.
+4. Revalidate the coupon.
+5. Calculate applicable charges.
+6. Create the order and order items transactionally.
+7. Assign a unique order number.
+8. Save price snapshots for historical accuracy.
+9. Set the initial order status.
+10. Generate the order receipt.
+11. Return the order confirmation to the customer.
+
+Prevent duplicate orders caused by retries or repeated submissions
+using appropriate idempotency handling.
+
+An order must be saved successfully before showing confirmation.
+
+Do not claim an order has been placed if order creation fails.
+
+==================================================
+8. DIGITAL RECEIPT / E-BILL
+==================================================
+
+After successful order creation, display an order confirmation page.
+
+Include:
+
+- Restaurant name and logo
+- Order ID
+- Order date and time
+- Table number
+- Ordered products
+- Quantities
+- Unit prices
+- Subtotal
+- Discounts
+- Taxes and charges
+- Final total
+- Order status
+
+Provide:
+
+- View E-Bill
+- Download Receipt
+- Back to Menu
+
+Generate the receipt from the persisted order data.
+
+The receipt must not recalculate historical totals using current menu
+prices.
+
+Clearly distinguish an order receipt from a formal tax invoice.
+
+If online payments are not implemented, do not display a payment
+success state.
+
+==================================================
+9. RESTAURANT ORDER MANAGEMENT
+==================================================
+
+Extend the existing Qrise dashboard with a restaurant-specific
+management view.
+
+Provide an Orders section containing:
+
+- New orders
+- Pending orders
+- Accepted orders
+- Preparing orders
+- Ready orders
+- Completed orders
+- Cancelled or rejected orders
+
+Each order should display:
+
+- Order ID
+- Restaurant
+- Table number
+- Items
+- Total
+- Creation time
+- Order status
+
+Allow authorized restaurant staff to view order details and update
+order status.
+
+Support filters for:
+
+- Table
+- Date
+- Order status
+- Order ID
+
+Use real-time updates if the existing backend supports them.
+Otherwise, implement a reliable refresh strategy.
+
+Do not create a second unrelated restaurant dashboard if the
+existing dashboard can be extended.
+
+==================================================
+10. TABLE-WISE ORDER VIEW
+==================================================
+
+Provide a table management view with each table's:
+
+- Table number
+- QR status
+- Scan count
+- Active orders
+- Latest order
+
+When an owner opens Table 2, show orders associated with Table 2.
+
+Example:
+
+Table 2
+Order ID: QR-1042
+Status: Pending
+
+Products:
+- 2 × Chicken Biryani
+- 1 × Paneer Tikka
+- 2 × Fresh Lime Soda
+
+Display the order's persisted total and receipt.
+
+Use the validated table association from the backend.
+
+Never determine table ownership solely from an editable query
+parameter or browser-submitted table number.
+
+Keep scans, active orders, and completed orders as separate metrics.
+
+==================================================
+11. RESTAURANT ANALYTICS
+==================================================
+
+Integrate restaurant-specific analytics with the existing Qrise
+analytics infrastructure.
+
+Track appropriate events:
+
+- QR scan or QR landing
+- Menu view
+- Category interaction
+- Product interaction
+- Add to cart
+- Remove from cart
+- Checkout started
+- Order created
+- Order completed
+
+Provide:
+
+- Total scans
+- Unique visitors where measurable
+- Menu views
+- Cart additions
+- Orders created
+- Completed orders
+- Conversion rates
+- Coupon usage
+- Popular products
+- Table-wise performance
+- Revenue from completed orders
+
+Provide date filters.
+
+Avoid counting a single scan as an order.
+
+Avoid double-counting analytics events during retries.
+
+Use privacy-conscious analytics and existing consent mechanisms.
+
+Revenue reporting must clearly distinguish order value, payment
+status, refunds, and collected revenue.
+
+==================================================
+12. DATA MODEL AND BACKEND
+==================================================
+
+First inspect the existing database schema and determine whether
+equivalent entities already exist.
+
+Reuse or extend existing tables instead of creating unnecessary
+duplicates.
+
+The logical data model may include:
+
+- restaurant_profiles
+- restaurant_tables
+- restaurant_menu_categories
+- restaurant_menu_products
+- restaurant_offers
+- restaurant_coupons
+- restaurant_pages
+- restaurant_orders
+- restaurant_order_items
+- restaurant_order_receipts
+- restaurant_analytics_events
+
+Adapt naming and relationships to the existing application.
+
+Every restaurant-owned record must be associated with the correct
+business or tenant.
+
+Implement server-side authorization so one restaurant owner cannot
+read or modify another restaurant's data.
+
+Use appropriate database transactions and constraints.
+
+Add indexes for frequently queried fields.
+
+Handle database errors and partial failures safely.
+
+Do not create a second authentication system.
+
+If the application uses Supabase, follow the existing Supabase
+architecture and enforce Row Level Security where appropriate.
+
+If it uses Firebase, follow its existing security rules and data
+access patterns.
+
+If it uses another backend, adapt to that backend instead.
+
+Do not assume a particular technology stack before inspecting
+the project.
+
+==================================================
+13. SECURITY AND VALIDATION
+==================================================
+
+Implement:
+
+- Authentication for owner operations
+- Tenant-level access control
+- Server-side product price validation
+- Server-side coupon validation
+- Image file type and size validation
+- Safe image storage
+- Public/private data separation
+- QR identifier validation
+- Order idempotency
+- Input validation
+- Error handling
+- Rate limiting where appropriate
+
+Never expose secret keys in frontend code.
+
+Never trust browser-submitted totals.
+
+Prevent unauthorized modification of orders, coupons, products,
+table mappings, and published content.
+
+==================================================
+14. INTEGRATION RULES
+==================================================
+
+Before implementation:
+
+1. Inspect the current project structure.
+2. Identify the framework and backend.
+3. Identify the existing routing system.
+4. Locate the current QR creation workflow.
+5. Locate the Select QR Type page.
+6. Locate the existing QR Dashboard and My QR pages.
+7. Identify reusable UI components and design tokens.
+8. Inspect the existing database and authorization model.
+9. Determine how QR destinations and scan analytics work.
+10. Plan the smallest safe set of changes.
+
+Do not replace existing pages with mockups.
+
+Do not hardcode sample restaurant data in production components.
+
+Do not create nonfunctional buttons.
+
+Do not add duplicate navigation items unnecessarily.
+
+Do not change existing QR types or their behavior.
+
+Preserve existing features, routes, and user data.
+
+If a required backend capability is missing, implement it using
+the existing architecture rather than faking its behavior.
+
+==================================================
+15. TESTING AND ACCEPTANCE CRITERIA
+==================================================
+
+Verify the following end-to-end flow:
+
+1. An authenticated owner selects Restaurant Menu QR.
+2. The owner enters restaurant details.
+3. The owner enters a table count.
+4. The system creates the correct number of unique table QR codes.
+5. The owner adds categories and products.
+6. The owner creates offers and coupons.
+7. The owner previews and publishes the menu.
+8. A customer scans Table 2's QR code.
+9. The correct restaurant menu opens with Table 2 identified.
+10. The customer adds products to the cart.
+11. The customer applies an eligible coupon.
+12. The backend calculates the correct total.
+13. The customer places the order.
+14. The order is persisted without duplication.
+15. The digital receipt displays the persisted order details.
+16. The restaurant owner sees the order under Table 2.
+17. The owner can update the order status.
+18. Analytics reflect the relevant events.
+19. Updating the published menu does not break existing QR codes.
+20. Existing Qrise QR functionality continues to work.
+
+Also test:
+
+- Mobile responsiveness
+- Empty states
+- Validation failures
+- Expired coupons
+- Unavailable products
+- Invalid QR identifiers
+- Unauthorized access
+- Repeated order submissions
+- Database failures
+- Image upload failures
+- Draft and publish behavior
+
+==================================================
+16. IMPLEMENTATION DELIVERABLES
+==================================================
+
+Implement the feature in the existing codebase.
+
+Deliver:
+
+1. Updated Select QR Type integration.
+2. Restaurant menu builder.
+3. Category and product management.
+4. Offers and coupons.
+5. Table QR management.
+6. Customer-facing menu.
+7. Functional cart and checkout.
+8. Server-side order creation.
+9. Digital order receipt.
+10. Restaurant order dashboard.
+11. Table-wise order view.
+12. Restaurant analytics.
+13. Required database migrations.
+14. Appropriate security policies.
+15. Tests for critical workflows.
+16. A summary of modified and newly created files.
+
+Work incrementally.
+
+Start with codebase inspection, then implement the feature using
+the existing Qrise architecture.
+
+Do not stop after generating a UI mockup.
+
+Connect the frontend to real backend operations and verify the
+complete restaurant ordering workflow.
+
+If a necessary external service or credential is unavailable,
+identify the dependency clearly rather than pretending it works.

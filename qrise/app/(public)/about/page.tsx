@@ -24,8 +24,8 @@ export default function AboutPage() {
       ]} />
       <article className="max-w-4xl mx-auto py-24 px-4 sm:px-6 lg:px-8">
         <header className="text-center mb-16">
-          <h1 className="text-4xl font-black mb-6 tracking-tight text-gray-900">About QRise</h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <h1 className="text-2xl sm:text-[1.875rem] md:text-[2.25rem] font-bold tracking-tight text-gray-900 leading-[1.2] mb-3">About QRise</h1>
+          <p className="text-sm text-gray-600 max-w-2xl mx-auto leading-normal mt-3">
             We&apos;re building the future of physical-to-digital connections.
           </p>
         </header>

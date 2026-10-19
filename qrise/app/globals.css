@@ -232,3 +232,160 @@ html {
   background: #e5e7eb;
   border-radius: 9999px;
 }
+
+/* ==========================================================================
+   Staggered Blur-In & Focus Reveal Loading / Transitions
+   ========================================================================== */
+
+@keyframes blurFocusReveal {
+  0% {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateY(14px) scale(0.985);
+  }
+  50% {
+    opacity: 0.8;
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes focusShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes focusPulseSoft {
+  0%, 100% {
+    opacity: 0.7;
+    filter: blur(0px);
+  }
+  50% {
+    opacity: 1;
+    filter: blur(1.5px);
+  }
+}
+
+.animate-blur-focus-in {
+  animation: blurFocusReveal 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: filter, transform, opacity;
+}
+
+.animate-focus-shimmer {
+  animation: focusShimmer 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-focus-pulse {
+  animation: focusPulseSoft 2.5s ease-in-out infinite;
+}
+
+/* Stagger delays */
+.stagger-delay-1 { animation-delay: 50ms; }
+.stagger-delay-2 { animation-delay: 110ms; }
+.stagger-delay-3 { animation-delay: 170ms; }
+.stagger-delay-4 { animation-delay: 230ms; }
+.stagger-delay-5 { animation-delay: 290ms; }
+.stagger-delay-6 { animation-delay: 350ms; }
+.stagger-delay-7 { animation-delay: 410ms; }
+.stagger-delay-8 { animation-delay: 470ms; }
+
+/* Stagger container automatically cascading direct children */
+.stagger-blur-focus > *:nth-child(1) { animation: blurFocusReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both; }
+.stagger-blur-focus > *:nth-child(2) { animation: blurFocusReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.10s both; }
+.stagger-blur-focus > *:nth-child(3) { animation: blurFocusReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both; }
+.stagger-blur-focus > *:nth-child(4) { animation: blurFocusReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both; }
+.stagger-blur-focus > *:nth-child(5) { animation: blurFocusReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.28s both; }
+.stagger-blur-focus > *:nth-child(6) { animation: blurFocusReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.34s both; }
+.stagger-blur-focus > *:nth-child(7) { animation: blurFocusReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.40s both; }
+.stagger-blur-focus > *:nth-child(8) { animation: blurFocusReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.46s both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-blur-focus-in,
+  .animate-focus-shimmer,
+  .animate-focus-pulse,
+  .stagger-blur-focus > * {
+    animation: none !important;
+    filter: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ==========================================================================
+   Desktop Compact Typography for Authenticated Pages & Sidebar
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+  /* Scale root container text */
+  .app-desktop-compact {
+    font-size: 0.8125rem;
+  }
+
+  /* Sidebar text scaling */
+  .app-desktop-compact nav a span,
+  .app-desktop-compact nav a {
+    font-size: 0.8125rem !important;
+  }
+
+  /* After-login all pages typography scaling on desktop */
+  .app-desktop-compact #main-content h1,
+  .app-desktop-compact #main-content .text-3xl {
+    font-size: 1.5rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .app-desktop-compact #main-content h2,
+  .app-desktop-compact #main-content .text-2xl {
+    font-size: 1.25rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .app-desktop-compact #main-content h3,
+  .app-desktop-compact #main-content .text-xl {
+    font-size: 1rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .app-desktop-compact #main-content h4,
+  .app-desktop-compact #main-content .text-lg {
+    font-size: 0.875rem !important;
+  }
+
+  .app-desktop-compact #main-content p,
+  .app-desktop-compact #main-content .text-base {
+    font-size: 0.8125rem !important;
+  }
+
+  .app-desktop-compact #main-content .text-sm {
+    font-size: 0.75rem !important;
+  }
+
+  .app-desktop-compact #main-content .text-xs {
+    font-size: 0.6875rem !important;
+  }
+
+  .app-desktop-compact #main-content table th,
+  .app-desktop-compact #main-content table td {
+    font-size: 0.8125rem !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  .app-desktop-compact #main-content .card-title,
+  .app-desktop-compact #main-content [data-slot="card-title"] {
+    font-size: 0.9375rem !important;
+  }
+
+  .app-desktop-compact #main-content .card-description,
+  .app-desktop-compact #main-content [data-slot="card-description"] {
+    font-size: 0.75rem !important;
+  }
+}

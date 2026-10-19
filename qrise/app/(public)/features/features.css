@@ -32,13 +32,13 @@
 }
 
 .features-description {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
   font-size: 0.875rem; /* Matched to landing page */
   color: #4b5563;
   max-width: 42rem;
   margin-left: auto;
   margin-right: auto;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 /* Current Features Grid */
@@ -259,6 +259,10 @@
    ========================================================================== */
 
 @media (min-width: 640px) {
+  .features-title {
+    font-size: 1.875rem;
+  }
+
   .features-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -268,14 +272,16 @@
   }
 }
 
+@media (min-width: 768px) {
+  .features-title {
+    font-size: 2.25rem;
+  }
+}
+
 @media (min-width: 1024px) {
   .features-section {
     padding-top: 6rem;
     padding-bottom: 6rem;
-  }
-
-  .features-title {
-    font-size: 3rem;
   }
 
   .features-grid {

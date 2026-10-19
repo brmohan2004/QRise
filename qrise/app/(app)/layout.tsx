@@ -25,9 +25,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     defaultOptions: {
       queries: {
         staleTime: 1000 * 60 * 5, // 5 minutes
+        gcTime: 1000 * 60 * 30, // 30 minutes
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
         retry: (failureCount, error: any) => {
           if (error?.status === 429 || error?.message?.includes('429')) return false;
-          return failureCount < 3;
+          return failureCount < 2;
         },
       },
       mutations: {
@@ -61,7 +64,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex h-screen h-[100dvh] max-h-[100dvh] overflow-hidden bg-background">
+      <div className="app-desktop-compact flex h-screen h-[100dvh] max-h-[100dvh] overflow-hidden bg-background">
         {/* Desktop Sidebar */}
         <motion.div
           initial={false}

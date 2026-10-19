@@ -32,13 +32,13 @@
 }
 
 .pricing-description {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
   font-size: 0.875rem; /* Matched to landing page */
   color: #4b5563;
   max-width: 42rem;
   margin-left: auto;
   margin-right: auto;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 /* Toggle */
@@ -365,6 +365,12 @@
    DESKTOP & TABLET STYLES (Adjustments)
    ========================================================================== */
 
+@media (min-width: 640px) {
+  .pricing-title {
+    font-size: 1.875rem;
+  }
+}
+
 @media (min-width: 768px) {
   .pricing-section {
     padding-top: 6rem;
@@ -372,7 +378,7 @@
   }
 
   .pricing-title {
-    font-size: 3rem;
+    font-size: 2.25rem;
   }
 
   .plans-grid {

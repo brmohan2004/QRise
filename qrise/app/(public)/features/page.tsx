@@ -47,7 +47,7 @@ export default function FeaturesPage() {
       <div className="features-section">
         <div className="features-container">
           {/* Header */}
-          <header className="features-header">
+          <header className="features-header animate-blur-focus-in stagger-delay-1">
             <h1 className="features-title">
               All Features
             </h1>
@@ -57,11 +57,11 @@ export default function FeaturesPage() {
           </header>
 
           {/* Current features grid */}
-          <div className="features-grid">
+          <div className="features-grid stagger-blur-focus">
             {staticFeatures.map((feature) => (
               <article
                 key={feature.id}
-                className="feature-card"
+                className="feature-card animate-blur-focus-in"
                 data-feature={feature.id}
               >
                 <h2 className="feature-card-title">

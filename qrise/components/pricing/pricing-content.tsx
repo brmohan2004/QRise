@@ -114,7 +114,7 @@ export function PricingContent({ initialPlans }: { initialPlans: any[] }) {
     <div className="pricing-section">
       <div className="pricing-container">
         {/* Header */}
-        <div className="pricing-header">
+        <div className="pricing-header animate-blur-focus-in stagger-delay-1">
           <h1 className="pricing-title">
             Simple, transparent pricing
           </h1>
@@ -146,12 +146,12 @@ export function PricingContent({ initialPlans }: { initialPlans: any[] }) {
         </div>
 
         {/* Plan cards */}
-        <div className="plans-grid">
+        <div className="plans-grid stagger-blur-focus">
           {plans.map((plan: any) => (
             <div
               key={plan.name}
               className={cn(
-                "plan-card",
+                "plan-card animate-blur-focus-in",
                 plan.popular && "is-popular"
               )}
             >

@@ -10,6 +10,8 @@ interface FeatureFlag {
   enabledForPlans: string[] | null;
 }
 
+const memoryCache = new Map<string, { flag: FeatureFlag | null; expiry: number }>();
+
 /**
  * Checks if a global feature flag is enabled.
  * Optionally checks if it's enabled for a specific plan.
@@ -18,15 +20,41 @@ export async function isFeatureEnabled(
   flagKey: string,
   planName?: string
 ): Promise<boolean> {
-  try {
-    const cacheKey = `ff:${flagKey}`;
-    const cachedFlag = await redis.get(cacheKey) as FeatureFlag | null;
-    let flag: FeatureFlag | null = null;
+  const DEFAULT_FLAGS: Record<string, boolean> = {
+    'multi_action_qr': true,
+    'password_qr_enabled': true,
+    'bulk_qr_enabled': true,
+    'smart_routing_enabled': true,
+    'design_studio': true,
+    'static_qr': true,
+    'dynamic_qr': true,
+    'analytics_dashboard_enabled': true,
+    'analytics_export_enabled': true,
+    'pricing_page_enabled': true,
+  };
 
-    if (cachedFlag) {
-      flag = cachedFlag;
-    } else {
-      // Add a local timeout for the DB query to prevent hanging the request
+  try {
+    const now = Date.now();
+    const memCached = memoryCache.get(flagKey);
+    if (memCached && memCached.expiry > now) {
+      const flag = memCached.flag;
+      if (!flag) return DEFAULT_FLAGS[flagKey] ?? false;
+      if (!flag.isEnabled) return false;
+      if (planName && flag.enabledForPlans && flag.enabledForPlans.length > 0) {
+        return flag.enabledForPlans.includes(planName.toLowerCase());
+      }
+      return true;
+    }
+
+    const cacheKey = `ff:${flagKey}`;
+    let flag: FeatureFlag | null = null;
+    try {
+      flag = (await redis.get(cacheKey)) as FeatureFlag | null;
+    } catch {
+      // Redis error fallback
+    }
+
+    if (!flag) {
       const dbPromise = db
         .select()
         .from(featureFlags)
@@ -34,30 +62,18 @@ export async function isFeatureEnabled(
         .limit(1);
 
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Feature flag query timed out (3s)')), 3000)
+        setTimeout(() => reject(new Error('Feature flag query timed out (1s)')), 1000)
       );
 
       const [result] = (await Promise.race([dbPromise, timeoutPromise])) as FeatureFlag[];
-      flag = result;
+      flag = result || null;
       
       if (flag) {
-        await redis.set(cacheKey, flag, { ex: 60 });
+        redis.set(cacheKey, flag, { ex: 300 }).catch(() => {});
       }
     }
 
-    // Default values for common flags to ensure core functionality works
-    const DEFAULT_FLAGS: Record<string, boolean> = {
-      'multi_action_qr': true,
-      'password_qr_enabled': true,
-      'bulk_qr_enabled': true,
-      'smart_routing_enabled': true,
-      'design_studio': true,
-      'static_qr': true,
-      'dynamic_qr': true,
-      'analytics_dashboard_enabled': true,
-      'analytics_export_enabled': true,
-      'pricing_page_enabled': true,
-    };
+    memoryCache.set(flagKey, { flag, expiry: now + 300000 }); // 5 min in-memory cache
 
     if (!flag) {
       return DEFAULT_FLAGS[flagKey] ?? false;

@@ -9,11 +9,11 @@ export function DocsComingSoon() {
           <FileText className="h-10 w-10 text-[#0F6E56]" />
         </div>
         
-        <h1 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">
+        <h1 className="text-2xl sm:text-[1.875rem] md:text-[2.25rem] font-bold text-gray-900 mb-3 tracking-tight leading-[1.2]">
           We are working on this
         </h1>
         
-        <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+        <p className="text-sm text-gray-600 mb-8 max-w-md mx-auto leading-normal mt-3">
           Our documentation is currently being written to provide you with the most comprehensive guide. 
           Please check back soon!
         </p>

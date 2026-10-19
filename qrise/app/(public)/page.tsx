@@ -78,39 +78,41 @@ export default async function LandingPage() {
       <BreadcrumbSchema items={[
         { name: "Home", url: "https://qrise.app" },
       ]} />
-      <FAQSchema faqs={homeFAQs} />
-      <Hero />
-      <TrustedBy />
-      <DemoDashboard />
-      <FeaturesSection />
-      <WhyQRise />
-      <DeveloperSection />
-      <ReviewsCarousel />
+      {/* Above all sections: Elevated Sheet with upward layered elevation */}
+      <div className="page-sheet relative z-10 bg-white rounded-b-[2.5rem] sm:rounded-b-[4rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] border-b border-gray-100/60">
+        <Hero />
+        <TrustedBy />
+        <DemoDashboard />
+        <FeaturesSection />
+        <WhyQRise />
+        <DeveloperSection />
+        <ReviewsCarousel />
 
-      {/* FAQ Section for SEO */}
-      <section className="py-20 px-4 bg-gray-50" aria-label="Frequently Asked Questions" id="faq">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-black text-center mb-12 tracking-tight text-gray-900">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-6">
-            {homeFAQs.map((faq, i) => (
-              <details
-                key={i}
-                className="group bg-white rounded-2xl border border-gray-100 shadow-sm"
-              >
-                <summary className="flex items-center justify-between cursor-pointer p-6 text-lg font-bold text-gray-900 select-none [&::-webkit-details-marker]:hidden">
-                  {faq.question}
-                  <span className="ml-4 text-gray-400 group-open:rotate-45 transition-transform text-2xl font-light">+</span>
-                </summary>
-                <div className="px-6 pb-6 text-gray-600 leading-relaxed">
-                  {faq.answer}
-                </div>
-              </details>
-            ))}
+        {/* FAQ Section for SEO */}
+        <section className="py-20 px-4 bg-gray-50 rounded-b-[2.5rem] sm:rounded-b-[4rem]" aria-label="Frequently Asked Questions" id="faq">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-2xl sm:text-[1.875rem] md:text-[2.25rem] font-bold text-center mb-10 tracking-tight text-gray-900 leading-[1.2]">
+              Frequently Asked Questions
+            </h2>
+            <div className="space-y-6">
+              {homeFAQs.map((faq, i) => (
+                <details
+                  key={i}
+                  className="group bg-white rounded-2xl border border-gray-100 shadow-sm"
+                >
+                  <summary className="flex items-center justify-between cursor-pointer p-6 text-lg font-bold text-gray-900 select-none [&::-webkit-details-marker]:hidden">
+                    {faq.question}
+                    <span className="ml-4 text-gray-400 group-open:rotate-45 transition-transform text-2xl font-light">+</span>
+                  </summary>
+                  <div className="px-6 pb-6 text-gray-600 leading-relaxed">
+                    {faq.answer}
+                  </div>
+                </details>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <SiteFooter pricingEnabled={pricingEnabled} />
     </>
