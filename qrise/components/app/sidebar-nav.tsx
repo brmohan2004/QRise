@@ -15,8 +15,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Zap,
-  ArrowUpRight,
-  Layers
+  ArrowUpRight
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -32,10 +31,6 @@ const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "My QR Codes", href: "/qr-codes", icon: QrCode },
   { label: "Form Builder", href: "/forms", icon: FormInput },
-];
-
-const matrixItems = [
-  { label: "QRise Matrix", href: "/qrise-matrix", icon: Layers, isNew: true },
 ];
 
 export function SidebarNav({ 
@@ -216,55 +211,6 @@ export function SidebarNav({
                           className="whitespace-nowrap"
                         >
                           {item.label}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </Link>
-                </TooltipTrigger>
-                {collapsed && <TooltipContent side="right">{item.label}</TooltipContent>}
-              </Tooltip>
-            );
-          })}
-
-          <div className="pt-4 pb-2">
-            {!collapsed && !isMobile && (
-              <p className="px-4 text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest mb-2">
-                Industrial Mode
-              </p>
-            )}
-            {collapsed && <div className="mx-4 border-t border-muted my-4" />}
-          </div>
-
-          {matrixItems.map((item) => {
-            const isActive = pathname.startsWith(item.href);
-            return (
-              <Tooltip key={item.label}>
-                <TooltipTrigger asChild>
-                  <Link
-                    href={item.href}
-                    onClick={onNavClick}
-                    className={cn(
-                      "flex items-center rounded-xl font-bold transition-all duration-200 overflow-hidden",
-                      isMobile ? "py-2.5 px-4 text-[0.8125rem] gap-3" : (collapsed ? "py-2.5 justify-center px-0 text-sm" : "py-2.5 gap-3 px-4 text-sm"),
-                      isActive 
-                        ? "bg-indigo-600 text-white shadow-sm" 
-                        : "text-indigo-600 dark:text-indigo-400 bg-indigo-50/60 dark:bg-indigo-950/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40"
-                    )}
-                  >
-                    <item.icon className="w-5 h-5 shrink-0" />
-                    <AnimatePresence>
-                      {!collapsed && (
-                        <motion.span
-                          initial={{ opacity: 0, width: 0 }}
-                          animate={{ opacity: 1, width: "auto" }}
-                          exit={{ opacity: 0, width: 0 }}
-                          transition={{ duration: 0 }}
-                          className="whitespace-nowrap flex items-center gap-1.5"
-                        >
-                          {item.label}
-                          <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-full bg-indigo-500 text-white font-extrabold tracking-wider">
-                            New
-                          </span>
                         </motion.span>
                       )}
                     </AnimatePresence>

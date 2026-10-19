@@ -8,8 +8,6 @@ import { Flag, ArrowLeft } from "lucide-react";
 import { FeedbackModal } from "./feedback-modal";
 import { Button } from "@/components/ui/button";
 import { NotificationDropdown } from "./notification-dropdown";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 
 export function AppHeader() {
@@ -21,28 +19,12 @@ export function AppHeader() {
 
   const isProfilePage = pathname === "/profile" || pathname?.startsWith("/profile");
   const isCreatePage = pathname === "/create" || pathname?.startsWith("/create");
-  const isDeveloperPage = pathname === "/developer" || pathname?.startsWith("/developer") || pathname?.startsWith("/qrise-matrix/devhub");
+  const isDeveloperPage = pathname === "/developer" || pathname?.startsWith("/developer");
   const isShowOnlyBack = isProfilePage || isCreatePage;
-
-  // Hide header completely on Create Project, Create Custom Label, and Individual Project Workspace
-  const isHiddenMatrixPage = 
-    (pathname?.startsWith("/qrise-matrix/projects/") && pathname !== "/qrise-matrix/projects") ||
-    Boolean(pathname?.includes("/create-label"));
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  // Fetch current user for mobile profile avatar
-  const { data: userData } = useQuery({
-    queryKey: ["current-user"],
-    queryFn: async () => {
-      const res = await fetch("/api/user");
-      const json = await res.json();
-      return json.data;
-    },
-    enabled: mounted
-  });
 
   useEffect(() => {
     if (!mounted) return;
@@ -91,10 +73,6 @@ export function AppHeader() {
       router.push("/dashboard");
     }
   };
-
-  if (isHiddenMatrixPage) {
-    return null;
-  }
 
   if (isShowOnlyBack) {
     return (
@@ -167,21 +145,6 @@ export function AppHeader() {
 
           {/* Notifications */}
           <NotificationDropdown />
-
-          {/* Mobile Profile Icon (Direct navigation to /profile, NO popup card) */}
-          <Link
-            href={pathname ? `/profile?from=${encodeURIComponent(pathname)}` : "/profile"}
-            className="lg:hidden flex items-center justify-center p-0.5 rounded-full hover:opacity-90 active:scale-90 transition-transform outline-none"
-            aria-label="View Profile"
-            title="Profile"
-          >
-            <Avatar className="h-8 w-8 border border-slate-200 dark:border-slate-700 shadow-sm">
-              <AvatarImage src={userData?.avatarUrl} />
-              <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
-                {userData?.fullName ? userData.fullName.charAt(0).toUpperCase() : "U"}
-              </AvatarFallback>
-            </Avatar>
-          </Link>
         </div>
       </div>
 

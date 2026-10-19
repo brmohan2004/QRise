@@ -17,15 +17,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
 
   async redirects() {
-    return [
-      { source: '/marketplace', destination: '/qrise-matrix/marketplace', permanent: false },
-      { source: '/developer', destination: '/qrise-matrix/devhub', permanent: false },
-      { source: '/api-keys', destination: '/qrise-matrix/devhub?tab=api-keys', permanent: false },
-      { source: '/usage', destination: '/qrise-matrix/devhub?tab=usage', permanent: false },
-      { source: '/webhooks', destination: '/qrise-matrix/devhub?tab=webhooks', permanent: false },
-      { source: '/custom-types', destination: '/qrise-matrix/devhub?tab=custom-types', permanent: false },
-      { source: '/api-manager', destination: '/qrise-matrix/api-manager', permanent: false },
-    ];
+    return [];
   },
 
   async headers() {

@@ -136,7 +136,6 @@ export default async function middleware(request: NextRequest) {
     '/settings',
     '/onboarding',
     '/developer',
-    '/qrise-matrix',
   ];
   const isProtectedPath = protectedPaths.some((path) => pathname.startsWith(path));
 

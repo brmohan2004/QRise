@@ -255,7 +255,7 @@ export default function ProfilePage() {
 
       {/* DEVELOPER HUB BUTTON */}
       <Link
-        href="/qrise-matrix/devhub"
+        href="?settings=true"
         className="group relative overflow-hidden flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs transition-all"
       >
         <div className="relative flex items-center gap-3.5 sm:gap-4 min-w-0">
